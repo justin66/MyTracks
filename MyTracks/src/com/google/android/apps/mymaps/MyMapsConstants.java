@@ -24,6 +24,8 @@ public class MyMapsConstants {
   public static final String MAPSHOP_BASE_URL =
       "http://maps.google.com/maps/ms";
   public static final String MAPSHOP_SERVICE = MapsClient.SERVICE;
-
+  /**
+   * private constructor to prevent instanciation
+   */
   private MyMapsConstants() { }
 }
