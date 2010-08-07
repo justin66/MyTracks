@@ -55,6 +55,7 @@ public class MyTracksOverlay extends Overlay {
   private final Paint errorCirclePaint;
   private final Context context;
   private final ArrayList<Waypoint> waypoints = new ArrayList<Waypoint>();
+  private final ArrayList<Location> points = new ArrayList<Location>();
 
   private Track selectedTrack;
   private int lastHeading = 0;
@@ -128,12 +129,27 @@ public class MyTracksOverlay extends Overlay {
     return selectedTrack;
   }
 
+  /**
+   * Add a location to the map overlay.
+   * 
+   * NOTE: this method takes ownership of this location and may change it.
+   * 
+   * @param l the location to add
+   */
+  public void addLocation(Location l) {
+    points.add(l);
+  }
+  
   public void addWaypoint(Waypoint wpt) {
     waypoints.add(wpt);
   }
 
   public void clearWaypoints() {
     waypoints.clear();
+  }
+
+  public void clearPoints() {
+    points.clear();
   }
 
   public void setShowEndMarker(boolean showEndMarker) {
@@ -153,7 +169,8 @@ public class MyTracksOverlay extends Overlay {
     // Draw the waypoints:
     ArrayList<Waypoint> currentWaypoints = waypoints;
     for (int i = 1; i < currentWaypoints.size(); i++) {
-      Location loc = currentWaypoints.get(i).getLocation();
+      Waypoint wpt = currentWaypoints.get(i);
+      Location loc = wpt.getLocation();
       if (loc == null) {
         continue;
       }
@@ -162,7 +179,7 @@ public class MyTracksOverlay extends Overlay {
       mapView.getProjection().toPixels(geoPoint, pt);
       canvas.save();
       canvas.translate(pt.x - (markerWidth / 2) + 3, pt.y - (markerHeight));
-      if (currentWaypoints.get(i).getType() == Waypoint.TYPE_STATISTICS) {
+      if (wpt.getType() == Waypoint.TYPE_STATISTICS) {
         statsMarker.draw(canvas);
       } else {
         waypointMarker.draw(canvas);
@@ -196,7 +213,6 @@ public class MyTracksOverlay extends Overlay {
     if (track == null) {
       return;
     }
-    ArrayList<Location> points = track.getLocations();
     if (points.size() < 2) {
       return;
     }

@@ -1,12 +1,12 @@
 /*
  * Copyright 2008 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -56,7 +56,7 @@ import java.util.TimerTask;
 /**
  * A background service that registers a location listener and records track
  * points. Track points are saved to the MyTracksProvider.
- * 
+ *
  * @author Leif Hendrik Wilden
  */
 public class TrackRecordingService extends Service implements LocationListener {
@@ -111,7 +111,7 @@ public class TrackRecordingService extends Service implements LocationListener {
   private SplitManager splitManager;
 
   /**
-   * The interval in milliseconds that we have requested to be notfied of gps
+   * The interval in milliseconds that we have requested to be notified of gps
    * readings.
    */
   private long currentRecordingInterval = 0;
@@ -126,7 +126,7 @@ public class TrackRecordingService extends Service implements LocationListener {
    * Task invoked by a timer periodically to make sure the location listener is
    * still registered.
    */
-  private TimerTask checkLocationListener = new TimerTask() {
+  private final TimerTask checkLocationListener = new TimerTask() {
     @Override
     public void run() {
       if (!onCreateWasCalled) {
@@ -198,7 +198,7 @@ public class TrackRecordingService extends Service implements LocationListener {
   /**
    * Inserts a new location in the track points db and updates the corresponding
    * track in the track db.
-   * 
+   *
    * @param recordingTrack the track that is currently being recorded
    * @param location the location to be inserted
    * @param lastRecordedLocation the last recorded location before this one (or
@@ -475,8 +475,7 @@ public class TrackRecordingService extends Service implements LocationListener {
       }
 
       // This should never happen, but just in case (we really don't want the
-      // service
-      // to crash):
+      // service to crash):
       if (location == null) {
         Log.w(MyTracksConstants.TAG,
             "Location changed, but location is null.");
@@ -559,8 +558,7 @@ public class TrackRecordingService extends Service implements LocationListener {
         }
 
         // If separation from last recorded point is too large insert a
-        // separator
-        // to indicate end of a segment:
+        // separator to indicate end of a segment:
         boolean startNewSegment =
             lastRecordedLocation != null
                 && lastRecordedLocation.getLatitude() < 90
@@ -620,7 +618,7 @@ public class TrackRecordingService extends Service implements LocationListener {
    */
 
   /**
-   * Notifies that preferences have changed. 
+   * Notifies that preferences have changed.
    * Call this with key == null to update all preferences in one call.
    *
    * @param key the key that changed (may be null to update all preferences)
@@ -636,22 +634,25 @@ public class TrackRecordingService extends Service implements LocationListener {
       return;
     }
 
-    if (key == null || key.equals(MyTracksSettings.MIN_RECORDING_DISTANCE)) {
+    if (key == null
+        || key.equals(getString(R.string.min_recording_distance_key))) {
       minRecordingDistance = sharedPreferences.getInt(
-          MyTracksSettings.MIN_RECORDING_DISTANCE,
+          getString(R.string.min_recording_distance_key),
           MyTracksSettings.DEFAULT_MIN_RECORDING_DISTANCE);
       Log.d(MyTracksConstants.TAG,
           "TrackRecordingService: minRecordingDistance = "
           + minRecordingDistance);
     }
-    if (key == null || key.equals(MyTracksSettings.MAX_RECORDING_DISTANCE)) {
+    if (key == null
+        || key.equals(getString(R.string.max_recording_distance_key))) {
       maxRecordingDistance = sharedPreferences.getInt(
-          MyTracksSettings.MAX_RECORDING_DISTANCE,
+          getString(R.string.max_recording_distance_key),
           MyTracksSettings.DEFAULT_MAX_RECORDING_DISTANCE);
     }
-    if (key == null || key.equals(MyTracksSettings.MIN_RECORDING_INTERVAL)) {
+    if (key == null
+        || key.equals(getString(R.string.min_recording_interval_key))) {
       minRecordingInterval = sharedPreferences.getInt(
-          MyTracksSettings.MIN_RECORDING_INTERVAL,
+          getString(R.string.min_recording_interval_key),
           MyTracksSettings.DEFAULT_MIN_RECORDING_INTERVAL);
       switch (minRecordingInterval) {
         case -2:
@@ -675,18 +676,17 @@ public class TrackRecordingService extends Service implements LocationListener {
               new AbsoluteLocationListenerPolicy(minRecordingInterval * 1000);
       }
     }
-    if (key == null || key.equals(MyTracksSettings.MIN_REQUIRED_ACCURACY)) {
+    if (key == null
+        || key.equals(getString(R.string.min_required_accuracy_key))) {
       minRequiredAccuracy = sharedPreferences.getInt(
-          MyTracksSettings.MIN_REQUIRED_ACCURACY,
+          getString(R.string.min_required_accuracy_key),
           MyTracksSettings.DEFAULT_MIN_REQUIRED_ACCURACY);
     }
-    if (key == null || key.equals(MyTracksSettings.RECORDING_TRACK)) {
-      recordingTrackId =
-          sharedPreferences.getLong(MyTracksSettings.RECORDING_TRACK, -1);
-    }
-    if (key == null || key.equals(MyTracksSettings.ANNOUNCEMENT_FREQUENCY)) {
+    if (key == null
+        || key.equals(getString(R.string.announcement_frequency_key))) {
       announcementFrequency =
-          sharedPreferences.getInt(MyTracksSettings.ANNOUNCEMENT_FREQUENCY, -1);
+          sharedPreferences.getInt(getString(R.string.announcement_frequency_key),
+              -1);
       if (mTTSAvailable) {
         if (announcementFrequency == -1) {
           if (executer != null) {
@@ -703,17 +703,18 @@ public class TrackRecordingService extends Service implements LocationListener {
         }
       }
     }
-    if (key == null || key.equals(MyTracksSettings.SPLIT_FREQUENCY)) {
+    if (key == null || key.equals(getString(R.string.split_frequency_key))) {
       splitManager.setSplitFrequency(
-          sharedPreferences.getInt(MyTracksSettings.SPLIT_FREQUENCY, 0));
+          sharedPreferences.getInt(getString(R.string.split_frequency_key), 0));
     }
-    if (key == null || key.equals(MyTracksSettings.SIGNAL_SAMPLING_FREQUENCY)) {
+    if (key == null
+        || key.equals(getString(R.string.signal_sampling_frequency_key))) {
       signalManager.setFrequency(sharedPreferences.getInt(
-          MyTracksSettings.SIGNAL_SAMPLING_FREQUENCY, -1), this);
+          getString(R.string.signal_sampling_frequency_key), -1), this);
     }
-    if (key == null || key.equals(MyTracksSettings.METRIC_UNITS)) {
-      splitManager.setMetricUnits(
-          sharedPreferences.getBoolean(MyTracksSettings.METRIC_UNITS, true));
+    if (key == null || key.equals(getString(R.string.metric_units_key))) {
+      splitManager.setMetricUnits(sharedPreferences.getBoolean(
+          getString(R.string.metric_units_key), true));
     }
 
     if (isRecording) {
@@ -730,7 +731,6 @@ public class TrackRecordingService extends Service implements LocationListener {
     Log.d(MyTracksConstants.TAG, "TrackRecordingService.onCreate");
     super.onCreate();
     onCreateWasCalled = true;
-    setForeground(true);
     providerUtils = MyTracksProviderUtils.Factory.get(this);
     notificationManager =
         (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -815,7 +815,7 @@ public class TrackRecordingService extends Service implements LocationListener {
   /**
    * Inserts a statistics marker. A statistics marker holds the stats for the
    * last segment up to this marker.
-   * 
+   *
    * @param location the location where to insert
    * @return the unique id of the inserted marker
    */
@@ -872,7 +872,7 @@ public class TrackRecordingService extends Service implements LocationListener {
         public boolean hasRecorded() {
           return providerUtils.getLastTrackId() >= 0;
         }
-    
+
         @Override
         public long startNewTrack() {
           Log.d(MyTracksConstants.TAG, "TrackRecordingService.startNewTrack");
@@ -903,11 +903,11 @@ public class TrackRecordingService extends Service implements LocationListener {
           signalManager.restore();
           return trackId;
         }
-    
+
         /**
          * Insert the given waypoint marker. Users can insert waypoint markers
          * to tag locations with a name, description, category etc.
-         * 
+         *
          * @param waypoint a waypoint
          * @return the unique id of the inserted marker
          */
@@ -915,11 +915,11 @@ public class TrackRecordingService extends Service implements LocationListener {
         public long insertWaypointMarker(Waypoint waypoint) {
           return TrackRecordingService.this.insertWaypointMarker(waypoint);
         }
-    
+
         /**
          * Insert a statistics marker. A statistics marker holds the stats for
          * the last segment up to this marker.
-         * 
+         *
          * @param location the location where to insert
          * @return the unique id of the inserted marker
          */
@@ -927,7 +927,7 @@ public class TrackRecordingService extends Service implements LocationListener {
         public long insertStatisticsMarker(Location location) {
           return TrackRecordingService.this.insertStatisticsMarker(location);
         }
-    
+
         @Override
         public void endCurrentTrack() {
           Log.d(MyTracksConstants.TAG, "TrackRecordingService.endCurrentTrack");
@@ -952,18 +952,18 @@ public class TrackRecordingService extends Service implements LocationListener {
           showNotification();
           recordingTrackId = -1;
         }
-    
+
         @Override
         public void deleteAllTracks() {
           endCurrentTrack();
           providerUtils.deleteAllTracks();
         }
-    
+
         @Override
         public void recordLocation(Location loc) {
           onLocationChanged(loc);
         }
-    
+
         @Override
         public void sharedPreferenceChanged(String key) {
           Log.d(MyTracksConstants.TAG,

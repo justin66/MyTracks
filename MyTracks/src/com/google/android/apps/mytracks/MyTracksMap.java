@@ -136,6 +136,11 @@ public class MyTracksMap extends MapActivity
   private Handler updateTrackHandler;
 
   private MyTracksProviderUtils providerUtils;
+ 
+  /**
+   * This value is used to decide how many points to display.
+   */
+  private int samplingFrequency = 1;
 
   /**
    * A runnable that updates the track from the provider (looking for points
@@ -159,12 +164,17 @@ public class MyTracksMap extends MapActivity
           if (cursor.moveToLast()) {
             final int idColumnIdx =
                 cursor.getColumnIndexOrThrow(TrackPointsColumns._ID);
+            int i = 0;
+            // TODO We should update the samplingFrequency.
             do {
-              lastSeenLocationId = cursor.getLong(idColumnIdx);
-              Location location = providerUtils.createLocation(cursor);
-              if (location != null) {
-                selectedTrack.addLocation(location);
+              if (i % samplingFrequency == 0) {
+                lastSeenLocationId = cursor.getLong(idColumnIdx);
+                Location location = providerUtils.createLocation(cursor);
+                if (location != null) {
+                  mapOverlay.addLocation(location);
+                }
               }
+              i++;
             } while (cursor.moveToPrevious());
           }
         }
@@ -188,8 +198,60 @@ public class MyTracksMap extends MapActivity
       if (selectedTrack == null) {
         return;
       }
-      lastSeenLocationId = providerUtils.getTrackPoints(selectedTrack,
-          MyTracksConstants.MAX_DISPLAYED_TRACK_POINTS);
+      Cursor cursor = null;
+      mapOverlay.clearPoints();
+      lastSeenLocationId = selectedTrack.getStartId();
+      long totalLocations = selectedTrack.getStopId()
+          - selectedTrack.getStartId();
+  
+      // Limit the number of map points readings.
+      samplingFrequency =
+            (int) (1 +
+                totalLocations / MyTracksConstants.TARGET_DISPLAYED_TRACK_POINTS);
+      Log.i(MyTracksConstants.TAG, "Sampling locations: " + samplingFrequency);
+      int bufferSize = 1024;
+      try {
+        int points = 0;
+        while (lastSeenLocationId < selectedTrack.getStopId()) {
+          cursor = providerUtils.getLocationsCursor(
+              selectedTrack.getId(), lastSeenLocationId, bufferSize, false);
+          if (cursor != null) {
+            if (cursor.moveToFirst()) {
+              final int idColumnIdx =
+                  cursor.getColumnIndexOrThrow(TrackPointsColumns._ID);
+              while (cursor.moveToNext()) {
+                points++;
+                Location location = providerUtils.createLocation(cursor);
+                if (MyTracksUtils.isValidLocation(location)) {
+                  lastSeenLocationId = cursor.getLong(idColumnIdx);
+                  // Include a point if it fits one of the following criteria:
+                  // - Has the mod for the sampling frequency.
+                  // - Is the first point.
+                  // - Is the last point and we are not recording this track.
+                  if (points % samplingFrequency == 0 ||
+                      points == 0 ||
+                      (recordingTrackId != selectedTrack.getId() &&
+                          points == (totalLocations - 1))) {
+                    mapOverlay.addLocation(location);
+                  }
+                }
+              }
+            } else {
+              lastSeenLocationId += bufferSize;
+            }
+          } else {
+            lastSeenLocationId += bufferSize;
+          }
+          cursor.close();
+          cursor = null;
+        }
+      } catch (RuntimeException e) {
+        Log.w(MyTracksConstants.TAG, "Caught unexpected exception.", e);
+      } finally {
+        if (cursor != null) {
+          cursor.close();
+        }
+      }
       mapView.postInvalidate();
     }
   };
@@ -380,12 +442,12 @@ public class MyTracksMap extends MapActivity
         getSharedPreferences(MyTracksSettings.SETTINGS_NAME, 0);
     if (preferences != null) {
       minRequiredAccuracy = preferences.getInt(
-          MyTracksSettings.MIN_REQUIRED_ACCURACY,
+          getString(R.string.min_required_accuracy_key),
           MyTracksSettings.DEFAULT_MIN_REQUIRED_ACCURACY);
       recordingTrackId =
-          preferences.getLong(MyTracksSettings.RECORDING_TRACK, -1);
+          preferences.getLong(getString(R.string.recording_track_key), -1);
       long selectedTrackId =
-          preferences.getLong(MyTracksSettings.SELECTED_TRACK, -1);
+          preferences.getLong(getString(R.string.selected_track_key), -1);
       if (selectedTrackId >= 0) {
         setSelectedTrack(selectedTrackId);
       }
@@ -783,6 +845,8 @@ public class MyTracksMap extends MapActivity
                 R.string.tracklist_share_kml_file);
             share.add(0, MyTracksConstants.MENU_SHARE_CSV_FILE, 0,
                 R.string.tracklist_share_csv_file);
+            share.add(0, MyTracksConstants.MENU_SHARE_TCX_FILE, 0,
+                R.string.tracklist_share_tcx_file);
             SubMenu save = menu.addSubMenu(0,
                 MyTracksConstants.MENU_WRITE_TO_SD_CARD, 0,
                 R.string.tracklist_write_to_sd);
@@ -792,6 +856,8 @@ public class MyTracksMap extends MapActivity
                 R.string.tracklist_save_as_kml);
             save.add(0, MyTracksConstants.MENU_SAVE_CSV_FILE, 0,
                 R.string.tracklist_save_as_csv);
+            save.add(0, MyTracksConstants.MENU_SAVE_TCX_FILE, 0,
+                R.string.tracklist_save_as_tcx);
             menu.add(0, MyTracksConstants.MENU_CLEAR_MAP, 0,
                 R.string.tracklist_clear_map);
             menu.add(0, MyTracksConstants.MENU_DELETE, 0,
@@ -888,17 +954,19 @@ public class MyTracksMap extends MapActivity
   public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
       String key) {
     if (key != null) {
-      if (key.equals(MyTracksSettings.MIN_REQUIRED_ACCURACY)) {
+      if (key.equals(getString(R.string.min_required_accuracy_key))) {
         minRequiredAccuracy = sharedPreferences.getInt(
-            MyTracksSettings.MIN_REQUIRED_ACCURACY,
+            getString(R.string.min_required_accuracy_key),
             MyTracksSettings.DEFAULT_MIN_REQUIRED_ACCURACY);
-      } else if (key.equals(MyTracksSettings.SELECTED_TRACK)) {
+      } else if (key.equals(getString(R.string.selected_track_key))) {
         long selectedTrackId =
-            sharedPreferences.getLong(MyTracksSettings.SELECTED_TRACK, -1);
+            sharedPreferences.getLong(getString(R.string.selected_track_key),
+                -1);
         setSelectedTrack(selectedTrackId);
-      } else if (key.equals(MyTracksSettings.RECORDING_TRACK)) {
+      } else if (key.equals(getString(R.string.recording_track_key))) {
         recordingTrackId =
-            sharedPreferences.getLong(MyTracksSettings.RECORDING_TRACK, -1);
+            sharedPreferences.getLong(getString(R.string.recording_track_key),
+                -1);
         if (selectedTrack != null) {
           mapOverlay.setShowEndMarker(
               selectedTrack.getId() != recordingTrackId);

@@ -122,6 +122,7 @@ limitations under the License.
   <string name="tracklist_save_as_gpx">Save a GPX file</string>
   <string name="tracklist_save_as_kml">Save a KML file</string>
   <string name="tracklist_save_as_csv">Save a CSV file</string>
+  <string name="tracklist_save_as_tcx">Save a TCX file</string>
   <string name="tracklist_btn_send_all_to_mymaps">Send to Google My Maps</string>
   <string name="tracklist_btn_delete_all">Delete all tracks</string>
   <!-- Export All -->
@@ -135,6 +136,7 @@ limitations under the License.
   <string name="tracklist_share_gpx_file">A GPX file</string>
   <string name="tracklist_share_kml_file">A KML file</string>
   <string name="tracklist_share_csv_file">A CSV file</string>
+  <string name="tracklist_share_tcx_file">A TCX file</string>
   <string name="tracklist_clear_map">Clear map</string>
 
   <!-- Waypoints list -->
@@ -164,6 +166,10 @@ limitations under the License.
   <string name="settings_display">Display</string>
   <string name="settings_recording">Recording</string>
   <string name="settings_sharing">Sharing</string>
+
+  <string name="settings_black_box_mode">Black box mode</string>
+  <string name="settings_black_box_mode_summary_on">Recording will be started and stopped automatically</string>
+  <string name="settings_black_box_mode_summary_off">Recording must be initiated by the user</string>
 
   <string name="settings_announcement_frequency">Announcement frequency</string>
   <string name="settings_announcement_frequency_summary">Minimum time between two voice announcements</string>
@@ -203,6 +209,21 @@ limitations under the License.
   <string name="settings_split_frequency">Split Frequency</string>
   <string name="settings_split_frequency_summary">Maximum time or distance after which a new split marker will be inserted</string>
   <string name="pace_label">Pace</string>
+
+  <string name="eclair_required">Only supported in Android 2.0 or above</string>
+  <string name="settings_sensor_type">Sensor Type</string>
+  <string name="settings_sensor_type_summary">The type of sensor to connect to.</string>
+
+  <string name="settings_sensor_id">Sensor Id</string>
+  <string name="settings_sensor_id_summary">The Id sent to sensors.</string>
+  <string name="sensor_id_malformed">The Id must be an integer value.</string>
+
+  <string name="bluetooth_sensor_title">Bluetooth sensor</string>
+  <string name="bluetooth_sensor_summary">The bluetooth sensor to connect to.</string>
+
+  <string name="settings_modular_stats_display_title">Modular Stats Display</string>
+  <string name="settings_modular_stats_display_summary_on">The stats screen is split in various modes.</string>
+  <string name="settings_modular_stats_display_summary_off">Display all stats on one screen</string>
 
   <!-- MyTracksSky -->
   <string name="mytracks_sky">GPS Satellites</string>
@@ -291,6 +312,7 @@ limitations under the License.
   <string name="minutes">minutes</string>
   <string name="second">second</string>
   <string name="seconds">seconds</string>
+  <string name="milliseconds">ms</string>
 
   <!-- Distance -->
   <string name="meter">m</string>
@@ -310,6 +332,12 @@ limitations under the License.
   <string name="min_per_mile">min/mi</string>
   <string name="per_mile">per mile</string>
 
+  <!-- Power -->
+  <string name="watts">W</string>
+
+  <string name="revolutions_per_minute">rpm</string>
+  <string name="bpm">bpm</string>
+
   <!-- Stats Labels -->
   <string name="moving_time_label">Moving Time</string>
   <string name="total_time_label">Total Time</string>
@@ -320,8 +348,13 @@ limitations under the License.
   <string name="statistics">Statistics</string>
   <string name="total_distance_label">Total Distance</string>
   <string name="distance_label">Distance</string>
+  <string name="power">Power</string>
+  <string name="cadence">Cadence</string>
+  <string name="heart_rate">Heart Rate</string>
+  <string name="max_heart_rate">Max Heart Rate</string>
   <string name="unknown">-</string>
   <string name="waiting">Waiting...</string>
+  <string name="mode">Mode</string>
 
   <!-- End User License Agreement -->
   <string name="eula_title">End User License Agreement</string>
@@ -337,7 +370,6 @@ limitations under the License.
   <string name="about_support">Support:</string>
 
   <!-- DO NOT TRANSLATE -->
-  <string name="version">1.0.14</string>
   <string name="about_googlegroups">mytracks@googlegroups.com</string>
   <string name="about_weburl">mytracks.appspot.com</string>
   <string name="about_copyright_message">Copyright 2009 Google Inc.</string>
@@ -403,4 +435,65 @@ limitations under the License.
   <string name="gsm_strength">GSM Strength: %1$d</string>
   <string name="cdma_strength">CDMA Strength: %1$d dBm</string>
   <string name="evdo_strength">EVDO Strength: %1$d dBm</string>
+
+  <!-- These are constants used internally for preferences - DO NOT TRANSLATE -->
+  <string name="announcement_frequency_key">announcementFrequency</string>
+  <string name="bluetooth_device_key">bluetoothDevice</string>
+  <string name="bluetooth_pairing_key">bluetoothPairing</string>
+  <string name="bluetooth_sensor_key">bluetoothSensor</string>
+  <string name="default_map_public_key">defaultMapPublic</string>
+  <string name="max_recording_distance_key">maxRecordingDistance</string>
+  <string name="metric_units_key">metricUnits</string>
+  <string name="min_recording_distance_key">minRecordingDistance</string>
+  <string name="min_recording_interval_key">minRecordingInterval</string>
+  <string name="min_required_accuracy_key">minRequiredAccuracy</string>
+  <string name="modular_stats_display_key">modularStatsDisplay</string>
+  <string name="pick_existing_map_key">pickExistingMap</string>
+  <string name="recording_track_key">recordingTrack</string>
+  <string name="report_speed_key">reportSpeed</string>
+  <string name="selected_track_key">selectedTrack</string>
+  <string name="send_stats_and_points_key">sendStatsAndPoints</string>
+  <string name="send_to_docs_key">sendToDocs</string>
+  <string name="send_to_my_maps_key">sendToMyMaps</string>
+  <string name="sensor_id_key">sensorId</string>
+  <string name="sensor_type_key">sensorType</string>
+  <string name="share_url_only_key">shareUrlOnly</string>
+  <string name="signal_sampling_frequency_key">signalSamplingFrequency</string>
+  <string name="split_frequency_key">splitFrequency</string>
+
+  <!-- Fake preference keys - never saved, but show options in the preferences screen -->
+  <string name="method_bluetooth">Bluetooth</string>
+  <string name="bluetooth_options">Bluetooth options</string>
+  <string name="bluetooth_pairing">Device pairing</string>
+  <string name="bluetooth_pairing_summary">Open Android\'s bluetooth settings to pair a device</string>
+  <string name="sensor_bluetooth_options_key">bluetoothSensorsEnabled</string>
+  <string name="sensor_options">Sensor Options</string>
+
+  <!-- Sensor Types => DO NOT TRANSLATE -->
+  <string name="none">NONE</string>
+  <string name="ant_sensor_type">ANT</string>
+  <string name="srm_sensor_type">SRM</string>
+  <string name="athlosoft_sensor_type">ATHLOSOFT</string>
+
+  <!-- Bluetooth Sensor -->
+  <string name="bluetooth_connected">Connected to %s</string>
+  <string name="bluetooth_connecting">Bluetooth sensor connecting ...</string>
+  <string name="bluetooth_not_connected">Bluetooth sensor not connected</string>
+
+  <!-- Sensor State -->
+  <string name="sensor_data_time">Sensor Data Time</string>
+  <string name="power_meter_enabled">Power meter enabled</string>
+  <string name="heart_rate_monitor_enabled">Heart rate monitor enabled</string>
+  <string name="last_upload_latency">Last Upload Latency</string>
+  <string name="last_n_uploads_latency">Last N Uploads Latency</string>
+
+  <!-- Realtime data uploads -->
+  <string name="realtime_upload_failed">Realtime upload failed.</string>
+  <string name="realtime_uploader_status">Realtime upload status</string>
+  <string name="key_loading_failed">Failed to load encryption keys.</string>
+  <string name="uploader_id">Uploader ID</string>
+  <string name="uploader_id_summary">Your ID to upload data with</string>
+  <string name="upload_url">Upload URL</string>
+  <string name="upload_url_summary">URL to upload realtime data to</string>
+
 </resources>
