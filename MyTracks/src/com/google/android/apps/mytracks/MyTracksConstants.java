@@ -32,6 +32,12 @@ public abstract class MyTracksConstants {
    */
   public static final String GPS_PROVIDER = "gps";
 
+  /**
+   * Name of the top-level directory inside the SD card where our files will
+   * be read from/written to.
+   */
+  public static final Object SDCARD_TOP_DIR = "MyTracks";
+
   /*
    * onActivityResult request codes:
    */

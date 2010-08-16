@@ -214,7 +214,14 @@ public class TrackWriter {
    */
   protected boolean canWriteFile() {
     if (directory == null) {
-      directory = newFile(writer.getDefaultDirectory());
+      String sep = System.getProperty("file.separator");
+      StringBuilder dirNameBuilder = new StringBuilder();
+      dirNameBuilder.append(Environment.getExternalStorageDirectory());
+      dirNameBuilder.append(sep);
+      dirNameBuilder.append(MyTracksConstants.SDCARD_TOP_DIR);
+      dirNameBuilder.append(sep);
+      dirNameBuilder.append(writer.getExtension());
+      directory = newFile(dirNameBuilder.toString());
     }
 
     if (!Environment.getExternalStorageState()
@@ -224,7 +231,7 @@ public class TrackWriter {
       return false;
     }
     if (!ensureExists(directory)) {
-      Log.i(MyTracksConstants.TAG, "Could not create GPX directory.");
+      Log.i(MyTracksConstants.TAG, "Could not create export directory.");
       errorMessage = R.string.io_create_dir_failed;
       return false;
     }
