@@ -153,7 +153,8 @@ public class MyTracksOverlay extends Overlay {
     // Draw the waypoints:
     ArrayList<Waypoint> currentWaypoints = waypoints;
     for (int i = 1; i < currentWaypoints.size(); i++) {
-      Location loc = currentWaypoints.get(i).getLocation();
+      Waypoint wpt = currentWaypoints.get(i);
+      Location loc = wpt.getLocation();
       if (loc == null) {
         continue;
       }
@@ -162,7 +163,7 @@ public class MyTracksOverlay extends Overlay {
       mapView.getProjection().toPixels(geoPoint, pt);
       canvas.save();
       canvas.translate(pt.x - (markerWidth / 2) + 3, pt.y - (markerHeight));
-      if (currentWaypoints.get(i).getType() == Waypoint.TYPE_STATISTICS) {
+      if (wpt.getType() == Waypoint.TYPE_STATISTICS) {
         statsMarker.draw(canvas);
       } else {
         waypointMarker.draw(canvas);
