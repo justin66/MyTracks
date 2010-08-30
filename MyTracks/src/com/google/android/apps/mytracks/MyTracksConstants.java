@@ -15,6 +15,8 @@
  */
 package com.google.android.apps.mytracks;
 
+import android.os.Build;
+
 /**
  * Constants used by the MyTracks application.
  *
@@ -31,6 +33,17 @@ public abstract class MyTracksConstants {
    * Name of the gps location provider:
    */
   public static final String GPS_PROVIDER = "gps";
+
+  /**
+   * Name of the top-level directory inside the SD card where our files will
+   * be read from/written to.
+   */
+  public static final Object SDCARD_TOP_DIR = "MyTracks";
+
+  /**
+   * The API level of the Android version we're being run under.
+   */
+  public static final int ANDROID_API_LEVEL = Integer.parseInt(Build.VERSION.SDK);
 
   /*
    * onActivityResult request codes:

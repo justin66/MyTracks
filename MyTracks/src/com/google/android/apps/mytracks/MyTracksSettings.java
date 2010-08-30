@@ -15,14 +15,18 @@
  */
 package com.google.android.apps.mytracks;
 
+import com.google.android.apps.mytracks.io.backup.BackupActivityHelper;
+import com.google.android.apps.mytracks.io.backup.BackupPreferencesListener;
 import com.google.android.apps.mytracks.services.SafeStatusAnnouncerTask;
 import com.google.android.maps.mytracks.R;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
+import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -48,6 +52,9 @@ public class MyTracksSettings extends PreferenceActivity {
   public static final int DEFAULT_SPLIT_FREQUENCY = 0;
 
   private static boolean mTTSAvailable;
+  private BackupPreferencesListener backupListener;
+
+  private SharedPreferences preferences;
 
   /* establish whether the tts class is available to us */
   static {
@@ -70,13 +77,19 @@ public class MyTracksSettings extends PreferenceActivity {
     preferenceManager.setSharedPreferencesName(SETTINGS_NAME);
     preferenceManager.setSharedPreferencesMode(0);
 
+    // Set up automatic preferences backup
+    backupListener = BackupPreferencesListener.create(this);
+    preferences = preferenceManager.getSharedPreferences();
+    preferences.registerOnSharedPreferenceChangeListener(backupListener);
+
     // Load the preferences to be displayed
     addPreferencesFromResource(R.xml.preferences);
 
     // Hook up switching of displayed list entries between metric and imperial
     // units
     CheckBoxPreference metricUnitsPreference =
-        (CheckBoxPreference) findPreference(getString(R.string.metric_units_key));
+        (CheckBoxPreference) findPreference(
+            getString(R.string.metric_units_key));
     metricUnitsPreference.setOnPreferenceChangeListener(
         new OnPreferenceChangeListener() {
           @Override
@@ -99,6 +112,59 @@ public class MyTracksSettings extends PreferenceActivity {
       announcementFrequency.setSummary(
           R.string.settings_announcement_not_available_summary);
     }
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+
+    Preference backupNowPreference =
+        findPreference(getString(R.string.backup_to_sd_key));
+    Preference restoreNowPreference =
+        findPreference(getString(R.string.restore_from_sd_key));
+
+    // If recording, disable backup/restore
+    // (we don't want to get to inconsistent states)
+    boolean recording =
+        preferences.getLong(getString(R.string.recording_track_key), -1) != -1;
+    backupNowPreference.setEnabled(!recording);
+    restoreNowPreference.setEnabled(!recording);
+    backupNowPreference.setSummary(
+        recording ? R.string.settings_no_backup_while_recording
+                  : R.string.settings_backup_to_sd_summary);
+    restoreNowPreference.setSummary(
+        recording ? R.string.settings_no_backup_while_recording
+                  : R.string.settings_restore_from_sd_summary);
+
+    // Add actions to the backup preferences
+    backupNowPreference.setOnPreferenceClickListener(
+        new OnPreferenceClickListener() {
+          @Override
+          public boolean onPreferenceClick(Preference preference) {
+            BackupActivityHelper backupHelper =
+                new BackupActivityHelper(MyTracksSettings.this);
+            backupHelper.writeBackup();
+            return true;
+          }
+        });
+    restoreNowPreference.setOnPreferenceClickListener(
+        new OnPreferenceClickListener() {
+          @Override
+          public boolean onPreferenceClick(Preference preference) {
+            BackupActivityHelper backupHelper =
+                new BackupActivityHelper(MyTracksSettings.this);
+            backupHelper.restoreBackup();
+            return true;
+          }
+        });
+  }
+
+  @Override
+  protected void onDestroy() {
+    getPreferenceManager().getSharedPreferences()
+        .unregisterOnSharedPreferenceChangeListener(backupListener);
+
+    super.onPause();
   }
 
   /**
