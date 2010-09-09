@@ -130,7 +130,7 @@ public class PreferenceManager {
     }
     if (key == null || key.equals(recording_track_key)) {
       service.setRecordingTrackId(
-          sharedPreferences.getInt(recording_track_key, -1));
+          sharedPreferences.getLong(recording_track_key, -1));
     }
     if (key == null || key.equals(split_frequency_key)) {
       service.getSplitManager().setSplitFrequency(
