@@ -15,12 +15,12 @@
  */
 package com.google.android.apps.mytracks.services;
 
-import android.content.SharedPreferences;
-import android.util.Log;
-
 import com.google.android.apps.mytracks.MyTracksConstants;
 import com.google.android.apps.mytracks.MyTracksSettings;
 import com.google.android.maps.mytracks.R;
+
+import android.content.SharedPreferences;
+import android.util.Log;
 
 /**
  * A class that manages reading the shared preferences for the service.
@@ -38,6 +38,7 @@ public class PreferenceManager {
   private final String recordingTrackKey;
   private final String signalSamplingFrequencyKey;
   private final String splitFrequencyKey;
+  private final String autoResumeTrackTimeoutKey;
 
   public PreferenceManager(TrackRecordingService service) {
     this.service = service;
@@ -60,6 +61,8 @@ public class PreferenceManager {
         service.getString(R.string.signal_sampling_frequency_key);
     recordingTrackKey =
         service.getString(R.string.recording_track_key);
+    autoResumeTrackTimeoutKey =
+        service.getString(R.string.auto_resume_track_timeout_key);
   }
 
   /**
@@ -126,8 +129,7 @@ public class PreferenceManager {
     }
     if (key == null || key.equals(announcementFrequencyKey)) {
       service.setAnnouncementFrequency(
-          sharedPreferences.getInt(announcementFrequencyKey,
-              -1));
+          sharedPreferences.getInt(announcementFrequencyKey, -1));
     }
     if (key == null || key.equals(recordingTrackKey)) {
       service.setRecordingTrackId(
@@ -139,13 +141,15 @@ public class PreferenceManager {
     }
     if (key == null || key.equals(signalSamplingFrequencyKey)) {
       service.getSignalManager().setFrequency(
-          sharedPreferences.getInt(
-              signalSamplingFrequencyKey, -1), service);
+          sharedPreferences.getInt(signalSamplingFrequencyKey, -1), service);
     }
     if (key == null || key.equals(metricUnitsKey)) {
       service.getSplitManager().setMetricUnits(
-          sharedPreferences.getBoolean(
-              metricUnitsKey, true));
+          sharedPreferences.getBoolean(metricUnitsKey, true));
+    }
+    if (key == null || key.equals(autoResumeTrackTimeoutKey)) {
+      service.setAutoResumeTrackTimeout(
+          sharedPreferences.getInt(autoResumeTrackTimeoutKey, -1));
     }
   }
 }

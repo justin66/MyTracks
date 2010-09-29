@@ -72,8 +72,16 @@
              android:enabled="true"
              android:exported="true" />
 
-  </application>
+    <receiver android:name="com.google.android.apps.mytracks.MyTracksReceiver">
+      <intent-filter>
+        <action android:name="android.intent.action.BOOT_COMPLETED" />
+	  </intent-filter>
+    </receiver>
+</application>
 
+  <!-- Permissions to initialize service -->
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+  
   <!-- Permissions for recording tracks and showing maps -->
   <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -97,4 +105,3 @@
           android:smallScreens="true"
           android:anyDensity="true" />
 </manifest>
-

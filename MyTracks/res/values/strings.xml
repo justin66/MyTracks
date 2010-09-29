@@ -200,11 +200,15 @@ limitations under the License.
   <string name="settings_share_url_only_summary_on">Only the URL of the map will be sent when sharing</string>
   <string name="settings_share_url_only_summary_off">The contents of the track will also be included when sharing</string>
 
-  <string name="settings_signal_sampling_frequency">Signal Sampling frequency</string>
+  <string name="settings_signal_sampling_frequency">Signal sampling frequency</string>
   <string name="settings_signal_sampling_frequency_summary">Time between two recordings of the phone\'s signal strength</string>
 
-  <string name="settings_split_frequency">Split Frequency</string>
+  <string name="settings_split_frequency">Split frequency</string>
   <string name="settings_split_frequency_summary">Maximum time or distance after which a new split marker will be inserted</string>
+
+  <string name="settings_auto_resume_track_timeout">Auto-resume track timeout</string>
+  <string name="settings_auto_resume_track_timeout_summary">Maximum time in minutes after which a previously recording track will not be resumed on phone reboot</string>
+
   <string name="pace_label">Pace</string>
 
   <string name="eclair_required">Only supported in Android 2.0 or above</string>

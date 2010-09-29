@@ -179,6 +179,13 @@ public abstract class MyTracksConstants {
    * The type of account that we can use for gdata uploads.
    */
   public static final String ACCOUNT_TYPE = "com.google";
+  
+  /**
+   * The name of extra intent property to indicate whether we want to resume
+   * a previously recorded track.
+   */
+  public static final String RESUME_TRACK_EXTRA_NAME =
+      "com.google.android.apps.mytracks.resumeTrack";
 
   public static int getActionFromMenuId(int menuId) {
     switch (menuId) {

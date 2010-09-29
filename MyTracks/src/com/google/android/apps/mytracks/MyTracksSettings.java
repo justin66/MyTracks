@@ -25,10 +25,10 @@ import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
-import android.preference.Preference.OnPreferenceChangeListener;
-import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.preference.Preference.OnPreferenceChangeListener;
+import android.preference.Preference.OnPreferenceClickListener;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
@@ -51,6 +51,7 @@ public class MyTracksSettings extends PreferenceActivity {
   public static final int DEFAULT_MIN_RECORDING_INTERVAL = 0;
   public static final int DEFAULT_MIN_REQUIRED_ACCURACY = 200;
   public static final int DEFAULT_SPLIT_FREQUENCY = 0;
+  public static final int DEFAULT_AUTO_RESUME_TRACK_TIMEOUT = 10;  // In min.
 
   private static boolean mTTSAvailable;
   private BackupPreferencesListener backupListener;
@@ -190,7 +191,10 @@ public class MyTracksSettings extends PreferenceActivity {
     final ListPreference splitFrequency =
         (ListPreference) findPreference(
             getString(R.string.split_frequency_key));
-
+    final ListPreference autoResumeTrackTimeout =
+        (ListPreference) findPreference(
+            getString(R.string.auto_resume_track_timeout_key));
+    
     minRecordingDistance.setEntries(isMetric
         ? R.array.min_recording_distance_options
         : R.array.min_recording_distance_options_ft);
@@ -203,5 +207,7 @@ public class MyTracksSettings extends PreferenceActivity {
     splitFrequency.setEntries(isMetric
         ? R.array.split_frequency_options
         : R.array.split_frequency_options_ft);
+    autoResumeTrackTimeout.setEntries(
+        R.array.auto_resume_track_timeout_options);
   }
 }

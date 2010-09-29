@@ -233,11 +233,10 @@ public class SpreadsheetsClient extends GDataServiceClient {
       throws ParseException, IOException {
     switch (cause.getStatusCode()) {
       case HttpException.SC_CONFLICT:
-        Entry entry = null;
         if (entryClass != null) {
           InputStream is = cause.getResponseStream();
           if (is != null) {
-            entry = parseEntry(entryClass, cause.getResponseStream());
+            parseEntry(entryClass, cause.getResponseStream());
           }
         }
         throw new IOException(message);
