@@ -18,7 +18,6 @@ package com.google.android.apps.mytracks;
 import com.google.android.accounts.Account;
 import com.google.android.apps.mymaps.MyMapsConstants;
 import com.google.android.apps.mymaps.MyMapsList;
-import com.google.android.apps.mymaps.VersionChecker;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
 import com.google.android.apps.mytracks.content.Track;
 import com.google.android.apps.mytracks.content.Waypoint;
@@ -63,9 +62,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
-import android.view.Window;
 import android.view.WindowManager.BadTokenException;
 import android.widget.RelativeLayout;
 import android.widget.TabHost;
@@ -207,6 +206,11 @@ public class MyTracks extends TabActivity implements OnTouchListener,
       trackRecordingService = null;
     }
   };
+  
+  /**
+   * Whether {@link #serviceConnection} is bound or not.
+   */
+  private boolean isBound = false;
 
   /*
    * Tabs/View navigation:
@@ -309,9 +313,6 @@ public class MyTracks extends TabActivity implements OnTouchListener,
     // This will show the eula until the user accepts or quits the app.
     Eula.showEula(this);
 
-    // Check if new version is available and prompt user with update options:
-    new VersionChecker(this);
-
     // Check if we got invoked via the VIEW intent:
     Intent intent = getIntent();
     if (intent != null && intent.getAction() != null) {
@@ -332,6 +333,13 @@ public class MyTracks extends TabActivity implements OnTouchListener,
     } else {
       Log.d(MyTracksConstants.TAG, "Received an intent with no action.");
     }
+  }
+  
+  @Override
+  protected void onDestroy() {
+    Log.d(MyTracksConstants.TAG, "MyTracks.onDestroy");
+    tryUnbindTrackRecordingService();
+    super.onDestroy();
   }
 
   @Override
@@ -354,6 +362,7 @@ public class MyTracks extends TabActivity implements OnTouchListener,
 
   @Override
   protected void onStop() {
+    Log.d(MyTracksConstants.TAG, "MyTracks.onStop");
     super.onStop();
     // Clean up any temporary GPX and KML files.
     cleanTmpDirectory("gpx");
@@ -1366,6 +1375,8 @@ public class MyTracks extends TabActivity implements OnTouchListener,
         "MyTracks: Trying to bind to track recording service...");
     bindService(new Intent(this, TrackRecordingService.class),
         serviceConnection, 0);
+    Log.d(MyTracksConstants.TAG, "MyTracks: ...bind finished!");
+    isBound = true;
   }
 
   /**
@@ -1373,13 +1384,17 @@ public class MyTracks extends TabActivity implements OnTouchListener,
    * case service is not registered anymore.
    */
   private void tryUnbindTrackRecordingService() {
-    Log.d(MyTracksConstants.TAG,
-        "MyTracks: Trying to unbind from track recording service...");
-    try {
-      unbindService(serviceConnection);
-    } catch (IllegalArgumentException e) {
+    if (isBound) {
       Log.d(MyTracksConstants.TAG,
-          "MyTracks: Tried unbinding, but service was not registered.", e);
+          "MyTracks: Trying to unbind from track recording service...");
+      try {
+        unbindService(serviceConnection);
+        Log.d(MyTracksConstants.TAG, "MyTracks: ...unbind finished!");
+      } catch (IllegalArgumentException e) {
+        Log.d(MyTracksConstants.TAG,
+            "MyTracks: Tried unbinding, but service was not registered.", e);
+      }
+      isBound = false;
     }
   }
 

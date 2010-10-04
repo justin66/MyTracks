@@ -15,12 +15,12 @@
  */
 package com.google.android.apps.mytracks.services;
 
-import android.content.SharedPreferences;
-import android.util.Log;
-
 import com.google.android.apps.mytracks.MyTracksConstants;
 import com.google.android.apps.mytracks.MyTracksSettings;
 import com.google.android.maps.mytracks.R;
+
+import android.content.SharedPreferences;
+import android.util.Log;
 
 /**
  * A class that manages reading the shared preferences for the service.
@@ -30,6 +30,7 @@ import com.google.android.maps.mytracks.R;
 public class PreferenceManager {
   private TrackRecordingService service;
   private final String announcementFrequencyKey;
+  private final String autoResumeTrackTimeoutKey;
   private final String maxRecordingDistanceKey;
   private final String metricUnitsKey;
   private final String minRecordingDistanceKey;
@@ -44,6 +45,8 @@ public class PreferenceManager {
 
     announcementFrequencyKey =
         service.getString(R.string.announcement_frequency_key);
+    autoResumeTrackTimeoutKey =
+      service.getString(R.string.auto_resume_track_timeout_key);
     maxRecordingDistanceKey = 
         service.getString(R.string.max_recording_distance_key);
     metricUnitsKey =
@@ -126,8 +129,11 @@ public class PreferenceManager {
     }
     if (key == null || key.equals(announcementFrequencyKey)) {
       service.setAnnouncementFrequency(
-          sharedPreferences.getInt(announcementFrequencyKey,
-              -1));
+          sharedPreferences.getInt(announcementFrequencyKey, -1));
+    }
+    if (key == null || key.equals(autoResumeTrackTimeoutKey)) {
+      service.setAutoResumeTrackTimeout(
+          sharedPreferences.getInt(autoResumeTrackTimeoutKey, -1));
     }
     if (key == null || key.equals(recordingTrackKey)) {
       service.setRecordingTrackId(
@@ -139,13 +145,11 @@ public class PreferenceManager {
     }
     if (key == null || key.equals(signalSamplingFrequencyKey)) {
       service.getSignalManager().setFrequency(
-          sharedPreferences.getInt(
-              signalSamplingFrequencyKey, -1), service);
+          sharedPreferences.getInt(signalSamplingFrequencyKey, -1), service);
     }
     if (key == null || key.equals(metricUnitsKey)) {
       service.getSplitManager().setMetricUnits(
-          sharedPreferences.getBoolean(
-              metricUnitsKey, true));
+          sharedPreferences.getBoolean(metricUnitsKey, true));
     }
   }
 }
