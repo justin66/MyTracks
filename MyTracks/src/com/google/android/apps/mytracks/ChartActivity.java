@@ -21,6 +21,7 @@ import com.google.android.apps.mytracks.content.Track;
 import com.google.android.apps.mytracks.content.TrackPointsColumns;
 import com.google.android.apps.mytracks.content.Waypoint;
 import com.google.android.apps.mytracks.content.WaypointsColumns;
+import com.google.android.apps.mytracks.services.StatusAnnouncerFactory;
 import com.google.android.apps.mytracks.stats.DoubleBuffer;
 import com.google.android.apps.mytracks.stats.TripStatisticsBuilder;
 import com.google.android.apps.mytracks.util.MyTracksUtils;
@@ -35,7 +36,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -243,7 +243,7 @@ public class ChartActivity extends Activity implements
     providerUtils = MyTracksProviderUtils.Factory.get(this);
 
     // The volume we want to control is the Text-To-Speech volume
-    setVolumeControlStream(TextToSpeech.Engine.DEFAULT_STREAM);
+    setVolumeControlStream(StatusAnnouncerFactory.getVolumeStream());
 
     requestWindowFeature(Window.FEATURE_NO_TITLE);
     setContentView(R.layout.mytracks_elevation);

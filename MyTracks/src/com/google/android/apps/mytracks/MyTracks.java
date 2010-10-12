@@ -30,6 +30,7 @@ import com.google.android.apps.mytracks.io.TrackWriter;
 import com.google.android.apps.mytracks.io.TrackWriterFactory;
 import com.google.android.apps.mytracks.io.TrackWriterFactory.TrackFileFormat;
 import com.google.android.apps.mytracks.services.ITrackRecordingService;
+import com.google.android.apps.mytracks.services.StatusAnnouncerFactory;
 import com.google.android.apps.mytracks.services.TrackRecordingService;
 import com.google.android.apps.mytracks.util.FileUtils;
 import com.google.android.maps.mytracks.R;
@@ -55,15 +56,14 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
+import android.view.Window;
 import android.view.WindowManager.BadTokenException;
 import android.widget.RelativeLayout;
 import android.widget.TabHost;
@@ -258,7 +258,7 @@ public class MyTracks extends TabActivity implements OnTouchListener,
     menuManager = new MenuManager(this);
 
     // The volume we want to control is the Text-To-Speech volume
-    setVolumeControlStream(TextToSpeech.Engine.DEFAULT_STREAM);
+    setVolumeControlStream(StatusAnnouncerFactory.getVolumeStream());
 
     // We don't need a window title bar:
     requestWindowFeature(Window.FEATURE_NO_TITLE);
