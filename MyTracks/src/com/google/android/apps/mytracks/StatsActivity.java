@@ -135,7 +135,7 @@ public class StatsActivity extends Activity
 
   public StatsActivity() {
     utils = new StatsUtilities(this);
-    providerUtils = new MyTracksProviderUtilsImpl(this);
+    providerUtils = new MyTracksProviderUtilsImpl(getContentResolver());
   }
 
   /** Called when the activity is first created. */
