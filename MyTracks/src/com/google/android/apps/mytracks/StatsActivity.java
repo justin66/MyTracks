@@ -20,6 +20,8 @@ import com.google.android.apps.mytracks.content.MyTracksProviderUtilsImpl;
 import com.google.android.apps.mytracks.content.Track;
 import com.google.android.apps.mytracks.content.TracksColumns;
 import com.google.android.apps.mytracks.content.WaypointsColumns;
+import com.google.android.apps.mytracks.services.StatusAnnouncerFactory;
+import com.google.android.apps.mytracks.util.ApiFeatures;
 import com.google.android.maps.mytracks.R;
 
 import android.app.Activity;
@@ -33,7 +35,6 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
 import android.os.Handler;
-import android.speech.tts.TextToSpeech;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
@@ -51,7 +52,7 @@ import android.widget.Toast;
 public class StatsActivity extends Activity
     implements OnSharedPreferenceChangeListener {
 
-  private final StatsUtilities utils;
+  private StatsUtilities utils;
   private UIUpdateThread thread;
 
   private ContentObserver observer;
@@ -93,7 +94,7 @@ public class StatsActivity extends Activity
    */
   private boolean showCurrentSegment = false;
 
-  private final MyTracksProviderUtils providerUtils;
+  private MyTracksProviderUtils providerUtils;
 
   /**
    * A runnable for posting to the UI thread. Will update the total time field.
@@ -132,18 +133,18 @@ public class StatsActivity extends Activity
     }
   }
 
-  public StatsActivity() {
-    utils = new StatsUtilities(this);
-    providerUtils = new MyTracksProviderUtilsImpl(this);
-  }
-
   /** Called when the activity is first created. */
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
+    utils = new StatsUtilities(this);
+    providerUtils = new MyTracksProviderUtilsImpl(getContentResolver());
+    
     // The volume we want to control is the Text-To-Speech volume
-    setVolumeControlStream(TextToSpeech.Engine.DEFAULT_STREAM);
+    int volumeStream =
+        new StatusAnnouncerFactory(ApiFeatures.getInstance()).getVolumeStream();
+    setVolumeControlStream(volumeStream);
 
     // We don't need a window title bar:
     requestWindowFeature(Window.FEATURE_NO_TITLE);

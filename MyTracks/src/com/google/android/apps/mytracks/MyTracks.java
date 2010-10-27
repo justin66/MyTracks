@@ -28,9 +28,12 @@ import com.google.android.apps.mytracks.io.SendToDocs;
 import com.google.android.apps.mytracks.io.SendToMyMaps;
 import com.google.android.apps.mytracks.io.TrackWriter;
 import com.google.android.apps.mytracks.io.TrackWriterFactory;
+import com.google.android.apps.mytracks.io.SendToMyMaps.OnSendCompletedListener;
 import com.google.android.apps.mytracks.io.TrackWriterFactory.TrackFileFormat;
 import com.google.android.apps.mytracks.services.ITrackRecordingService;
+import com.google.android.apps.mytracks.services.StatusAnnouncerFactory;
 import com.google.android.apps.mytracks.services.TrackRecordingService;
+import com.google.android.apps.mytracks.util.ApiFeatures;
 import com.google.android.apps.mytracks.util.FileUtils;
 import com.google.android.maps.mytracks.R;
 
@@ -53,9 +56,10 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -229,19 +233,34 @@ public class MyTracks extends TabActivity implements OnTouchListener,
   }
 
   /**
+   * Checks whether we have a track recording session in progress.
+   * In some cases, when the service has crashed or has been restarted
+   * by the system, we fall back to the shared preferences. 
+   * 
    * @return true if the activity is bound to the track recording service and
-   * the service is recording a track.
+   *         the service is recording a track or in case the service is down,
+   *         based on settings from the shared preferences. 
    */
   public boolean isRecording() {
     if (trackRecordingService == null) {
-      return false;
+      // Fall back to alternative check method.
+      return isRecordingBasedOnSharedPreferences();
     }
     try {
       return trackRecordingService.isRecording();
     } catch (RemoteException e) {
       Log.e(MyTracksConstants.TAG, "MyTracks: Remote exception.", e);
-      return false;
+  
+      // Fall back to alternative check method.
+      return isRecordingBasedOnSharedPreferences();
     }
+  }
+  
+  private boolean isRecordingBasedOnSharedPreferences() {
+    // TrackRecordingServices guarantees that recordingTrackId is set to
+    // -1 if the track has been stopped.
+    // TODO: Refresh recordingTrackId.
+    return recordingTrackId >= 0;
   }
 
   /*
@@ -258,7 +277,9 @@ public class MyTracks extends TabActivity implements OnTouchListener,
     menuManager = new MenuManager(this);
 
     // The volume we want to control is the Text-To-Speech volume
-    setVolumeControlStream(TextToSpeech.Engine.DEFAULT_STREAM);
+    int volumeStream =
+        new StatusAnnouncerFactory(ApiFeatures.getInstance()).getVolumeStream();
+    setVolumeControlStream(volumeStream);
 
     // We don't need a window title bar:
     requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -297,6 +318,12 @@ public class MyTracks extends TabActivity implements OnTouchListener,
       recordingTrackId =
           prefs.getLong(getString(R.string.recording_track_key), -1);
       prefs.registerOnSharedPreferenceChangeListener(this);
+      Log.d(MyTracksConstants.TAG, "recordingTrackId: " + recordingTrackId
+          + ", selectedTrackId: " + selectedTrackId);
+      if (recordingTrackId > 0) {
+        Intent startIntent = new Intent(this, TrackRecordingService.class);
+        startService(startIntent);
+      }
     }
 
     // This will show the eula until the user accepts or quits the app.
@@ -520,8 +547,8 @@ public class MyTracks extends TabActivity implements OnTouchListener,
           if (results.hasExtra("mapid")) {
             sendToMyMapsMapId = results.getStringExtra("mapid");
           }
-          setProgressMessage(getString(
-              R.string.progress_message_authenticating_mymaps));
+          setProgressMessage(
+              R.string.progress_message_authenticating_mymaps);
           authenticate(results, MyTracksConstants.SEND_TO_GOOGLE,
               MyMapsConstants.MAPSHOP_SERVICE);
         } else {
@@ -587,7 +614,7 @@ public class MyTracks extends TabActivity implements OnTouchListener,
         if (resultCode == RESULT_OK) {
           setProgressValue(0);
           setProgressMessage(
-              getString(R.string.progress_message_authenticating_docs));
+              R.string.progress_message_authenticating_docs);
           authenticate(results,
               MyTracksConstants.AUTHENTICATE_TO_TRIX, "writely");
         } else {
@@ -599,7 +626,7 @@ public class MyTracks extends TabActivity implements OnTouchListener,
         if (resultCode == RESULT_OK) {
           setProgressValue(30);
           setProgressMessage(
-              getString(R.string.progress_message_authenticating_docs));
+              R.string.progress_message_authenticating_docs);
           authenticate(results, MyTracksConstants.SEND_TO_DOCS, "wise");
         } else {
           dismissDialogSafely(DIALOG_PROGRESS);
@@ -610,7 +637,7 @@ public class MyTracks extends TabActivity implements OnTouchListener,
         if (results != null && resultCode == RESULT_OK) {
           Log.d(MyTracksConstants.TAG, "Sending to Docs....");
           setProgressValue(50);
-          setProgressMessage(getString(R.string.progress_message_sending_docs));
+          setProgressMessage(R.string.progress_message_sending_docs);
           final long trackId = results.getLongExtra("trackid", selectedTrackId);
           final SendToDocs sender = new SendToDocs(this, authMap.get("wise"),
               authMap.get("writely"), trackId);
@@ -641,30 +668,30 @@ public class MyTracks extends TabActivity implements OnTouchListener,
       }
       case MyTracksConstants.SEND_TO_GOOGLE: {
         if (results != null && resultCode == RESULT_OK) {
-          final String mapid;
+          final String mapId;
           final long trackId;
           if (results.hasExtra("mapid")) {
-            mapid = results.getStringExtra("mapid");
+            mapId = results.getStringExtra("mapid");
           } else {
-            mapid = "new";
+            mapId = "new";
           }
           if (results.hasExtra("trackid")) {
             trackId = results.getLongExtra("trackid", -1);
           } else {
             trackId = selectedTrackId;
           }
-          final SendToMyMaps sender = new SendToMyMaps(this, mapid, auth,
-              trackId, this/*progressIndicator*/);
-          Runnable onCompletion = new Runnable() {
-            public void run() {
-              sendToMyMapsMessage = sender.getStatusMessage();
-              sendToMyMapsSuccess = sender.wasSuccess();
+
+          OnSendCompletedListener onCompletion = new OnSendCompletedListener() {
+            @Override
+            public void onSendCompleted(String mapId, boolean success, int statusMessage) {
+              sendToMyMapsMessage = getString(statusMessage);
+              sendToMyMapsSuccess = success;
               if (sendToMyMapsSuccess) {
-                sendToMyMapsMapId = sender.getMapId();
+                sendToMyMapsMapId = mapId;
                 // Update the map id for this track:
                 try {
                   Track track = providerUtils.getTrack(trackId);
-                  track.setMapId(sender.getMapId());
+                  track.setMapId(mapId);
                   providerUtils.updateTrack(track);
                 } catch (RuntimeException e) {
                   // If that fails whatever reasons we'll just log an error, but
@@ -685,8 +712,13 @@ public class MyTracks extends TabActivity implements OnTouchListener,
               }
             }
           };
-          sender.setOnCompletion(onCompletion);
-          sender.run();
+          final SendToMyMaps sender = new SendToMyMaps(this, mapId, auth,
+              trackId, this/*progressIndicator*/, onCompletion);
+
+          HandlerThread handlerThread = new HandlerThread("SendToMyMaps");
+          handlerThread.start();
+          Handler handler = new Handler(handlerThread.getLooper());
+          handler.post(sender);
         } else {
           dismissDialogSafely(DIALOG_PROGRESS);
         }
@@ -950,18 +982,31 @@ public class MyTracks extends TabActivity implements OnTouchListener,
     });
   }
 
-  public void setProgressMessage(final String text) {
+  // ProgressIndicator implementation
+
+  @Override
+  public void setProgressMessage(int resId) {
+    setProgressMessage(getString(resId));
+  }
+
+  private void setProgressMessage(final String message) {
     runOnUiThread(new Runnable() {
       public void run() {
         synchronized (this) {
           if (progressDialog != null) {
-            progressDialog.setMessage(text);
+            progressDialog.setMessage(message);
           }
         }
       }
     });
   }
 
+  @Override
+  public void clearProgressMessage() {
+    setProgressMessage("");
+  }
+
+  @Override
   public void setProgressValue(final int percent) {
     runOnUiThread(new Runnable() {
       public void run() {
@@ -1275,7 +1320,7 @@ public class MyTracks extends TabActivity implements OnTouchListener,
       return;
     }
     setProgressValue(0);
-    setProgressMessage("");
+    clearProgressMessage();
     showDialogSafely(DIALOG_PROGRESS);
     if (sendToGoogleDialog.getSendToMyMaps()) {
       if (!sendToGoogleDialog.getCreateNewMap()) {
@@ -1283,8 +1328,8 @@ public class MyTracks extends TabActivity implements OnTouchListener,
         startActivityForResult(listIntent, MyTracksConstants.GET_MAP);
       } else {
         setProgressValue(0);
-        setProgressMessage(getString(
-            R.string.progress_message_authenticating_mymaps));
+        setProgressMessage(
+            R.string.progress_message_authenticating_mymaps);
         authenticate(new Intent(), MyTracksConstants.SEND_TO_GOOGLE,
             MyMapsConstants.MAPSHOP_SERVICE);
       }

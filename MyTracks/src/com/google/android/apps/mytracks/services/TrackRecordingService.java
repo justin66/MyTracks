@@ -27,6 +27,8 @@ import com.google.android.apps.mytracks.content.Waypoint;
 import com.google.android.apps.mytracks.content.WaypointsColumns;
 import com.google.android.apps.mytracks.stats.TripStatistics;
 import com.google.android.apps.mytracks.stats.TripStatisticsBuilder;
+import com.google.android.apps.mytracks.util.ApiFeatures;
+import com.google.android.apps.mytracks.util.ApiPlatformAdapter;
 import com.google.android.apps.mytracks.util.MyTracksUtils;
 import com.google.android.apps.mytracks.util.StringUtils;
 import com.google.android.maps.mytracks.R;
@@ -66,7 +68,7 @@ public class TrackRecordingService extends Service implements LocationListener {
   private static final String STATISTICS_ICON_URL =
       "http://maps.google.com/mapfiles/ms/micons/ylw-pushpin.png";
 
-  private static final int MAX_AUTO_RESUME_TRACK_RETRY_ATTEMPTS = 3;
+  static final int MAX_AUTO_RESUME_TRACK_RETRY_ATTEMPTS = 3;
   
   private NotificationManager notificationManager;
   private LocationManager locationManager;
@@ -93,8 +95,8 @@ public class TrackRecordingService extends Service implements LocationListener {
    */
   private MyTracksProviderUtils providerUtils;
 
-  private TripStatisticsBuilder statsBuilder = new TripStatisticsBuilder();
-  private TripStatisticsBuilder waypointStatsBuilder = new TripStatisticsBuilder();
+  private TripStatisticsBuilder statsBuilder;
+  private TripStatisticsBuilder waypointStatsBuilder;
 
   /**
    * Current length of the recorded track. This length is calculated from the
@@ -106,7 +108,7 @@ public class TrackRecordingService extends Service implements LocationListener {
   /**
    * Status announcer executer.
    */
-  private PeriodicTaskExecuter executer;
+  private PeriodicTaskExecuter announcementExecuter;
   private TaskExecuterManager signalManager;
   private SplitManager splitManager;
 
@@ -180,18 +182,6 @@ public class TrackRecordingService extends Service implements LocationListener {
    * The frequency of status announcements.
    */
   private int announcementFrequency = -1;
-
-  private static boolean mTTSAvailable;
-
-  /* establish whether the "new" class is available to us */
-  static {
-    try {
-      SafeStatusAnnouncerTask.checkAvailable();
-      mTTSAvailable = true;
-    } catch (Throwable t) {
-      mTTSAvailable = false;
-    }
-  }
 
   /*
    * Utility functions
@@ -340,6 +330,8 @@ public class TrackRecordingService extends Service implements LocationListener {
    * Shows the notification message and icon in the notification bar.
    */
   public void showNotification() {
+    final ApiPlatformAdapter apiPlatformAdapter =
+        ApiFeatures.getInstance().getApiPlatformAdapter();
     if (isRecording) {
       Notification notification = new Notification(
           R.drawable.arrow_320, null /* tickerText */,
@@ -350,9 +342,10 @@ public class TrackRecordingService extends Service implements LocationListener {
       notification.setLatestEventInfo(this, getString(R.string.app_name),
           getString(R.string.recording_your_track), contentIntent);
       notification.flags += Notification.FLAG_NO_CLEAR;
-      notificationManager.notify(1, notification);
+      apiPlatformAdapter.startForeground(this, notificationManager, 1,
+          notification);
     } else {
-      notificationManager.cancelAll();
+      apiPlatformAdapter.stopForeground(this, notificationManager, 1);
     }
   }
 
@@ -401,9 +394,11 @@ public class TrackRecordingService extends Service implements LocationListener {
   }
 
   private void restoreStats(Track track) {
+    Log.d(MyTracksConstants.TAG,
+        "Restoring stats of track with ID: " + track.getId());
+    
     TripStatistics stats = track.getStatistics();
-    statsBuilder = new TripStatisticsBuilder();
-    statsBuilder.resumeAt(stats.getStartTime());
+    statsBuilder = new TripStatisticsBuilder(stats.getStartTime());
     setUpAnnouncer();
 
     signalManager.restore();
@@ -414,11 +409,11 @@ public class TrackRecordingService extends Service implements LocationListener {
     Waypoint waypoint = providerUtils.getFirstWaypoint(recordingTrackId);
     if (waypoint != null) {
       currentWaypointId = waypoint.getId();
-      waypointStatsBuilder = new TripStatisticsBuilder(waypoint.getStatistics());
+      waypointStatsBuilder = new TripStatisticsBuilder(
+          waypoint.getStatistics());
     } else {
       // This should never happen, but we got to do something so life goes on:
-      waypointStatsBuilder = new TripStatisticsBuilder();
-      waypointStatsBuilder.resumeAt(stats.getStartTime());
+      waypointStatsBuilder = new TripStatisticsBuilder(stats.getStartTime());
       currentWaypointId = -1;
     }
 
@@ -442,7 +437,7 @@ public class TrackRecordingService extends Service implements LocationListener {
         }
         statsBuilder.getStatistics().setMovingTime(stats.getMovingTime());
         statsBuilder.pauseAt(stats.getStopTime());
-        statsBuilder.resume();
+        statsBuilder.resumeAt(System.currentTimeMillis());
       } else {
         Log.e(MyTracksConstants.TAG, "Could not get track points cursor.");
       }
@@ -645,17 +640,12 @@ public class TrackRecordingService extends Service implements LocationListener {
         (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
     splitManager = new SplitManager(this);
-    try {
-      signalManager =
-          new TaskExecuterManager(-1, new SignalStrengthTaskModern(this), this);
-      Log.d(MyTracksConstants.TAG,
-          "TrackRecordingService using modern signal strength api.");
-    } catch (LinkageError e) {
-      Log.w(MyTracksConstants.TAG,
-          "TrackRecordingService could not load modern signal strength.", e);
-      signalManager =
-          new TaskExecuterManager(-1, new SignalStrengthTask(this), this);
-    }
+
+    SignalStrengthTaskFactory strengthTaskFactory =
+        new SignalStrengthTaskFactory(ApiFeatures.getInstance());
+    signalManager =
+        new TaskExecuterManager(-1, strengthTaskFactory.create(this), this);
+
     prefManager = new PreferenceManager(this);
     prefManager.onSharedPreferenceChanged(null);
     registerLocationListener();
@@ -675,19 +665,23 @@ public class TrackRecordingService extends Service implements LocationListener {
     }
     showNotification();
   }
-  
+
   /**
    * Creates an {@link Executer} and schedules {@class SafeStatusAnnouncerTask}.
    * The announcer requires a TTS service and user should have enabled
    * the announcements, otherwise this method is no-op.
    */
   private void setUpAnnouncer() {
-    if (mTTSAvailable && announcementFrequency != -1) {
-      if (executer == null) {
-        SafeStatusAnnouncerTask announcer = new SafeStatusAnnouncerTask(this);
-        executer = new PeriodicTaskExecuter(announcer, this);
+    if (announcementFrequency != -1) {
+      if (announcementExecuter == null) {
+        StatusAnnouncerFactory statusAnnouncerFactory =
+            new StatusAnnouncerFactory(ApiFeatures.getInstance());
+        PeriodicTask announcer = statusAnnouncerFactory.create(this);
+        if (announcer == null) return;
+
+        announcementExecuter = new PeriodicTaskExecuter(announcer, this);
       }
-      executer.scheduleTask(announcementFrequency * 60000);
+      announcementExecuter.scheduleTask(announcementFrequency * 60000);
     }
   }
 
@@ -702,8 +696,8 @@ public class TrackRecordingService extends Service implements LocationListener {
     isRecording = false;
     showNotification();
     unregisterLocationListener();
-    if (executer != null) {
-      executer.shutdown();
+    if (announcementExecuter != null) {
+      announcementExecuter.shutdown();
     }
     splitManager.shutdown();
     super.onDestroy();
@@ -751,8 +745,10 @@ public class TrackRecordingService extends Service implements LocationListener {
       // Make sure that the current track exists and is fresh enough.
       if (recordingTrack == null || !shouldResumeTrack(recordingTrack)) {
         Log.i(MyTracksConstants.TAG,
-            "TrackRecordingService: Not resuming because the previous track "
-            + "doesn't exist or is too old");
+            "TrackRecordingService: Not resuming, because the previous track ("
+            + recordingTrack + ") doesn't exist or is too old");
+        isRecording = false;
+        prefManager.setRecordingTrack(recordingTrackId = -1); 
         stopSelfResult(startId);
         return;
       }
@@ -765,16 +761,12 @@ public class TrackRecordingService extends Service implements LocationListener {
       SharedPreferences sharedPreferences, int retryAttempts) {
     Log.d(MyTracksConstants.TAG,
         "Updating auto-resume retry attempts to: " + retryAttempts);
-    
-    SharedPreferences.Editor editor = sharedPreferences.edit();
-    editor.putInt(
-        getString(R.string.auto_resume_track_current_retry_key), retryAttempts);
-    editor.commit();
+    prefManager.setAutoResumeTrackCurrentRetry(retryAttempts);
   }
   
   private boolean shouldResumeTrack(Track track) {
-    Log.d(MyTracksConstants.TAG,
-        "maybeResumeTrack: autoResumeTrackTimeout = " + autoResumeTrackTimeout);
+    Log.d(MyTracksConstants.TAG, "shouldResumeTrack: autoResumeTrackTimeout = "
+        + autoResumeTrackTimeout);
 
     // Check if we haven't exceeded the maximum number of retry attempts.
     SharedPreferences sharedPreferences =
@@ -782,11 +774,11 @@ public class TrackRecordingService extends Service implements LocationListener {
     int retries = sharedPreferences.getInt(
         getString(R.string.auto_resume_track_current_retry_key), 0);
     Log.d(MyTracksConstants.TAG,
-        "TrackRecordingService: Attempting to auto-resume the track ("
+        "shouldResumeTrack: Attempting to auto-resume the track ("
         + (retries + 1) + "/" + MAX_AUTO_RESUME_TRACK_RETRY_ATTEMPTS + ")");
     if (retries >= MAX_AUTO_RESUME_TRACK_RETRY_ATTEMPTS) {
       Log.i(MyTracksConstants.TAG,
-          "TrackRecordingService: Not resuming because exceeded the maximum "
+          "shouldResumeTrack: Not resuming because exceeded the maximum "
           + "number of auto-resume retries");
       return false;
     }
@@ -797,9 +789,13 @@ public class TrackRecordingService extends Service implements LocationListener {
     // Check for special cases.
     if (autoResumeTrackTimeout == 0) {
       // Never resume.  
+      Log.d(MyTracksConstants.TAG,
+          "shouldResumeTrack: Auto-resume disabled (never resume)");
       return false;
     } else if (autoResumeTrackTimeout == -1) {
       // Always resume.
+      Log.d(MyTracksConstants.TAG,
+          "shouldResumeTrack: Auto-resume forced (always resume)");
       return true;
     }
 
@@ -807,7 +803,8 @@ public class TrackRecordingService extends Service implements LocationListener {
     long lastModified =
         track.getStatistics() != null ? track.getStatistics().getStopTime() : 0;
     Log.d(MyTracksConstants.TAG,
-        "maybeResumeTrack: lastModified = " + lastModified);
+        "shouldResumeTrack: lastModified = " + lastModified
+        + ", autoResumeTrackTimeout: " + autoResumeTrackTimeout);
     return lastModified > 0 && System.currentTimeMillis() - lastModified <=
         autoResumeTrackTimeout * 60 * 1000;  
   }
@@ -817,6 +814,11 @@ public class TrackRecordingService extends Service implements LocationListener {
   }
 
   public long insertWaypointMarker(Waypoint waypoint) {
+    if (!isRecording()) {
+      throw new IllegalStateException(
+          "Unable to insert waypoint marker while not recording!");
+    }
+    
     if (waypoint.getLocation() != null) {
       waypoint.setLength(length);
       waypoint.setDuration(waypoint.getLocation().getTime()
@@ -835,6 +837,11 @@ public class TrackRecordingService extends Service implements LocationListener {
    * @return the unique id of the inserted marker
    */
   public long insertStatisticsMarker(Location location) {
+    if (!isRecording()) {
+      throw new IllegalStateException(
+          "Unable to insert statistics marker while not recording!");
+    }
+    
     StringUtils utils = new StringUtils(TrackRecordingService.this);
 
     // Create a new waypoint to save
@@ -862,8 +869,7 @@ public class TrackRecordingService extends Service implements LocationListener {
     Uri uri = providerUtils.insertWaypoint(waypoint);
 
     // Create a new stats keeper for the next marker
-    waypointStatsBuilder = new TripStatisticsBuilder();
-    waypointStatsBuilder.resumeAt(time);
+    waypointStatsBuilder = new TripStatisticsBuilder(time);
     updateCurrentWaypoint();
     return Long.parseLong(uri.getLastPathSegment());
   }
@@ -920,6 +926,10 @@ public class TrackRecordingService extends Service implements LocationListener {
         @Override
         public void endCurrentTrack() {
           Log.d(MyTracksConstants.TAG, "TrackRecordingService.endCurrentTrack");
+          if (recordingTrackId == -1 || !isRecording) {
+            throw new IllegalStateException("No recording track in progress!");
+          }
+         
           isRecording = false;
           Track recordingTrack = providerUtils.getTrack(recordingTrackId);
           if (recordingTrack != null) {
@@ -939,12 +949,15 @@ public class TrackRecordingService extends Service implements LocationListener {
                 "_id=" + recordingTrack.getId(), null);
           }
           showNotification();
-          recordingTrackId = -1;
+          prefManager.setRecordingTrack(recordingTrackId = -1);
         }
 
         @Override
         public void deleteAllTracks() {
-          endCurrentTrack();
+          if (isRecording()) {
+            throw new IllegalStateException(
+                "Cannot delete all tracks while recording!");
+          }
           providerUtils.deleteAllTracks();
         }
 
@@ -963,6 +976,10 @@ public class TrackRecordingService extends Service implements LocationListener {
 
   public long startNewTrack() {
     Log.d(MyTracksConstants.TAG, "TrackRecordingService.startNewTrack");
+    if (recordingTrackId != -1 || isRecording) {
+      throw new IllegalStateException("A track is already in progress!");
+    }
+    
     Track track = new Track();
     TripStatistics trackStats = track.getStatistics();
     track.setName("new");
@@ -973,22 +990,26 @@ public class TrackRecordingService extends Service implements LocationListener {
     recordingTrackId = Long.parseLong(trackUri.getLastPathSegment());
     track.setId(recordingTrackId);
     track.setName(String.format(getString(R.string.new_track), recordingTrackId));
-    providerUtils.updateTrack(track);
-    currentWaypointId = insertStatisticsMarker(null);
     isRecording = true;
     isMoving = true;
-    statsBuilder = new TripStatisticsBuilder();
-    statsBuilder.resumeAt(startTime);
+    
+    providerUtils.updateTrack(track);
+    statsBuilder = new TripStatisticsBuilder(startTime);
+    waypointStatsBuilder = new TripStatisticsBuilder(startTime);
+    currentWaypointId = insertStatisticsMarker(null);
     setUpAnnouncer();
     length = 0;
     showNotification();
     registerLocationListener();
     splitManager.restore();
     signalManager.restore();
+
     // Reset the number of auto-resume retries.
-    SharedPreferences sharedPreferences =
-        getSharedPreferences(MyTracksSettings.SETTINGS_NAME, 0); 
-    setAutoResumeTrackRetries(sharedPreferences, 0);
+    setAutoResumeTrackRetries(
+        getSharedPreferences(MyTracksSettings.SETTINGS_NAME, 0), 0);
+    // Persist the current recording track.
+    prefManager.setRecordingTrack(recordingTrackId);
+    
     return recordingTrackId;
   }
 
@@ -1014,15 +1035,13 @@ public class TrackRecordingService extends Service implements LocationListener {
 
   public void setAnnouncementFrequency(int announcementFrequency) {
     this.announcementFrequency = announcementFrequency;
-    if (mTTSAvailable) {
-      if (announcementFrequency == -1) {
-        if (executer != null) {
-          executer.shutdown();
-          executer = null;
-        }
-      } else {
-        setUpAnnouncer();
+    if (announcementFrequency == -1) {
+      if (announcementExecuter != null) {
+        announcementExecuter.shutdown();
+        announcementExecuter = null;
       }
+    } else {
+      setUpAnnouncer();
     }
   }
 

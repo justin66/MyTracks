@@ -21,8 +21,10 @@ import com.google.android.apps.mytracks.content.Track;
 import com.google.android.apps.mytracks.content.TrackPointsColumns;
 import com.google.android.apps.mytracks.content.Waypoint;
 import com.google.android.apps.mytracks.content.WaypointsColumns;
+import com.google.android.apps.mytracks.services.StatusAnnouncerFactory;
 import com.google.android.apps.mytracks.stats.DoubleBuffer;
 import com.google.android.apps.mytracks.stats.TripStatisticsBuilder;
+import com.google.android.apps.mytracks.util.ApiFeatures;
 import com.google.android.apps.mytracks.util.MyTracksUtils;
 import com.google.android.apps.mytracks.util.UnitConversions;
 import com.google.android.maps.mytracks.R;
@@ -35,7 +37,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -243,7 +244,9 @@ public class ChartActivity extends Activity implements
     providerUtils = MyTracksProviderUtils.Factory.get(this);
 
     // The volume we want to control is the Text-To-Speech volume
-    setVolumeControlStream(TextToSpeech.Engine.DEFAULT_STREAM);
+    int volumeStream =
+        new StatusAnnouncerFactory(ApiFeatures.getInstance()).getVolumeStream();
+    setVolumeControlStream(volumeStream);
 
     requestWindowFeature(Window.FEATURE_NO_TITLE);
     setContentView(R.layout.mytracks_elevation);
@@ -295,13 +298,13 @@ public class ChartActivity extends Activity implements
       public void onChange(boolean selfChange) {
         Log.d(MyTracksConstants.TAG, "ChartActivity: ContentObserver.onChange");
         // Check for any new locations and append them to the currently
-        // recording track:
-        if (!MyTracks.getInstance().isRecording()) {
+        // recording track.
+        if (recordingTrackId < 0) {
           // No track is being recorded. We should not be here.
           return;
         }
         if (selectedTrackId != recordingTrackId) {
-          // no track, or one other than the recording track is selected, don't
+          // No track, or one other than the recording track is selected, don't
           // bother.
           return;
         }
