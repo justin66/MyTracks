@@ -61,7 +61,7 @@ public class SendToGoogleDialog extends Dialog {
     Button cancel = (Button) findViewById(R.id.sendtogoogle_cancel);
     cancel.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
-        MyTracks.getInstance().dismissDialog(MyTracks.DIALOG_SEND_TO_GOOGLE);
+        MyTracks.getInstance().dismissDialog(DialogManager.DIALOG_SEND_TO_GOOGLE);
       }
     });
 
