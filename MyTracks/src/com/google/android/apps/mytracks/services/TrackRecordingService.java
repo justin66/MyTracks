@@ -980,7 +980,7 @@ public class TrackRecordingService extends Service implements LocationListener {
     return recordingTrackId;
   }
 
-  TripStatistics getTripStatistics() {
+  public TripStatistics getTripStatistics() {
     return statsBuilder.getStatistics();
   }
 
