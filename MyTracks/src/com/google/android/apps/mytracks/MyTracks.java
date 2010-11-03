@@ -18,6 +18,10 @@ package com.google.android.apps.mytracks;
 import com.google.android.accounts.Account;
 import com.google.android.apps.mymaps.MyMapsConstants;
 import com.google.android.apps.mymaps.MyMapsList;
+import static com.google.android.apps.mytracks.DialogManager.DIALOG_PROGRESS;
+import static com.google.android.apps.mytracks.DialogManager.DIALOG_SEND_TO_GOOGLE;
+import static com.google.android.apps.mytracks.DialogManager.DIALOG_IMPORT_PROGRESS;
+import static com.google.android.apps.mytracks.DialogManager.DIALOG_WRITE_PROGRESS;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
 import com.google.android.apps.mytracks.content.Track;
 import com.google.android.apps.mytracks.content.Waypoint;
@@ -27,6 +31,7 @@ import com.google.android.apps.mytracks.io.GpxImporter;
 import com.google.android.apps.mytracks.io.SendToDocs;
 import com.google.android.apps.mytracks.io.SendToMyMaps;
 import com.google.android.apps.mytracks.io.SendToMyMaps.OnSendCompletedListener;
+import com.google.android.apps.mytracks.io.TempFileCleaner;
 import com.google.android.apps.mytracks.io.TrackWriter;
 import com.google.android.apps.mytracks.io.TrackWriterFactory;
 import com.google.android.apps.mytracks.io.TrackWriterFactory.TrackFileFormat;
@@ -40,7 +45,6 @@ import com.google.android.maps.mytracks.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.app.TabActivity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -50,12 +54,10 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -109,31 +111,17 @@ public class MyTracks extends TabActivity implements OnTouchListener,
   }
 
   /*
-   * Authentication:
+   * Authentication
    */
-
   private AuthManager auth;
   private final HashMap<String, AuthManager> authMap =
       new HashMap<String, AuthManager>();
   private final AccountChooser accountChooser = new AccountChooser();
 
   /*
-   * Dialogs:
+   * Dialogs manager.
    */
-
-  public static final int DIALOG_PROGRESS = 1;
-  public static final int DIALOG_IMPORT_PROGRESS = 2;
-  public static final int DIALOG_WRITE_PROGRESS = 3;
-  public static final int DIALOG_SEND_TO_GOOGLE = 4;
-  public static final int DIALOG_SEND_TO_GOOGLE_RESULT = 5;
-  public static final int DIALOG_CHART_SETTINGS = 6;
-
-  private ProgressDialog progressDialog;
-  private ProgressDialog importProgressDialog;
-  private ProgressDialog writeProgressDialog;
-  private SendToGoogleDialog sendToGoogleDialog;
-  private AlertDialog sendToGoogleResultDialog;
-  private ChartSettingsDialog chartSettingsDialog;
+  private DialogManager dialogManager;
 
   /*
    * Menu manager.
@@ -260,6 +248,7 @@ public class MyTracks extends TabActivity implements OnTouchListener,
     instance = this;
     providerUtils = MyTracksProviderUtils.Factory.get(this);
     menuManager = new MenuManager(this);
+    dialogManager = new DialogManager(this);
 
     // The volume we want to control is the Text-To-Speech volume
     int volumeStream =
@@ -290,7 +279,8 @@ public class MyTracks extends TabActivity implements OnTouchListener,
     LayoutParams params =
         new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
     layout.setLayoutParams(params);
-    navControls = new NavControls(this, layout, leftIcons, rightIcons, changeTab);
+    navControls =
+        new NavControls(this, layout, leftIcons, rightIcons, changeTab);
     navControls.show();
     tabHost.addView(layout);
     layout.setOnTouchListener(this);
@@ -358,31 +348,9 @@ public class MyTracks extends TabActivity implements OnTouchListener,
   @Override
   protected void onStop() {
     Log.d(MyTracksConstants.TAG, "MyTracks.onStop");
-    // Clean up any temporary GPX and KML files.
-    cleanTmpDirectory("gpx");
-    cleanTmpDirectory("kml");
+    // Clean up any temporary track files.
+    (new TempFileCleaner()).clean();
     super.onStop();
-  }
-
-  private void cleanTmpDirectory(String name) {
-    if (!Environment.getExternalStorageState().equals(
-        Environment.MEDIA_MOUNTED)) {
-      return;  // Can't do anything now.
-    }
-    String sep = System.getProperty("file.separator");
-    File dir = new File(
-        Environment.getExternalStorageDirectory() + sep + name + sep + "tmp");
-    if (!dir.exists()) {
-      return;
-    }
-    File[] list = dir.listFiles();
-    long now = System.currentTimeMillis();
-    long oldest = now - 1000 * 3600;
-    for (File f : list) {
-      if (f.lastModified() < oldest) {
-        f.delete();
-      }
-    }
   }
 
   /*
@@ -416,87 +384,14 @@ public class MyTracks extends TabActivity implements OnTouchListener,
    */
 
   @Override
-  protected Dialog onCreateDialog(int id) {
-    switch (id) {
-      case DIALOG_PROGRESS:
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setIcon(android.R.drawable.ic_dialog_info);
-        progressDialog.setTitle(getString(R.string.progress_title));
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        progressDialog.setMessage("");
-        progressDialog.setMax(100);
-        progressDialog.setProgress(10);
-        return progressDialog;
-      case DIALOG_IMPORT_PROGRESS:
-        importProgressDialog = new ProgressDialog(this);
-        importProgressDialog.setIcon(android.R.drawable.ic_dialog_info);
-        importProgressDialog.setTitle(getString(R.string.progress_title));
-        importProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        importProgressDialog.setMessage(
-            getString(R.string.import_progress_message));
-        return importProgressDialog;
-      case DIALOG_WRITE_PROGRESS:
-        writeProgressDialog = new ProgressDialog(this);
-        writeProgressDialog.setIcon(android.R.drawable.ic_dialog_info);
-        writeProgressDialog.setTitle(getString(R.string.progress_title));
-        writeProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        writeProgressDialog.setMessage(
-            getString(R.string.write_progress_message));
-        return writeProgressDialog;
-      case DIALOG_SEND_TO_GOOGLE:
-        sendToGoogleDialog = new SendToGoogleDialog(this);
-        return sendToGoogleDialog;
-      case DIALOG_SEND_TO_GOOGLE_RESULT:
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setIcon(android.R.drawable.ic_dialog_info);
-        builder.setTitle("Title");
-        builder.setMessage("Message");
-        builder.setPositiveButton(getString(R.string.ok), null);
-        builder.setNeutralButton(getString(R.string.share_map),
-            new DialogInterface.OnClickListener() {
-          public void onClick(DialogInterface dialog, int which) {
-            shareLinkToMyMap(sendToMyMapsMapId);
-            dialog.dismiss();
-          }
-        });
-        sendToGoogleResultDialog = builder.create();
-        return sendToGoogleResultDialog;
-      case DIALOG_CHART_SETTINGS:
-        chartSettingsDialog = new ChartSettingsDialog(this);
-        return chartSettingsDialog;
-    }
-    return null;
+  protected Dialog onCreateDialog(int id, Bundle args) {
+    return dialogManager.onCreateDialog(id, args);
   }
 
   @Override
   protected void onPrepareDialog(int id, Dialog dialog) {
     super.onPrepareDialog(id, dialog);
-    Log.d(MyTracksConstants.TAG, "MyTracks.onPrepareDialog: " + id);
-    switch (id) {
-      case DIALOG_SEND_TO_GOOGLE:
-        resetSendToGoogleStatus();
-        break;
-      case DIALOG_SEND_TO_GOOGLE_RESULT:
-        boolean success = sendToMyMapsSuccess && sendToDocsSuccess;
-        sendToGoogleResultDialog.setTitle(
-            success ? R.string.success : R.string.error);
-        sendToGoogleResultDialog.setIcon(success
-            ? android.R.drawable.ic_dialog_info
-            : android.R.drawable.ic_dialog_alert);
-        sendToGoogleResultDialog.setMessage(getMapsResultMessage());
-
-        boolean canShare = sendToMyMapsMapId != null;
-        View share =
-            sendToGoogleResultDialog.findViewById(android.R.id.button3);
-        if (share != null) {
-          share.setVisibility(canShare ? View.VISIBLE : View.GONE);
-        }
-        break;
-      case DIALOG_CHART_SETTINGS:
-        Log.d(MyTracksConstants.TAG, "MyTracks.onPrepare chart dialog");
-        chartSettingsDialog.setup(chartActivity);
-        break;
-    }
+    dialogManager.onPrepareDialog(id, dialog);
   }
 
   /*
@@ -662,7 +557,8 @@ public class MyTracks extends TabActivity implements OnTouchListener,
 
           OnSendCompletedListener onCompletion = new OnSendCompletedListener() {
             @Override
-            public void onSendCompleted(String mapId, boolean success, int statusMessage) {
+            public void onSendCompleted(String mapId, boolean success,
+                int statusMessage) {
               sendToMyMapsMessage = getString(statusMessage);
               sendToMyMapsSuccess = success;
               if (sendToMyMapsSuccess) {
@@ -678,7 +574,7 @@ public class MyTracks extends TabActivity implements OnTouchListener,
                   Log.w(MyTracksConstants.TAG, "Updating map id failed.", e);
                 }
               }
-              if (sendToGoogleDialog.getSendToDocs()) {
+              if (dialogManager.getSendToGoogleDialog().getSendToDocs()) {
                 onActivityResult(MyTracksConstants.AUTHENTICATE_TO_DOCS,
                     RESULT_OK, new Intent());
               } else {
@@ -834,46 +730,12 @@ public class MyTracks extends TabActivity implements OnTouchListener,
   /**
    * Resets status information for sending to MyMaps/Docs.
    */
-  private void resetSendToGoogleStatus() {
+  public void resetSendToGoogleStatus() {
     sendToMyMapsMessage = "";
     sendToMyMapsSuccess = true;
     sendToDocsMessage = "";
     sendToDocsSuccess = true;
     sendToMyMapsMapId = null;
-  }
-
-  /**
-   * Reads data from a provider, for example gmail attachment preview. Currently
-   * fails (due to permissions?!). This is currently dead code not invoked from
-   * anywhere.
-   */
-  protected String getContent(Uri uri) {
-    Cursor cursor = null;
-    try {
-      cursor = managedQuery(uri,
-          null /*projection*/, null /*selection*/, null /*selectionArgs*/,
-          null /*sortOrder*/);
-      if (cursor == null) {
-        Toast.makeText(this,
-            R.string.error_unable_to_read_file, Toast.LENGTH_LONG).show();
-        return null;
-      }
-      if (cursor.moveToFirst()) {
-        String cols[] = cursor.getColumnNames();
-        String s = "Cols:";
-        for (String c : cols) { s += c + ","; }
-        Toast.makeText(this, s, Toast.LENGTH_LONG).show();
-        return "";
-      } else {
-        Toast.makeText(this, R.string.error_generic, Toast.LENGTH_LONG).show();
-        return null;
-      }
-    } finally {
-      if (cursor != null) {
-        stopManagingCursor(cursor);
-        cursor.close();
-      }
-    }
   }
 
   private void importGpxFile(final String fileName) {
@@ -965,44 +827,24 @@ public class MyTracks extends TabActivity implements OnTouchListener,
 
   @Override
   public void setProgressMessage(int resId) {
-    setProgressMessage(getString(resId));
-  }
-
-  private void setProgressMessage(final String message) {
-    runOnUiThread(new Runnable() {
-      public void run() {
-        synchronized (this) {
-          if (progressDialog != null) {
-            progressDialog.setMessage(message);
-          }
-        }
-      }
-    });
+    dialogManager.setProgressMessage(getString(resId));
   }
 
   @Override
   public void clearProgressMessage() {
-    setProgressMessage("");
+    dialogManager.setProgressMessage("");
   }
 
   @Override
   public void setProgressValue(final int percent) {
-    runOnUiThread(new Runnable() {
-      public void run() {
-        synchronized (this) {
-          if (progressDialog != null) {
-            progressDialog.setProgress(percent);
-          }
-        }
-      }
-    });
+    dialogManager.setProgressValue(percent);
   }
 
   /**
    * Shares a link to a My Map via external app (email, gmail, ...)
    * A chooser with apps that support text/plain will be shown to the user.
    */
-  private void shareLinkToMyMap(String mapId) {
+  public void shareLinkToMyMap(String mapId) {
     Intent shareIntent = new Intent(Intent.ACTION_SEND);
     shareIntent.setType("text/plain");
     shareIntent.putExtra(Intent.EXTRA_SUBJECT,
@@ -1295,6 +1137,8 @@ public class MyTracks extends TabActivity implements OnTouchListener,
    * SendToGoogleDialog.
    */
   public void sendToGoogle() {
+    SendToGoogleDialog sendToGoogleDialog =
+      dialogManager.getSendToGoogleDialog();
     if (sendToGoogleDialog == null) {
       return;
     }
@@ -1370,8 +1214,10 @@ public class MyTracks extends TabActivity implements OnTouchListener,
             getSharedPreferences(MyTracksSettings.SETTINGS_NAME, 0);
         if (prefs != null) {
           SharedPreferences.Editor editor = prefs.edit();
-          editor.putLong(getString(R.string.selected_track_key), theSelectedTrackId);
-          editor.putLong(getString(R.string.recording_track_key), theRecordingTrackId);
+          editor.putLong(getString(R.string.selected_track_key),
+              theSelectedTrackId);
+          editor.putLong(getString(R.string.recording_track_key),
+              theRecordingTrackId);
           editor.commit();
         }
       }
@@ -1501,12 +1347,14 @@ public class MyTracks extends TabActivity implements OnTouchListener,
       Toast.makeText(this, getMapsResultMessage(), Toast.LENGTH_LONG).show();
       shareLinkToMyMap(sendToMyMapsMapId);
     } else {
-      showDialogSafely(DIALOG_SEND_TO_GOOGLE_RESULT);
+      showDialogSafely(DialogManager.DIALOG_SEND_TO_GOOGLE_RESULT);
     }
   }
 
-  private String getMapsResultMessage() {
+  public String getMapsResultMessage() {
     StringBuilder message = new StringBuilder();
+    SendToGoogleDialog sendToGoogleDialog =
+      dialogManager.getSendToGoogleDialog();
     if (sendToGoogleDialog.getSendToMyMaps()) {
       message.append(sendToMyMapsMessage);
     }
@@ -1525,5 +1373,13 @@ public class MyTracks extends TabActivity implements OnTouchListener,
 
   public AccountChooser getAccountChooser() {
     return accountChooser;
+  }
+
+  public String getSendToMyMapsMapId() {
+    return sendToMyMapsMapId;
+  }
+  
+  public boolean getSendToGoogleSuccess() {
+    return sendToMyMapsSuccess && sendToDocsSuccess;
   }
 }
