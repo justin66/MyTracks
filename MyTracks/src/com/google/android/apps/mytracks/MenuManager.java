@@ -28,7 +28,7 @@ import android.view.MenuItem;
  */
 class MenuManager {
 
-  private MyTracks activity;
+  private final MyTracks activity;
 
   public MenuManager(MyTracks activity) {
     this.activity = activity;
@@ -44,12 +44,12 @@ class MenuManager {
     menu.findItem(R.id.menu_list_tracks).setEnabled(hasRecorded);
     menu.findItem(R.id.menu_list_markers)
         .setEnabled(hasRecorded && hasSelectedTrack);
-    MenuItem startRecording = menu.findItem(R.id.menu_start_recording);
-    startRecording.setEnabled(!isRecording);
-    startRecording.setVisible(!isRecording);
-    MenuItem stopRecording = menu.findItem(R.id.menu_stop_recording);
-    stopRecording.setEnabled(isRecording);
-    stopRecording.setVisible(isRecording);
+    menu.findItem(R.id.menu_start_recording)
+        .setEnabled(!isRecording)
+        .setVisible(!isRecording);
+    menu.findItem(R.id.menu_stop_recording)
+        .setEnabled(isRecording)
+        .setVisible(isRecording);
   }
   
   public boolean onOptionsItemSelected(MenuItem item) {
@@ -69,7 +69,7 @@ class MenuManager {
       }
       case R.id.menu_list_markers: {
         Intent startIntent = new Intent(activity, MyTracksWaypointsList.class);
-        startIntent.putExtra("trackid", activity.getSelectedTrack());
+        startIntent.putExtra("trackid", activity.getSelectedTrackId());
         activity.startActivityForResult(startIntent, MyTracksConstants.SHOW_WAYPOINT);
         return true;
       }
@@ -89,7 +89,7 @@ class MenuManager {
         return true;
       }
       case MyTracksConstants.MENU_CLEAR_MAP: {
-        activity.setSelectedTrack(-1);
+        activity.setSelectedTrackId(-1);
         return true;
       }
     }

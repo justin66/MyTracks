@@ -702,7 +702,7 @@ public class MyTracksMap extends MapActivity
    */
   public void setSelectedTrack(final long trackId) {
     Log.d(MyTracksConstants.TAG, "MyTracksMap.setSelectedTrack: "
-        + "selectedtTrackId = " + selectedTrackId + ", trackId = " + trackId);
+        + "selectedTrackId = " + selectedTrackId + ", trackId = " + trackId);
 
     if (selectedTrackId == trackId) {
       // Selected track did not change, nothing to do.

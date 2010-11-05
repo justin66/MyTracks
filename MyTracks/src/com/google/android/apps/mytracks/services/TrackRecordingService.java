@@ -52,10 +52,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.text.format.DateFormat;
 import android.util.Log;
 
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
