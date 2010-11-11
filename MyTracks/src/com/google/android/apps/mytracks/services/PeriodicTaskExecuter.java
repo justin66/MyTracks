@@ -25,7 +25,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * This class will periodically announce the user's trip statitics.
+ * This class will periodically announce the user's trip statistics.
  *
  * @author Sandor Dornbush
  */
@@ -61,12 +61,14 @@ public class PeriodicTaskExecuter {
 
     long now = System.currentTimeMillis();
     long next = service.getTripStatistics().getStartTime();
-    while (next < now) next += interval;
+    if (next < now) {
+      next = now + interval - ((now - next) % interval);
+    }
 
     Date start = new Date(next);
     Log.i(MyTracksConstants.TAG,
-          "StatusAnnouncer scheduled to start at " + start + " every "
-          + interval + " milliseconds.");
+        task.getClass().getSimpleName() + " scheduled to start at " + start
+        + " every " + interval + " milliseconds.");
     timer.scheduleAtFixedRate(new PeriodicTimerTask(), start, interval);
   }
 
@@ -74,6 +76,8 @@ public class PeriodicTaskExecuter {
    * Cleans up this object.
    */
   public void shutdown() {
+    Log.i(MyTracksConstants.TAG,
+        task.getClass().getSimpleName() + " shutting down.");
     timer.cancel();
     timer.purge();
     timer = null;
