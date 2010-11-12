@@ -267,7 +267,6 @@ public class MyTracks extends TabActivity implements OnTouchListener,
     providerUtils = MyTracksProviderUtils.Factory.get(this);
     menuManager = new MenuManager(this);
     sharedPreferences = getSharedPreferences(MyTracksSettings.SETTINGS_NAME, 0);
-    dialogManager = new DialogManager(this);
 
     // The volume we want to control is the Text-To-Speech volume
     int volumeStream =
@@ -368,6 +367,7 @@ public class MyTracks extends TabActivity implements OnTouchListener,
     // to the user.
     Log.d(MyTracksConstants.TAG, "MyTracks.onResume");
     tryBindTrackRecordingService();
+    dialogManager = new DialogManager(this);
     super.onResume();
   }
 
