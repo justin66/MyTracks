@@ -302,7 +302,9 @@ public class SendToDocs {
       return false;
     } finally {
       if (androidClient != null) {
+        Log.e(MyTracksConstants.TAG, "closing the android client");
         androidClient.close();
+        Log.e(MyTracksConstants.TAG, "closed the android client");
       }
     }
     return true;
