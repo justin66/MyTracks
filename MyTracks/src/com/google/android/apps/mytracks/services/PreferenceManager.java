@@ -42,17 +42,8 @@ public class PreferenceManager {
   private final String signalSamplingFrequencyKey;
   private final String splitFrequencyKey;
 
-  private final SharedPreferences sharedPreferences;
-
   public PreferenceManager(TrackRecordingService service) {
     this.service = service;
-    this.sharedPreferences =
-        service.getSharedPreferences(MyTracksSettings.SETTINGS_NAME, 0);
-    if (sharedPreferences == null) {
-      Log.w(MyTracksConstants.TAG,
-          "TrackRecordingService: Couldn't get shared preferences.");
-      throw new IllegalStateException("Couldn't get shared preferences");
-    }
     
     announcementFrequencyKey =
         service.getString(R.string.announcement_frequency_key);
@@ -77,6 +68,17 @@ public class PreferenceManager {
     splitFrequencyKey =
         service.getString(R.string.split_frequency_key);
   }
+  
+  private SharedPreferences getSharedPreference() {
+    SharedPreferences sharedPreferences =
+        service.getSharedPreferences(MyTracksSettings.SETTINGS_NAME, 0);
+    if (sharedPreferences == null) {
+      Log.w(MyTracksConstants.TAG,
+          "TrackRecordingService: Couldn't get shared preferences.");
+      throw new IllegalStateException("Couldn't get shared preferences");
+    }
+    return sharedPreferences;
+  }
 
   /**
    * Notifies that preferences have changed.
@@ -85,6 +87,10 @@ public class PreferenceManager {
    * @param key the key that changed (may be null to update all preferences)
    */
   public void onSharedPreferenceChanged(String key) {
+    // This is a hack!
+    // Ideally we should not have to reload the shared pref here.
+    // We have to reload it since the in memory version will not match the values from the activity.
+    SharedPreferences sharedPreferences = getSharedPreference();
     if (key == null || key.equals(minRecordingDistanceKey)) {
       service.setMinRecordingDistance(
           sharedPreferences.getInt(
@@ -163,12 +169,14 @@ public class PreferenceManager {
   }
   
   public void setAutoResumeTrackCurrentRetry(int retryAttempts) {
+    SharedPreferences sharedPreferences = getSharedPreference();
     SharedPreferences.Editor editor = sharedPreferences.edit();
     editor.putInt(autoResumeTrackCurrentRetryKey, retryAttempts);
     editor.commit();
   }
 
   public void setRecordingTrack(long id) {
+    SharedPreferences sharedPreferences = getSharedPreference();
     Editor editor = sharedPreferences.edit();
     editor.putLong(recordingTrackKey, id);
     editor.commit();

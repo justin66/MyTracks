@@ -681,17 +681,24 @@ public class TrackRecordingService extends Service implements LocationListener {
   private void setUpAnnouncer() {
     Log.d(MyTracksConstants.TAG, "TrackRecordingService.setUpAnnouncer: "
         + announcementExecuter);
-    if (announcementFrequency != -1 && recordingTrackId != -1) {
-      if (announcementExecuter == null) {
-        StatusAnnouncerFactory statusAnnouncerFactory =
-            new StatusAnnouncerFactory(ApiFeatures.getInstance());
-        PeriodicTask announcer = statusAnnouncerFactory.create(this);
-        if (announcer == null) return;
-
-        announcementExecuter = new PeriodicTaskExecuter(announcer, this);
-      }
-      announcementExecuter.scheduleTask(announcementFrequency * 60000);
+    if (announcementFrequency == -1 || recordingTrackId == -1) {
+      shutdownAnnouncer();
+      return;
     }
+    handler.post(new Runnable() {
+      public void run() {
+        if (announcementExecuter == null) {
+          StatusAnnouncerFactory statusAnnouncerFactory =
+              new StatusAnnouncerFactory(ApiFeatures.getInstance());
+          PeriodicTask announcer = statusAnnouncerFactory.create(TrackRecordingService.this);
+          if (announcer == null) return;
+  
+          announcer.start();
+          announcementExecuter = new PeriodicTaskExecuter(announcer, TrackRecordingService.this);
+        }
+        announcementExecuter.scheduleTask(announcementFrequency * 60000);
+      }
+    });
   }
   
   private void shutdownAnnouncer() {
@@ -1056,6 +1063,8 @@ public class TrackRecordingService extends Service implements LocationListener {
 
   public void setAnnouncementFrequency(int announcementFrequency) {
     this.announcementFrequency = announcementFrequency;
+    Log.d(MyTracksConstants.TAG, "TrackRecordingService.setAnnouncerFrequency:"
+        + this.announcementFrequency);
     if (announcementFrequency == -1) {
       shutdownAnnouncer();
     } else {
