@@ -31,21 +31,19 @@ import java.util.TimerTask;
  */
 public class PeriodicTaskExecuter {
 
+  private final PeriodicTask task;
   private final TrackRecordingService service;
 
   /**
    * A timer to schedule the announcements.
+   * This is non-null if the task is in started (scheduled) state.
    */
-  private Timer timer = new Timer();
-
-  private final PeriodicTask task;
+  private Timer timer;
 
   public PeriodicTaskExecuter(PeriodicTask task,
                               TrackRecordingService service) {
     this.task = task;
     this.service = service;
-
-    task.start();
   }
 
   /**
@@ -58,9 +56,15 @@ public class PeriodicTaskExecuter {
     if (!service.isRecording()) {
       return;
     }
-    
-    timer.cancel();
-    timer.purge();
+
+    if (timer != null) {
+      timer.cancel();
+      timer.purge();
+    } else {
+      // First start, or we were previously shut down.
+      task.start();
+    }
+
     timer = new Timer();
     if (interval <= 0) {
       return;
@@ -85,10 +89,12 @@ public class PeriodicTaskExecuter {
   public void shutdown() {
     Log.i(MyTracksConstants.TAG,
         task.getClass().getSimpleName() + " shutting down.");
-    timer.cancel();
-    timer.purge();
-    timer = null;
-    task.shutdown();
+    if (timer != null) {
+      timer.cancel();
+      timer.purge();
+      timer = null;
+      task.shutdown();
+    }
   }
 
   /**
