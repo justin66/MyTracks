@@ -479,4 +479,8 @@ limitations under the License.
   <string name="power_meter_enabled">Power meter enabled</string>
   <string name="heart_rate_monitor_enabled">Heart rate monitor enabled</string>
 
+  <!-- Manifest description (not seen inside the app) -->
+  <string name="notification_permission_summary">Be notified about track recording start/stop.</string>
+  <string name="read_tracks_permission_summary">Be able to read track data, such as points and waypoints</string>
+  <string name="write_tracks_permission_summary">Be able to write track data, such start recording and add waypoints</string>
 </resources>
