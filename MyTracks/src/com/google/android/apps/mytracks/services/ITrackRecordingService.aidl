@@ -1,12 +1,12 @@
 /*
  * Copyright 2008 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -84,4 +84,18 @@ interface ITrackRecordingService {
    * Deletes all the stored tracks.
    */
   void deleteAllTracks();
+
+  /**
+   * The current sensor data.
+   * The data is returned as a byte array which is a binary version of a
+   * Sensor.SensorDataSet object.
+   * @return the current sensor data or null if there is none.
+   */
+  byte[] getSensorData();
+
+  /**
+   * The current state of the sensor manager.
+   * The value is the value of a Sensor.SensorState enum.
+   */
+  int getSensorState();
 }

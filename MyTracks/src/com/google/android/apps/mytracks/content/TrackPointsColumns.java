@@ -33,7 +33,7 @@ public interface TrackPointsColumns extends BaseColumns {
       "vnd.android.cursor.dir/vnd.google.trackpoint";
   public static final String CONTENT_ITEMTYPE =
       "vnd.android.cursor.item/vnd.google.trackpoint";
-  public static final String DEFAULT_SORT_ORDER = "_id";
+  public static final String DEFAULT_SORT_ORDER = "trackpoints._id";
 
   /* All columns */
   public static final String TRACKID = "trackid";
@@ -44,6 +44,7 @@ public interface TrackPointsColumns extends BaseColumns {
   public static final String TIME = "time";
   public static final String ACCURACY = "accuracy";
   public static final String SPEED = "speed";
+  public static final String SENSOR = "sensor";
 
   /** Columns that go into the backup. */
   public static final String[] BACKUP_COLUMNS =
