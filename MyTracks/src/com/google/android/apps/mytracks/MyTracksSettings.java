@@ -60,7 +60,6 @@ public class MyTracksSettings extends PreferenceActivity {
   public static final int DEFAULT_MIN_REQUIRED_ACCURACY = 200;
   public static final int DEFAULT_SPLIT_FREQUENCY = 0;
 
-  private static boolean mTTSAvailable;
   private BackupPreferencesListener backupListener;
 
   private SharedPreferences preferences;
@@ -120,7 +119,7 @@ public class MyTracksSettings extends PreferenceActivity {
     updateSensorSettings(sensorTypePreference.getValue());
     
     // Disable TTS announcement preference if not available
-    if (!mTTSAvailable) {
+    if (!apiFeatures.hasTextToSpeech()) {
       IntegerListPreference announcementFrequency =
           (IntegerListPreference) findPreference(
               getString(R.string.announcement_frequency_key));
