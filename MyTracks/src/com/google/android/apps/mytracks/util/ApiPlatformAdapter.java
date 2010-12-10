@@ -57,4 +57,9 @@ public interface ApiPlatformAdapter {
    * @return true whether the handler has been stopped or not.
    */
   boolean stopHandlerThread(HandlerThread handlerThread);
+
+  /**
+   * Enables strict mode where supported, only if this is a development build.
+   */
+  void enableStrictMode();
 }

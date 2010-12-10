@@ -62,24 +62,18 @@ public class ApiFeatures {
    * Allow subclasses for mocking, but no direct instantiation.
    */
   protected ApiFeatures() {
-    if (getApiLevel() >= 5) {
-      try {
-        Class<?> clazz = Class.forName(
-            "com.google.android.apps.mytracks.util.EclairPlatformAdapter");
-        apiPlatformAdapter = (ApiPlatformAdapter) clazz.newInstance();
-      } catch (Exception e) {
-        Log.i(MyTracksConstants.TAG, "ApiFeatures: Unable to instantiate Eclair"
-            + " platform adapter", e);
-      }
-    }
-    if (apiPlatformAdapter == null) {
+    if (getApiLevel() >= 9) {
+      apiPlatformAdapter = new GingerbreadPlatformAdapter();
+    } else if (getApiLevel() >= 5) {
+      apiPlatformAdapter = new EclairPlatformAdapter();
+    } else {
       Log.i(MyTracksConstants.TAG,
           "ApiFeatures: Using default platform adapter");
       // Cupcake adapter is always supported, so it's safe to do static linkage.
       apiPlatformAdapter = new CupcakePlatformAdapter();
     }
   }
-  
+
   public ApiPlatformAdapter getApiPlatformAdapter() {
     return apiPlatformAdapter;
   }
@@ -111,7 +105,11 @@ public class ApiFeatures {
   public boolean hasModernSignalStrength() {
     return getApiLevel() >= 7;
   }
-  
+ 
+  public boolean hasStrictMode() {
+    return getApiLevel() >= 9;
+  }
+
   // Visible for testing.
   protected int getApiLevel() {
     return ANDROID_API_LEVEL;

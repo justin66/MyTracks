@@ -50,4 +50,9 @@ public class CupcakePlatformAdapter implements ApiPlatformAdapter {
     // Do nothing, as Cupcake doesn't provide quit().
     return false;
   }
+
+  @Override
+  public void enableStrictMode() {
+    // Not supported
+  }
 }

@@ -45,4 +45,9 @@ public class EclairPlatformAdapter implements ApiPlatformAdapter {
   public boolean stopHandlerThread(HandlerThread handlerThread) {
     return handlerThread.quit();
   }
+
+  @Override
+  public void enableStrictMode() {
+    // Not supported
+  }
 }
