@@ -16,6 +16,7 @@
 package com.google.android.apps.mytracks.services;
 
 import com.google.android.apps.mytracks.MyTracksConstants;
+import com.google.android.apps.mytracks.content.WaypointType;
 import com.google.android.apps.mytracks.util.UnitConversions;
 
 import android.util.Log;
@@ -111,7 +112,7 @@ public class SplitManager {
     }
 
     if (distance > this.nextSplitDistance) {
-      service.insertStatisticsMarker(service.getLastLocation());
+      service.insertWaypoint(WaypointType.STATISTICS);
       calculateNextSplit();
     }
   }

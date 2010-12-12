@@ -22,6 +22,7 @@ import com.google.android.apps.mytracks.content.MyTracksProvider;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
 import com.google.android.apps.mytracks.content.Track;
 import com.google.android.apps.mytracks.content.Waypoint;
+import com.google.android.apps.mytracks.content.WaypointType;
 import com.google.android.apps.mytracks.stats.TripStatistics;
 import com.google.android.apps.mytracks.util.ApiFeatures;
 import com.google.android.maps.mytracks.R;
@@ -546,9 +547,8 @@ public class TrackRecordingServiceTest
     ITrackRecordingService service = bindAndGetService(createStartIntent());
     assertFalse(service.isRecording());
     
-    Location loc = new Location("gps");
     try {
-      service.insertStatisticsMarker(loc);
+      service.insertWaypoint(WaypointType.STATISTICS);
       fail("Expecting IllegalStateException");
     } catch (IllegalStateException e) {
       // Expected.
@@ -562,9 +562,8 @@ public class TrackRecordingServiceTest
     ITrackRecordingService service = bindAndGetService(createStartIntent());
     assertTrue(service.isRecording());
     
-    Location loc = new Location("gps");
-    assertEquals(1, service.insertStatisticsMarker(loc));
-    assertEquals(2, service.insertStatisticsMarker(loc));
+    assertEquals(1, service.insertWaypoint(WaypointType.STATISTICS));
+    assertEquals(2, service.insertWaypoint(WaypointType.STATISTICS));
     
     // TODO: Add more checks.
   }
@@ -574,27 +573,12 @@ public class TrackRecordingServiceTest
     ITrackRecordingService service = bindAndGetService(createStartIntent());
     assertFalse(service.isRecording());
     
-    Location loc = new Location("gps");
-    Waypoint waypoint = new Waypoint();
-    waypoint.setId(1);
-    waypoint.setLocation(loc);
     try {
-      service.insertWaypointMarker(waypoint);
+      service.insertWaypoint(WaypointType.MARKER);
       fail("Expecting IllegalStateException");
     } catch (IllegalStateException e) {
       // Expected.
     }
-  }
-  
-  @MediumTest
-  public void testInsertWaypointMarker_invalidWaypoint() throws Exception {
-    createDummyTrack(123, -1, true);
-    
-    ITrackRecordingService service = bindAndGetService(createStartIntent());
-    assertTrue(service.isRecording());
-    
-    Waypoint waypoint = new Waypoint();
-    assertEquals(-1, service.insertWaypointMarker(waypoint));
   }
   
   @MediumTest
@@ -604,11 +588,7 @@ public class TrackRecordingServiceTest
     ITrackRecordingService service = bindAndGetService(createStartIntent());
     assertTrue(service.isRecording());
     
-    Location loc = new Location("gps");
-    Waypoint waypoint = new Waypoint();
-    waypoint.setId(1);
-    waypoint.setLocation(loc);
-    assertEquals(1, service.insertWaypointMarker(waypoint));
+    assertEquals(1, service.insertWaypoint(WaypointType.MARKER));
   }
   
   @MediumTest
@@ -804,11 +784,9 @@ public class TrackRecordingServiceTest
       service.recordLocation(loc);
       
       if (i % 10 == 0) {
-        service.insertStatisticsMarker(loc);
+        service.insertWaypoint(WaypointType.STATISTICS);
       } else if (i % 7 == 0) {
-        Waypoint waypoint = new Waypoint();
-        waypoint.setLocation(loc);
-        service.insertWaypointMarker(waypoint);
+        service.insertWaypoint(WaypointType.MARKER);
       }
     }
     

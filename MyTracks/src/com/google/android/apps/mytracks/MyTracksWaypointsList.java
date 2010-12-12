@@ -17,6 +17,7 @@ package com.google.android.apps.mytracks;
 
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
 import com.google.android.apps.mytracks.content.Waypoint;
+import com.google.android.apps.mytracks.content.WaypointType;
 import com.google.android.apps.mytracks.content.WaypointsColumns;
 import com.google.android.apps.mytracks.util.StringUtils;
 import com.google.android.maps.mytracks.R;
@@ -167,7 +168,7 @@ public class MyTracksWaypointsList extends ListActivity
   public void onClick(View v) {
     switch (v.getId()) {
       case R.id.waypointslist_btn_insert_waypoint: {
-        long id = MyTracks.getInstance().insertWaypointMarker();
+        long id = MyTracks.getInstance().insertWaypoint(WaypointType.MARKER);
         if (id >= 0) {
           Intent intent = new Intent(this, MyTracksWaypointDetails.class);
           intent.putExtra("waypointid", id);
@@ -176,7 +177,7 @@ public class MyTracksWaypointsList extends ListActivity
         break;
       }
       case R.id.waypointslist_btn_insert_statistics: {
-        long id = MyTracks.getInstance().insertStatisticsMarker();
+        long id = MyTracks.getInstance().insertWaypoint(WaypointType.STATISTICS);
         if (id >= 0) {
           Intent intent = new Intent(this, MyTracksWaypointDetails.class);
           intent.putExtra("waypointid", id);
