@@ -40,7 +40,7 @@ import android.util.Log;
 public class MyTracksProvider extends ContentProvider {
 
   private static final String DATABASE_NAME = "mytracks.db";
-  private static final int DATABASE_VERSION = 18;
+  private static final int DATABASE_VERSION = 19;
   private static final int TRACKPOINTS = 1;
   private static final int TRACKPOINTS_ID = 2;
   private static final int TRACKS = 3;
@@ -99,7 +99,8 @@ public class MyTracksProvider extends ContentProvider {
           + TracksColumns.ELEVATIONGAIN + " FLOAT, "
           + TracksColumns.MINGRADE + " FLOAT, "
           + TracksColumns.MAXGRADE + " FLOAT, "
-          + TracksColumns.MAPID + " STRING);");
+          + TracksColumns.MAPID + " STRING, "
+          + TracksColumns.TABLEID + " STRING);");
       db.execSQL("CREATE TABLE " + WAYPOINTS_TABLE + " ("
           + WaypointsColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
           + WaypointsColumns.NAME + " STRING, "
@@ -142,11 +143,19 @@ public class MyTracksProvider extends ContentProvider {
         db.execSQL("DROP TABLE IF EXISTS " + TRACKS_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + WAYPOINTS_TABLE);
         onCreate(db);
-      } else if (oldVersion >= 17) {
-        Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
-            + newVersion + ", adding sensor column.");
-        db.execSQL("ALTER TABLE " + TRACKPOINTS_TABLE 
-          + " ADD " + TrackPointsColumns.SENSOR + " BLOB");
+      } else {
+        if (oldVersion == 17) {
+          Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
+              + newVersion + ", adding sensor column.");
+          db.execSQL("ALTER TABLE " + TRACKPOINTS_TABLE 
+            + " ADD " + TrackPointsColumns.SENSOR + " BLOB");
+        };
+        if (oldVersion >= 17) {
+          Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
+              + newVersion + ", adding tableid column.");
+          db.execSQL("ALTER TABLE " + TRACKS_TABLE 
+            + " ADD " + TracksColumns.TABLEID + " STRING");
+        }
       }
     }
   }

@@ -52,7 +52,6 @@ limitations under the License.
   <string name="status_tracks_have_been_uploaded">Ihr Track wurde auf maps.google.com gespeichert.</string>
   <string name="status_tracks_have_been_uploaded_to_new_doc">Ihr Track wurde in einer neuen Tabelle bei docs.google.com gespeichert.</string>
   <string name="status_tracks_have_been_uploaded_to_docs">Ihr Track wurde an docs.google.com gesendet.</string>
-  <string name="status_mymap_info">Manchmal dauert es ein paar Minuten, bis neue Tracks bei maps.google.com erscheinen.</string>
   <string name="status_enable_gps">Berühren Sie hier um zu den Sicherheits- und Positionseinstellungen zu gelangen. Aktiviere \'GPS-Satelliten\'. Drücken Sie dann den Zurück-Knopf um zurückzukehren.</string>
   <string name="status_approximate_location">Anmerkung: Eine ungefähre Position wird angezeigt, bestimmt mittels Funktürmen und WiFi-Netzwerken.</string>
   <string name="status_no_location">Ihre Position kann derzeit nicht bestimmt werden. Aktivieren Sie mehr Positionsquellen (siehe Sicherheits- und Positionseinstellungen) und stellen Sie sicher, dass der Himmel sichtbar ist.</string>
@@ -98,6 +97,7 @@ limitations under the License.
   <string name="error">Fehler</string>
   <string name="success">Erfolgreich</string>
   <string name="waypoint">Wegpunkt</string>
+  <string name="cancel">Abbrechen</string>
 
   <!-- Placemark labels for start and end of track -->
   <string name="start">(Anfang)</string>
@@ -191,29 +191,8 @@ limitations under the License.
   <!-- MyTracksSky -->
   <string name="mytracks_sky">GPS-Satelliten</string>
 
-  <!-- MyMaps -->
-  <string name="select_map_message">Wähle eine Karte von Deinem Konto aus:</string>
-  <string name="create_new_map">Neue Karte erstellen…</string>
-  <string name="map_list_title">An Google My Maps senden</string>
-  <string name="maps_list_loading">Karten werden geladen…</string>
-  <string name="maps_list_failed">Ihre Karten konnten im Augenblick nicht geladen werden!</string>
-  <string name="open_map">Diese Karte auswählen</string>
-  <string name="edit_map_details">Kartendetails bearbeiten</string>
-  <string name="share_map">Karte mit Freunden teilen</string>
-  <string name="share_track">Track mit Freunden teilen</string>
-  <string name="delete_map">Karte vom Konto löschen</string>
-  <string name="map_title">Kartentitel:</string>
-  <string name="map_description">Trackbeschreibung:</string>
-  <string name="map_searchable_edit">Diese Karte und Ihren Inhalt in Suchergebnissen sichtbar machen.</string>
-  <string name="map_not_searchable_edit">Diese Karte und Ihren Inhalt nicht in Suchergebnissen sichtbar machen.</string>
-  <string name="map_searchable">Diese Karte und Ihr Inhalt sind in Suchergebnissen sichtbar.</string>
-  <string name="map_not_searchable">Weder diese Karte noch Ihr Inhalt sind in Suchergebnissen sichtbar, allerdings können Sie trotzdem von anderen durch einen direkten Link angezeigt werden.</string>
-  <string name="close">Schließen</string>
-  <string name="edit">Bearbeiten</string>
-  <string name="cancel">Abbrechen</string>
-  <string name="save">Sichern</string>
-
   <!-- Sharing -->
+  <string name="share_map">Karte mit Freunden teilen</string>
   <string name="share_map_subject">Ich möchte gerne eine Karte mit Dir teilen.</string>
   <string name="share_map_body_format">Vielleicht interessierst Du Dich für diese Karte:
 
@@ -222,6 +201,7 @@ limitations under the License.
   <string name="send_track_body_format">Vielleicht interessierst Du Dich für diese Track:
 
       %s.</string>
+  <string name="share_track">Track mit Freunden teilen</string>
   <string name="public_map">Öffentlich</string>
   <string name="unlisted_map">Nicht in Suchergebnissen enthalten.</string>
   <string name="mapslist_no_maps_available">Du hast noch keine Karten.</string>

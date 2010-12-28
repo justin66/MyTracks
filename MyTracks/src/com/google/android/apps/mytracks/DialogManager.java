@@ -20,7 +20,6 @@ import com.google.android.maps.mytracks.R;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -85,13 +84,6 @@ public class DialogManager {
         builder.setTitle("Title");
         builder.setMessage("Message");
         builder.setPositiveButton(activity.getString(R.string.ok), null);
-        builder.setNeutralButton(activity.getString(R.string.share_map),
-            new DialogInterface.OnClickListener() {
-          public void onClick(DialogInterface dialog, int which) {
-            activity.shareLinkToMyMap(activity.getSendToMyMapsMapId());
-            dialog.dismiss();
-          }
-        });
         sendToGoogleResultDialog = builder.create();
         return sendToGoogleResultDialog;
       case DIALOG_WRITE_PROGRESS:
@@ -119,9 +111,9 @@ public class DialogManager {
         sendToGoogleResultDialog.setIcon(success
             ? android.R.drawable.ic_dialog_info
             : android.R.drawable.ic_dialog_alert);
-        sendToGoogleResultDialog.setMessage(activity.getMapsResultMessage());
+        sendToGoogleResultDialog.setMessage(activity.getFusionTablesResultMessage());
 
-        boolean canShare = activity.getSendToMyMapsMapId() != null;
+        boolean canShare = activity.getSendToFusionTablesTableId() != null;
         View share =
             sendToGoogleResultDialog.findViewById(android.R.id.button3);
         if (share != null) {

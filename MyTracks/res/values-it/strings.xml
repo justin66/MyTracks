@@ -54,7 +54,6 @@ limitations under the License.
   <string name="status_tracks_have_been_uploaded">Il tuo percorso è stato inviato a maps.google.com.</string>
   <string name="status_tracks_have_been_uploaded_to_new_doc">Il tuo percorso è stato inviato ad un nuovo foglio di calcolo su docs.google.com.</string>
   <string name="status_tracks_have_been_uploaded_to_docs">Il tuo percorso è stato inviato a docs.google.com.</string>
-  <string name="status_mymap_info">Potrebbe essere necessario aspettare qualche minuto prima che i nuovi percorsi siano visibili.</string>
   <string name="status_enable_gps">Premi qui per andare a «Impostazioni di posizione e protezione» e attiva «Utilizza satelliti GPS». Poi premi il tasto di ritorno per tornare qui.</string>
   <string name="status_approximate_location">Nota: la posizione indicata è un\'approssimazione determinata in base alle antenne cellulari e reti WIFI vicine.</string>
   <string name="status_no_location">La posizione non può essere determinata. Attiva più fonti di posizione (vedi «Impostazioni di posizione e protezione») e eccertati che il cielo sia visibile. Riprova più tardi.</string>
@@ -104,6 +103,7 @@ limitations under the License.
   <string name="error">Errore</string>
   <string name="success">Successo</string>
   <string name="waypoint">Punto di passaggio</string>
+  <string name="cancel">Annulla</string>
 
   <!-- Placemark labels for start and end of track -->
   <string name="start">(Inizio)</string>
@@ -219,7 +219,6 @@ limitations under the License.
   <string name="map_not_searchable">Né questa mappa né il suo contenuto saranno visibili in risultati di ricerche, ma saranno comunque visibili ad altri tramite un link diretto.</string>
   <string name="close">Chiudi</string>
   <string name="edit">Modifica</string>
-  <string name="cancel">Annulla</string>
   <string name="save">Salva</string>
 
   <!-- Sharing -->

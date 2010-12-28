@@ -15,7 +15,6 @@
  */
 package com.google.android.apps.mytracks.io;
 
-import com.google.android.apps.mymaps.MyMapsConstants;
 import com.google.android.apps.mytracks.MyTracks;
 import com.google.android.apps.mytracks.MyTracksConstants;
 import com.google.android.apps.mytracks.MyTracksSettings;
@@ -196,11 +195,11 @@ public class SendToDocs {
    * @param track the track
    */
   private boolean uploadToDocs(Track track) {
-    GDataWrapper wiseWrapper = new GDataWrapper();
+    GDataWrapper<GDataServiceClient> wiseWrapper = new GDataWrapper<GDataServiceClient>();
     wiseWrapper.setAuthManager(wiseAuth);
     wiseWrapper.setRetryOnAuthFailure(true);
 
-    GDataWrapper writelyWrapper = new GDataWrapper();
+    GDataWrapper<GDataServiceClient> writelyWrapper = new GDataWrapper<GDataServiceClient>();
     writelyWrapper.setAuthManager(writelyAuth);
     writelyWrapper.setRetryOnAuthFailure(true);
 
@@ -308,53 +307,66 @@ public class SendToDocs {
     return true;
   }
 
-  private boolean getSpreadsheetId(GDataWrapper wrapper, final String title) {
+  private boolean getSpreadsheetId(GDataWrapper<GDataServiceClient> wrapper, final String title) {
     spreadSheetId = null;
-    return wrapper.runQuery(new QueryFunction() {
+    return wrapper.runQuery(new QueryFunction<GDataServiceClient>() {
       @Override
       public void query(GDataServiceClient client)
-          throws IOException, ParseException, HttpException {
+          throws IOException, GDataWrapper.ParseException, GDataWrapper.HttpException {
         GDataParser listParser;
-        listParser = client.getParserForFeed(Entry.class,
-            DOCS_MY_SPREADSHEETS_FEED_URL, writelyAuth.getAuthToken());
-        listParser.init();
-        while (listParser.hasMoreData()) {
-          Entry entry = listParser.readNextEntry(null);
-          String entryTitle = entry.getTitle();
-          Log.i(MyTracksConstants.TAG, "Found docs entry: " + entryTitle);
-          if (entryTitle.equals(title)) {
-            String entryId = entry.getId();
-            int lastSlash = entryId.lastIndexOf('/');
-            spreadSheetId = entryId.substring(lastSlash + 15);
-            break;
+        try {
+          listParser = client.getParserForFeed(Entry.class,
+              DOCS_MY_SPREADSHEETS_FEED_URL, writelyAuth.getAuthToken());
+          listParser.init();
+          while (listParser.hasMoreData()) {
+            Entry entry = listParser.readNextEntry(null);
+            String entryTitle = entry.getTitle();
+            Log.i(MyTracksConstants.TAG, "Found docs entry: " + entryTitle);
+            if (entryTitle.equals(title)) {
+              String entryId = entry.getId();
+              int lastSlash = entryId.lastIndexOf('/');
+              spreadSheetId = entryId.substring(lastSlash + 15);
+              break;
+            }
           }
+    	  } catch (ParseException e) {
+          throw new GDataWrapper.ParseException();
+        } catch (HttpException e) {
+          throw new GDataWrapper.HttpException(e.getStatusCode(), e.getMessage());
         }
       }
     });
   }
 
-  private boolean getWorkSheetId(GDataWrapper wrapper) {
+  private boolean getWorkSheetId(GDataWrapper<GDataServiceClient> wrapper) {
     workSheetId = null;
-    return wrapper.runQuery(new QueryFunction() {
+    return wrapper.runQuery(new QueryFunction<GDataServiceClient>() {
       @Override
       public void query(GDataServiceClient client)
-          throws AuthenticationException, IOException, ParseException {
+          throws GDataWrapper.AuthenticationException, IOException, GDataWrapper.ParseException {
         String uri = String.format(DOCS_WORKSHEETS_URL_FORMAT, spreadSheetId);
-        GDataParser sheetParser =
-            ((SpreadsheetsClient) client).getParserForWorksheetsFeed(uri,
-                wiseAuth.getAuthToken());
-        sheetParser.init();
-        if (!sheetParser.hasMoreData()) {
-          Log.i(MyTracksConstants.TAG, "Found no worksheets");
-          return; // failure
-        }
+        GDataParser sheetParser;
+				try {
+					sheetParser = ((SpreadsheetsClient) client).getParserForWorksheetsFeed(uri,
+					    wiseAuth.getAuthToken());
+	        sheetParser.init();
+	        if (!sheetParser.hasMoreData()) {
+	          Log.i(MyTracksConstants.TAG, "Found no worksheets");
+	          return; // failure
+	        }
 
-        // just grab the first.
-        WorksheetEntry worksheetEntry =
-            (WorksheetEntry) sheetParser.readNextEntry(new WorksheetEntry());
+	        // just grab the first.
+	        WorksheetEntry worksheetEntry =
+	            (WorksheetEntry) sheetParser.readNextEntry(new WorksheetEntry());
 
-        int lastSlash = worksheetEntry.getId().lastIndexOf('/');
-        workSheetId = worksheetEntry.getId().substring(lastSlash + 1);
+	        int lastSlash = worksheetEntry.getId().lastIndexOf('/');
+	        workSheetId = worksheetEntry.getId().substring(lastSlash + 1);
+
+				} catch (AuthenticationException e) {
+					throw new GDataWrapper.AuthenticationException();
+				} catch (ParseException e) {
+					throw new GDataWrapper.ParseException();
+				}
       }
     });
   }
@@ -362,11 +374,11 @@ public class SendToDocs {
   /**
    * Creates a new MyTracks spreadsheet with the given name.
    */
-  private boolean createSpreadSheet(GDataWrapper writelyWrapper,
+  private boolean createSpreadSheet(GDataWrapper<GDataServiceClient> writelyWrapper,
       final String name) {
     spreadSheetId = null;
 
-    return writelyWrapper.runQuery(new QueryFunction() {
+    return writelyWrapper.runQuery(new QueryFunction<GDataServiceClient>() {
       @Override
       public void query(GDataServiceClient client) throws IOException {
         // Construct data
@@ -470,8 +482,7 @@ public class SendToDocs {
         : activity.getString(R.string.feet),
         sb);
     if (track.getMapId().length() > 0) {
-      appendTag("map", MyMapsConstants.MAPSHOP_BASE_URL + "?msa=0&msid="
-          + track.getMapId(), sb);
+      appendTag("map", SendToFusionTables.getMapVisualizationUrl(track), sb);
     }
     sb.append("</entry>");
     Log.i(MyTracksConstants.TAG,

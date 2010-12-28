@@ -15,7 +15,6 @@
  */
 package com.google.android.apps.mytracks;
 
-import com.google.android.apps.mymaps.GeoRect;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
 import com.google.android.apps.mytracks.content.Track;
 import com.google.android.apps.mytracks.content.TrackPointsColumns;
@@ -24,6 +23,7 @@ import com.google.android.apps.mytracks.content.WaypointsColumns;
 import com.google.android.apps.mytracks.services.StatusAnnouncerFactory;
 import com.google.android.apps.mytracks.stats.TripStatistics;
 import com.google.android.apps.mytracks.util.ApiFeatures;
+import com.google.android.apps.mytracks.util.GeoRect;
 import com.google.android.apps.mytracks.util.MyTracksUtils;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;

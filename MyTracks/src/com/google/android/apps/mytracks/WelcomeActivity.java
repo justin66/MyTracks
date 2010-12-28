@@ -77,16 +77,7 @@ public class WelcomeActivity extends Activity {
     builder.setIcon(R.drawable.arrow_icon);
     AlertDialog dialog = builder.create();
     dialog.show();
-
-    // Get the version from the manifest.
-    try {
-      PackageInfo pi =
-          getPackageManager().getPackageInfo("com.google.android.maps.mytracks",
-              PackageManager.GET_META_DATA);
-      ((TextView) dialog.findViewById(R.id.about_version_register)).
-          setText(pi.versionName);
-    } catch (NameNotFoundException e) {
-      Log.w(MyTracksConstants.TAG, "Failed to get version info.", e);
-    }
+    ((TextView) dialog.findViewById(R.id.about_version_register)).
+        setText(MyTracks.getMyTracksVersion(this));
   }
 }

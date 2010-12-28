@@ -53,7 +53,6 @@ limitations under the License.
   <string name="status_tracks_have_been_uploaded">Votre parcours a été envoyé à maps.google.com.</string>
   <string name="status_tracks_have_been_uploaded_to_new_doc">Votre parcours a été envoyé dans un tableur à docs.google.com.</string>
   <string name="status_tracks_have_been_uploaded_to_docs">Votre parcours a été envoyé à docs.google.com.</string>
-  <string name="status_mymap_info">Votre parcours peut prendre quelques minutes avant d\'être visible.</string>
   <string name="status_enable_gps">Cliquez ici et allez dans \'Paramètres\', \'Sécurité et Localisation\' et selectionnez \'Activer les satellites GPS\'. Appuyez sur le bouton de retour pour revenir au menu.</string>
   <string name="status_approximate_location">Note : Votre position est approximative, elle a été déterminée par les antennes de téléphonie ou le réseau WiFi.</string>
   <string name="status_no_location">Votre position ne peut être déterminée. Vérifiez votre configuration dans \'Paramètres\', \'Sécurité et Localisation\'. Assurez-vous également que le ciel soit bien visible.</string>
@@ -100,6 +99,7 @@ limitations under the License.
   <string name="yes">Oui</string>
   <string name="error">Erreur</string>
   <string name="waypoint">Point de passage</string>
+  <string name="cancel">Annuler</string>
 
   <!-- Placemark labels for start and end of track -->
   <string name="start">(Début)</string>
@@ -213,7 +213,6 @@ limitations under the License.
   <string name="map_not_searchable">Ni cette carte, ni son contenu seront visible dans les résultats de recherche, mais ils seront consultables en utilisant l\'adresse URL exacte</string>
   <string name="close">Fermer</string>
   <string name="edit">Modifier</string>
-  <string name="cancel">Annuler</string>
   <string name="save">Enregistrer</string>
 
   <!-- Sharing -->

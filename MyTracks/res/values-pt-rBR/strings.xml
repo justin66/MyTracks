@@ -52,7 +52,6 @@ limitations under the License.
   <string name="status_tracks_have_been_uploaded">Seu caminho foi enviado para maps.google.com.</string>
   <string name="status_tracks_have_been_uploaded_to_new_doc">Seu caminho foi enviado para uma nova planilha em docs.google.com.</string>
   <string name="status_tracks_have_been_uploaded_to_docs">Seu caminho foi enviado para docs.google.com.</string>
-  <string name="status_mymap_info">"Pode demorar alguns minutor para que novos caminhos apareçam.</string>
   <string name="status_enable_gps">"Por favor pressione aqui para ir aos ajustes de segurança e localização e verifique que o GPS esteja habilitado. Pressione o botão de voltar para retornar."</string>
   <string name="status_approximate_location">Nota: Uma localização aproximada, determinada por torres de telefonia celular, está sendo mostrada.</string>
   <string name="status_no_location">Sua localização não pôde ser determinada.  Habilite fontes adicionais de localização (veja configurações de Segurança e Localização) e assegure-se de que o céu está visível.</string>
@@ -101,6 +100,7 @@ limitations under the License.
   <string name="error">Erro</string>
   <string name="success">Successo</string>
   <string name="waypoint">Ponto de passagem</string>
+  <string name="cancel">Cancelar</string>
 
   <!-- Placemark labels for start and end of track -->
   <string name="start">(Início)</string>
@@ -203,7 +203,6 @@ limitations under the License.
   <string name="map_not_searchable">Nem este mapa nem seu conteúdo vão aparecer em resultados de buscas, porém outras pessoas ainda podem vê-los se obtiverem sua URL direta</string>
   <string name="close">Fechar</string>
   <string name="edit">Editar</string>
-  <string name="cancel">Cancelar</string>
   <string name="save">Salvar</string>
 
   <!-- Sharing -->

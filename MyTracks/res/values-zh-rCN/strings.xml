@@ -56,7 +56,6 @@ limitations under the License.
   <string name="status_tracks_have_been_uploaded">你的轨迹已经发送到 maps.google.com.</string>
   <string name="status_tracks_have_been_uploaded_to_new_doc">你的轨迹已经作为新的电子表格发送到 docs.google.com.</string>
   <string name="status_tracks_have_been_uploaded_to_docs">你的轨迹已经发送到 docs.google.com.</string>
-  <string name="status_mymap_info">新增的轨迹可能需要等待一段时间才会显示到页面上.</string>
   <string name="status_enable_gps">请点击这里进入\'安全和位置设置\'并勾选上\'启用 GPS 卫星\'. 然后用后退键返回.</string>
   <string name="status_approximate_location">注意: 当前显示的位置是根据无线信号和无线网络计算的近似位置.</string>
   <string name="status_no_location">目前无法定位. 请启用更多的位置来源 (在\'安全和位置设置\'中) 并确认天空是可见的. 再重试.</string>
@@ -106,6 +105,7 @@ limitations under the License.
   <string name="error">错误</string>
   <string name="success">成功</string>
   <string name="waypoint">路点</string>
+  <string name="cancel">取消</string>
 
   <!-- Placemark labels for start and end of track -->
   <string name="start">(开始)</string>
@@ -258,7 +258,6 @@ limitations under the License.
   <string name="map_not_searchable">此地图及其内容不会出现在搜索结果中, 但它的内容依然可以通过网址直接访问</string>
   <string name="close">关闭</string>
   <string name="edit">编辑</string>
-  <string name="cancel">取消</string>
   <string name="save">保存</string>
 
   <!-- Sharing -->
