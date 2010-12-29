@@ -17,7 +17,6 @@ package com.google.android.apps.mytracks;
 
 import com.google.android.maps.mytracks.R;
 
-import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.test.AndroidTestCase;
 

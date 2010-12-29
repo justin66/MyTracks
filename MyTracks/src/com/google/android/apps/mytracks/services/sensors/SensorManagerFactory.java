@@ -13,7 +13,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
 package com.google.android.apps.mytracks.services.sensors;
 
 import com.google.android.apps.mytracks.MyTracksConstants;
@@ -52,9 +51,15 @@ public class SensorManagerFactory {
 
     if (sensor == null) {
       return null;
+    } else if (sensor.equals(context.getString(R.string.ant_sensor_type))) {
+      return new AntDirectSensorManager(context);
+    } else if (sensor.equals(
+    		context.getString(R.string.srm_ant_bridge_sensor_type))) {
+      return new AntSRMSensorManager(context);
     } else if (sensor.equals(context.getString(R.string.zephyr_sensor_type))) {
       return new ZephyrSensorManager(context);
     } else  {
+	  Log.w(MyTracksConstants.TAG, "Unable to find sensor type: " + sensor);
       return null;
     }
   }
