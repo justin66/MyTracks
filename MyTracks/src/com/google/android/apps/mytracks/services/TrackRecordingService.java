@@ -511,12 +511,6 @@ public class TrackRecordingService extends Service implements LocationListener {
         return;
       }
 
-      if (MyTracksUtils.isValidLocation(location)) {
-        long now = System.currentTimeMillis();
-        statsBuilder.addLocation(location, now);
-        waypointStatsBuilder.addLocation(location, now);
-      }
-
       // Update the idle time if needed.
       locationListenerPolicy.updateIdleTime(statsBuilder.getIdleTime());
       if (currentRecordingInterval !=
@@ -544,6 +538,8 @@ public class TrackRecordingService extends Service implements LocationListener {
       // two and ignore the rest. This code will only have an effect if the
       // maxRecordingDistance = 0
       if (distanceToLast == 0 && !hasSensorData) {
+        addLocationToStats(location);
+
         if (isMoving) {
           Log.d(MyTracksConstants.TAG, "Found two identical locations.");
           isMoving = false;
@@ -565,6 +561,7 @@ public class TrackRecordingService extends Service implements LocationListener {
         }
       } else if (distanceToLastRecorded > minRecordingDistance
           || hasSensorData) {
+        addLocationToStats(location);
         if (lastLocation != null && !isMoving) {
           // Last location was the last stationary location. Need to go back and
           // add it.
@@ -613,6 +610,14 @@ public class TrackRecordingService extends Service implements LocationListener {
       throw e;
     }
     lastLocation = location;
+  }
+
+  private void addLocationToStats(Location location) {
+    if (MyTracksUtils.isValidLocation(location)) {
+      long now = System.currentTimeMillis();
+      statsBuilder.addLocation(location, now);
+      waypointStatsBuilder.addLocation(location, now);
+    }
   }
 
   @Override
