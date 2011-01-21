@@ -40,7 +40,7 @@ import android.util.Log;
 public class MyTracksProvider extends ContentProvider {
 
   private static final String DATABASE_NAME = "mytracks.db";
-  private static final int DATABASE_VERSION = 18;
+  private static final int DATABASE_VERSION = 19;
   private static final int TRACKPOINTS = 1;
   private static final int TRACKPOINTS_ID = 2;
   private static final int TRACKS = 3;
@@ -147,15 +147,19 @@ public class MyTracksProvider extends ContentProvider {
       } else {
         // Incremental updates go here.
         // Each time you increase the DB version, add a corresponding if clause.
+        Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
+            + newVersion);
 
         // Sensor data.
         if (oldVersion <= 17) {
-          Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
-              + newVersion + ", adding sensor and tableid columns.");
+          Log.w(TAG, "Upgrade DB: Adding sensor column.");
           db.execSQL("ALTER TABLE " + TRACKPOINTS_TABLE 
               + " ADD " + TrackPointsColumns.SENSOR + " BLOB");
+        }
+        if (oldVersion <= 18) {
+          Log.w(TAG, "Upgrade DB: Adding tableid column.");
           db.execSQL("ALTER TABLE " + TRACKS_TABLE 
-            + " ADD " + TracksColumns.TABLEID + " STRING");
+              + " ADD " + TracksColumns.TABLEID + " STRING");
         }
       }
     }
