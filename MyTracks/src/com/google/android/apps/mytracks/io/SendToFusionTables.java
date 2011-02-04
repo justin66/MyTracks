@@ -84,6 +84,21 @@ public class SendToFusionTables implements Runnable {
   private static final int MAX_POINTS_PER_UPLOAD = 2048;
 
   private static final String GDATA_VERSION = "2";
+  
+  // This class reports upload status to the user as a completion percentage
+  // using a progress bar.  Progress is defined as follows:
+  // 
+  //       0%   Getting track metadata
+  //       5%   Creating Fusion Table (GData to FT server)
+  //  10%-90%   Uploading the track data to Fusion Tables
+  //      95%   Uploading waypoints
+  //     100%   Done
+  private static final int PROGRESS_INITIALIZATION = 0;
+  private static final int PROGRESS_FUSION_TABLE_CREATE = 5;
+  private static final int PROGRESS_UPLOAD_DATA_MIN = 10;
+  private static final int PROGRESS_UPLOAD_DATA_MAX = 90;
+  private static final int PROGRESS_UPLOAD_WAYPOINTS = 95;
+  private static final int PROGRESS_COMPLETE = 100;
 
   private final Activity context;
   private final AuthManager auth;
@@ -153,33 +168,39 @@ public class SendToFusionTables implements Runnable {
     int statusMessageId = R.string.error_sending_to_fusiontables;
     boolean success = true;
     try {
-      progressIndicator.setProgressValue(1);
-      progressIndicator.setProgressMessage(R.string.progress_message_reading_track);
+      progressIndicator.setProgressValue(PROGRESS_INITIALIZATION);
+      progressIndicator.setProgressMessage(R.string.progress_message_initializing);
 
       // Get the track meta-data
       Track track = providerUtils.getTrack(trackId);
       String originalDescription = track.getDescription();
 
       // Create a new table:
+      progressIndicator.setProgressValue(PROGRESS_FUSION_TABLE_CREATE);
       progressIndicator.setProgressMessage(R.string.progress_message_creating_fusiontable);
-      success = createNewTable(track);
-      
-      if (success) {
-        success = makeTableUnlisted(tableId);
+      if (!createNewTable(track) || !makeTableUnlisted(tableId)) {
+        return;
       }
+
+      progressIndicator.setProgressValue(PROGRESS_UPLOAD_DATA_MIN);
+      progressIndicator.setProgressMessage(R.string.progress_message_uploading_track_data);
 
       // Upload all of the segments of the track plus start/end markers
-      if (success) {
-        success = uploadAllTrackPoints(track, originalDescription);
+      if (!uploadAllTrackPoints(track, originalDescription)) {
+        return;
       }
+      
+      progressIndicator.setProgressValue(PROGRESS_UPLOAD_WAYPOINTS);
+      progressIndicator.setProgressMessage(R.string.progress_message_uploading_waypoints);
 
       // Upload all the waypoints.
-      if (success) {
-        success = uploadWaypoints(track);
-        statusMessageId = R.string.status_new_fusiontable_has_been_created;
+      if (!uploadWaypoints(track)) {
+        return;
       }
+      
+      statusMessageId = R.string.status_new_fusiontable_has_been_created;
       Log.d(MyTracksConstants.TAG, "SendToFusionTables: Done: " + success);
-      progressIndicator.setProgressValue(100);
+      progressIndicator.setProgressValue(PROGRESS_COMPLETE);
     } finally {
 
       final boolean finalSuccess = success;
@@ -298,11 +319,10 @@ public class SendToFusionTables implements Runnable {
       DoubleBuffer elevationBuffer = new DoubleBuffer(MyTracksConstants.ELEVATION_SMOOTHING_FACTOR);
 
       List<Location> locations = new ArrayList<Location>(MAX_POINTS_PER_UPLOAD);
-      progressIndicator.setProgressMessage(R.string.progress_message_reading_track);
       Location lastLocation = null;
       do {
         if (totalLocationsRead % 100 == 0) {
-          updateProgress();
+          updateTrackDataUploadProgress();
         }
 
         Location loc = providerUtils.createLocation(locationsCursor);
@@ -414,8 +434,7 @@ public class SendToFusionTables implements Runnable {
   }
 
   private boolean prepareAndUploadPoints(Track track, List<Location> locations) {
-    progressIndicator.setProgressMessage(R.string.progress_message_preparing_track);
-    updateProgress();
+    updateTrackDataUploadProgress();
 
     int numLocations = locations.size();
     if (numLocations < 2) {
@@ -428,7 +447,6 @@ public class SendToFusionTables implements Runnable {
     ArrayList<Track> splitTracks = prepareLocations(track, locations);
 
     // Start uploading them
-    progressIndicator.setProgressMessage(R.string.progress_message_sending_fusiontables);
     for (Track splitTrack : splitTracks) {
       if (totalSegmentsUploaded > 1) {
         splitTrack.setName(splitTrack.getName() + " "
@@ -452,7 +470,7 @@ public class SendToFusionTables implements Runnable {
 
     locations.clear();
     totalLocationsUploaded += numLocations;
-    updateProgress();
+    updateTrackDataUploadProgress();
     return true;
   }
 
@@ -481,7 +499,7 @@ public class SendToFusionTables implements Runnable {
     boolean startNewTrackSegment = false;
     for (Location loc : locations) {
       if (totalLocationsPrepared % 100 == 0) {
-        updateProgress();
+        updateTrackDataUploadProgress();
       }
       if (loc.getLatitude() > 90) {
         startNewTrackSegment = true;
@@ -604,17 +622,18 @@ public class SendToFusionTables implements Runnable {
     }
   }
 
-  /**
-   * Sets the current upload progress.
-   */
-  private void updateProgress() {
+  private void updateTrackDataUploadProgress() {
     // The percent of the total that represents the completed part of this
-    // segment.
-    int totalPercentage =
+    // segment.  We calculate it as an absolute percentage, and then scale it
+    // to fit the completion percentage range alloted to track data upload.
+    double totalPercentage =
         (totalLocationsRead + totalLocationsPrepared + totalLocationsUploaded)
         / (totalLocations * 3);
-    totalPercentage = Math.min(99, totalPercentage);
-    progressIndicator.setProgressValue(totalPercentage);
+    
+    double scaledPercentage = totalPercentage 
+        * (PROGRESS_UPLOAD_DATA_MAX - PROGRESS_UPLOAD_DATA_MIN) + PROGRESS_UPLOAD_DATA_MIN;
+
+    progressIndicator.setProgressValue((int) scaledPercentage);
   }
 
   /**
