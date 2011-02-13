@@ -125,9 +125,9 @@ limitations under the License.
   <string name="tracklist_save_as_csv">Save a CSV file</string>
   <string name="tracklist_save_as_tcx">Save a TCX file</string>
   <string name="tracklist_btn_send_all_to_fusiontables">Send to Google Fusion Tables</string>
-  <string name="tracklist_btn_delete_all">Delete all tracks</string>
+  <string name="tracklist_btn_delete_all">Delete all</string>
   <!-- Export All -->
-  <string name="tracklist_btn_export_all">Export all tracks</string>
+  <string name="tracklist_btn_export_all">Export all</string>
   <string name="export_done">Export finished</string>
   <string name="tracklist_pick_one">Pick a track. Press&amp;hold for more options.</string>
   <string name="tracklist_all_tracks">All Tracks:</string>
@@ -139,6 +139,10 @@ limitations under the License.
   <string name="tracklist_share_csv_file">A CSV file</string>
   <string name="tracklist_share_tcx_file">A TCX file</string>
   <string name="tracklist_clear_map">Clear map</string>
+  <!-- Import All -->
+  <string name="tracklist_btn_import_all">Import from SD</string>
+  <string name="import_done">Import finished</string>
+  <string name="import_empty">No files found in /sdcard/MyTracks/gpx/</string>
 
   <!-- Waypoints list -->
   <string name="waypointslist_btn_delete_all">Delete all markers</string>
