@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Vector;
 
 /**
@@ -72,7 +73,7 @@ public class SendToFusionTables implements Runnable {
   public static final String SERVICE_ID = "fusiontables";
 
   /** The path for viewing a map visualization of a table. */
-  private static final String FUSIONTABLES_MAP = 
+  private static final String FUSIONTABLES_MAP =
       "http://www.google.com/fusiontables/embedviz?" +
       "viz=MAP&q=select+col0,+col1,+col2,+col3+from+%s+&h=false&" +
       "lat=%f&lng=%f&z=%d&t=1&l=col2";
@@ -84,10 +85,10 @@ public class SendToFusionTables implements Runnable {
   private static final int MAX_POINTS_PER_UPLOAD = 2048;
 
   private static final String GDATA_VERSION = "2";
-  
+
   // This class reports upload status to the user as a completion percentage
   // using a progress bar.  Progress is defined as follows:
-  // 
+  //
   //       0%   Getting track metadata
   //       5%   Creating Fusion Table (GData to FT server)
   //  10%-90%   Uploading the track data to Fusion Tables
@@ -160,7 +161,12 @@ public class SendToFusionTables implements Runnable {
     double latE6 = stats.getBottom() + (stats.getTop() - stats.getBottom()) / 2;
     double lonE6 = stats.getLeft() + (stats.getRight() - stats.getLeft()) / 2;
     int z = 15;
-    return String.format(FUSIONTABLES_MAP, track.getTableId(), latE6 / 1.E6, lonE6 / 1.E6, z);
+
+    // We explicitly format with Locale.US because we need the latitude and
+    // longitude to be formatted in a locale-independent manner.  Specifically,
+    // we need the decimal separator to be a period rather than a comma.
+    return String.format(Locale.US, FUSIONTABLES_MAP, track.getTableId(),
+        latE6 / 1.E6, lonE6 / 1.E6, z);
   }
 
   private void doUpload() {
@@ -189,14 +195,14 @@ public class SendToFusionTables implements Runnable {
       if (!uploadAllTrackPoints(track, originalDescription)) {
         return;
       }
-      
+
       progressIndicator.setProgressValue(PROGRESS_UPLOAD_WAYPOINTS);
 
       // Upload all the waypoints.
       if (!uploadWaypoints(track)) {
         return;
       }
-      
+
       statusMessageId = R.string.status_new_fusiontable_has_been_created;
       Log.d(MyTracksConstants.TAG, "SendToFusionTables: Done: " + success);
       progressIndicator.setProgressValue(PROGRESS_COMPLETE);
@@ -253,7 +259,7 @@ public class SendToFusionTables implements Runnable {
     builder.append(')');
     return builder.toString();
   }
-  
+
   private static String sqlEscape(String value) {
     return value.replaceAll("'", "''");
   }
@@ -632,8 +638,8 @@ public class SendToFusionTables implements Runnable {
     double totalPercentage =
         (totalLocationsRead + totalLocationsPrepared + totalLocationsUploaded)
         / (totalLocations * 3);
-    
-    double scaledPercentage = totalPercentage 
+
+    double scaledPercentage = totalPercentage
         * (PROGRESS_UPLOAD_DATA_MAX - PROGRESS_UPLOAD_DATA_MIN) + PROGRESS_UPLOAD_DATA_MIN;
 
     progressIndicator.setProgressValue((int) scaledPercentage);
