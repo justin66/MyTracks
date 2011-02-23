@@ -229,7 +229,7 @@ limitations under the License.
   <string name="settings_sensor_type_summary">The type of sensor to connect to</string>
   <string name="settings_heart_rate_ant_sensor_id">Clear ANT heart rate sensor pairing</string>
   <string name="settings_power_ant_sensor_id">Clear ANT power sensor pairing</string>
-  <string name="settings_srm_bridge_ant_sensor_id">Clear ANT srm bridge sensor pairing</string>
+  <string name="settings_srm_bridge_ant_sensor_id">Clear ANT SRM bridge sensor pairing</string>
   <string name="settings_ant_not_paired">ANT sensor not paired</string>
   <string name="settings_ant_paired">ANT sensor paired with: %d</string>
   <string name="bluetooth_sensor_title">Bluetooth sensor</string>
@@ -430,6 +430,7 @@ limitations under the License.
   <string name="bluetooth_pairing">Device pairing</string>
   <string name="bluetooth_pairing_summary">Open Android\'s bluetooth settings to pair a device</string>
   <string name="sensor_bluetooth_options_key">bluetoothSensorsEnabled</string>
+  <string name="ant_options">ANT options</string>
   <string name="sensor_options">Sensor Options</string>
 
   <!-- Bluetooth Sensor -->
