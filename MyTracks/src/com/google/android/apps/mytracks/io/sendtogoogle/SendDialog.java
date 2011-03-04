@@ -13,8 +13,11 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.android.apps.mytracks;
+package com.google.android.apps.mytracks.io.sendtogoogle;
 
+import com.google.android.apps.mytracks.DialogManager;
+import com.google.android.apps.mytracks.MyTracks;
+import com.google.android.apps.mytracks.MyTracksSettings;
 import com.google.android.maps.mytracks.R;
 
 import android.app.Dialog;
@@ -37,7 +40,7 @@ import android.widget.RadioGroup;
  *
  * @author Leif Hendrik Wilden
  */
-public class SendToGoogleDialog extends Dialog {
+public class SendDialog extends Dialog {
 
   private RadioGroup groupMyMaps;
   private RadioButton createNewMapRadioButton;
@@ -49,7 +52,7 @@ public class SendToGoogleDialog extends Dialog {
   private RadioButton sendStatsAndPointsRadioButton;
   private Button sendButton;
 
-  public SendToGoogleDialog(Context context) {
+  public SendDialog(Context context) {
     super(context);
   }
 
