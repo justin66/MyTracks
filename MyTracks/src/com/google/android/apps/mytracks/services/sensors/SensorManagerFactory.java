@@ -15,7 +15,7 @@
  */
 package com.google.android.apps.mytracks.services.sensors;
 
-import com.google.android.apps.mytracks.MyTracksConstants;
+import com.google.android.apps.mytracks.Constants;
 import com.google.android.apps.mytracks.MyTracksSettings;
 import com.google.android.maps.mytracks.R;
 
@@ -46,7 +46,7 @@ public class SensorManagerFactory {
     }
     
     String sensor = prefs.getString(context.getString(R.string.sensor_type_key), null);
-    Log.i(MyTracksConstants.TAG, "Creating sensor of type: " + sensor);
+    Log.i(Constants.TAG, "Creating sensor of type: " + sensor);
 
     if (sensor == null) {
       return null;
@@ -57,7 +57,7 @@ public class SensorManagerFactory {
     } else if (sensor.equals(context.getString(R.string.zephyr_sensor_type))) {
       return new ZephyrSensorManager(context);
     } else  {
-      Log.w(MyTracksConstants.TAG, "Unable to find sensor type: " + sensor);
+      Log.w(Constants.TAG, "Unable to find sensor type: " + sensor);
       return null;
     }
   }

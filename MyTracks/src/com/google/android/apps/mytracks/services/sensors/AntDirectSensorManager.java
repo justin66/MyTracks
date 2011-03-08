@@ -15,7 +15,7 @@
  */
 package com.google.android.apps.mytracks.services.sensors;
 
-import static com.google.android.apps.mytracks.MyTracksConstants.TAG;
+import static com.google.android.apps.mytracks.Constants.TAG;
 import com.google.android.apps.mytracks.MyTracksSettings;
 import com.google.android.apps.mytracks.content.Sensor;
 import com.google.android.apps.mytracks.services.sensors.ant.AntChannelIdMessage;

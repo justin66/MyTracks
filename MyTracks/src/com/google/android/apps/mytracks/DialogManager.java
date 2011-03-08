@@ -134,7 +134,7 @@ public class DialogManager {
         }
         break;
       case DIALOG_CHART_SETTINGS:
-        Log.d(MyTracksConstants.TAG, "MyTracks.onPrepare chart dialog");
+        Log.d(Constants.TAG, "MyTracks.onPrepare chart dialog");
         chartSettingsDialog.setup(activity.getChartActivity());
         break;
     }
@@ -208,10 +208,10 @@ public class DialogManager {
         try {
           activity.showDialog(id);
         } catch (BadTokenException e) {
-          Log.w(MyTracksConstants.TAG,
+          Log.w(Constants.TAG,
               "Could not display dialog with id " + id, e);
         } catch (IllegalStateException e) {
-          Log.w(MyTracksConstants.TAG,
+          Log.w(Constants.TAG,
               "Could not display dialog with id " + id, e);
         }
       }

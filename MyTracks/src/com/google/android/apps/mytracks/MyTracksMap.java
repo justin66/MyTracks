@@ -198,7 +198,7 @@ public class MyTracksMap extends MapActivity
         // TODO: Try to only load the waypoints in the view port.
         cursor = providerUtils.getWaypointsCursor(
             selectedTrackId, 0,
-            MyTracksConstants.MAX_DISPLAYED_WAYPOINTS_POINTS);
+            Constants.MAX_DISPLAYED_WAYPOINTS_POINTS);
         if (cursor != null && cursor.moveToFirst()) {
           do {
             Waypoint waypoint = providerUtils.createWaypoint(cursor);
@@ -208,7 +208,7 @@ public class MyTracksMap extends MapActivity
           } while (cursor.moveToNext());
         }
       } catch (RuntimeException e) {
-        Log.w(MyTracksConstants.TAG, "Caught an unexpected exception.", e);
+        Log.w(Constants.TAG, "Caught an unexpected exception.", e);
       } finally {
         if (cursor != null) {
           cursor.close();
@@ -285,7 +285,7 @@ public class MyTracksMap extends MapActivity
 
   @Override
   public void onCreate(Bundle bundle) {
-    Log.d(MyTracksConstants.TAG, "MyTracksMap.onCreate");
+    Log.d(Constants.TAG, "MyTracksMap.onCreate");
     super.onCreate(bundle);
 
     // The volume we want to control is the Text-To-Speech volume
@@ -335,7 +335,7 @@ public class MyTracksMap extends MapActivity
     observer = new ContentObserver(contentHandler) {
       @Override
       public void onChange(boolean selfChange) {
-        Log.d(MyTracksConstants.TAG, "MyTracksMap: ContentObserver.onChange");
+        Log.d(Constants.TAG, "MyTracksMap: ContentObserver.onChange");
         if (!isRecordingSelected()) {
           // No track, or one other than the recording track is selected,
           // don't bother.
@@ -350,7 +350,7 @@ public class MyTracksMap extends MapActivity
     waypointObserver = new ContentObserver(contentHandler) {
       @Override
       public void onChange(boolean selfChange) {
-        Log.d(MyTracksConstants.TAG,
+        Log.d(Constants.TAG,
             "MyTracksMap: ContentObserver.onChange waypoints");
         if (!isATrackSelected()) {
           return;
@@ -371,7 +371,7 @@ public class MyTracksMap extends MapActivity
 
   @Override
   protected void onDestroy() {
-    Log.d(MyTracksConstants.TAG, "MyTracksMap.onDestroy");
+    Log.d(Constants.TAG, "MyTracksMap.onDestroy");
 
     if (updateTrackThread != null) {
       ApiFeatures.getInstance().getApiPlatformAdapter().stopHandlerThread(
@@ -407,7 +407,7 @@ public class MyTracksMap extends MapActivity
   protected void onStart() {
     // Called after onCreate or onStop.
     // Will be followed by onRestart.
-    Log.d(MyTracksConstants.TAG, "MyTracksMap.onStart");
+    Log.d(Constants.TAG, "MyTracksMap.onStart");
     super.onStart();
   }
 
@@ -416,7 +416,7 @@ public class MyTracksMap extends MapActivity
     // Called when activity is no longer visible to user.
     // Next either onStart, onDestroy or nothing will be called.
     // This method may never be called in low memory situations.
-    Log.d(MyTracksConstants.TAG, "MyTracksMap.onStop");
+    Log.d(Constants.TAG, "MyTracksMap.onStop");
     super.onStop();
   }
 
@@ -424,7 +424,7 @@ public class MyTracksMap extends MapActivity
   protected void onRestart() {
     // Called when the current activity is being re-displayed.
     // Will be followed by onResume.
-    Log.d(MyTracksConstants.TAG, "MyTracksMap.onRestart");
+    Log.d(Constants.TAG, "MyTracksMap.onRestart");
     super.onRestart();
   }
 
@@ -432,7 +432,7 @@ public class MyTracksMap extends MapActivity
   protected void onPause() {
     // Called when activity is going into the background, but has not (yet) been
     // killed. Shouldn't block longer than approx. 2 seconds.
-    Log.d(MyTracksConstants.TAG, "MyTracksMap.onPause");
+    Log.d(Constants.TAG, "MyTracksMap.onPause");
     unregisterLocationAndSensorListeners();
     unregisterContentObservers();
     super.onPause();
@@ -442,7 +442,7 @@ public class MyTracksMap extends MapActivity
   protected void onResume() {
     // Called when the current activity is being displayed or re-displayed
     // to the user.
-    Log.d(MyTracksConstants.TAG, "MyTracksMap.onResume");
+    Log.d(Constants.TAG, "MyTracksMap.onResume");
     super.onResume();
 
     // Reload all preferences as they might have changed since last run.
@@ -456,7 +456,7 @@ public class MyTracksMap extends MapActivity
     registerContentObservers();
     registerLocationAndSensorListeners();
 
-    if (locationManager.isProviderEnabled(MyTracksConstants.GPS_PROVIDER)) {
+    if (locationManager.isProviderEnabled(Constants.GPS_PROVIDER)) {
       messageText.setText(R.string.wait_for_fix);
       messagePane.setOnClickListener(null);
     } else {
@@ -477,7 +477,7 @@ public class MyTracksMap extends MapActivity
 
   @Override
   protected void onSaveInstanceState(Bundle outState) {
-    Log.d(MyTracksConstants.TAG, "MyTracksMap.onSaveInstanceState");
+    Log.d(Constants.TAG, "MyTracksMap.onSaveInstanceState");
     outState.putBoolean(KEY_HAVE_GOOD_FIX, haveGoodFix);
     outState.putBoolean(KEY_KEEP_MY_LOCATION_VISIBLE, keepMyLocationVisible);
     if (currentLocation != null) {
@@ -488,7 +488,7 @@ public class MyTracksMap extends MapActivity
 
   @Override
   protected void onRestoreInstanceState(Bundle bundle) {
-    Log.d(MyTracksConstants.TAG, "MyTracksMap.onRestoreInstanceState");
+    Log.d(Constants.TAG, "MyTracksMap.onRestoreInstanceState");
     if (bundle != null) {
       super.onRestoreInstanceState(bundle);
       haveGoodFix = bundle.getBoolean(KEY_HAVE_GOOD_FIX, false);
@@ -523,12 +523,12 @@ public class MyTracksMap extends MapActivity
   void registerLocationAndSensorListeners() {
     if (locationManager != null) {
       LocationProvider gpsProvider =
-          locationManager.getProvider(MyTracksConstants.GPS_PROVIDER);
+          locationManager.getProvider(Constants.GPS_PROVIDER);
       if (gpsProvider == null) {
         alert(getString(R.string.error_no_gps_location_provider));
         return;
       } else {
-        Log.d(MyTracksConstants.TAG, "MyTracksMap: Using location provider "
+        Log.d(Constants.TAG, "MyTracksMap: Using location provider "
             + gpsProvider.getName());
       }
       locationManager.requestLocationUpdates(gpsProvider.getName(),
@@ -539,7 +539,7 @@ public class MyTracksMap extends MapActivity
       } catch (RuntimeException e) {
         // If anything at all goes wrong with getting a cell location do not
         // abort. Cell location is not essential to this app.
-        Log.w(MyTracksConstants.TAG,
+        Log.w(Constants.TAG,
             "Could not register network location listener.");
       }
     }
@@ -550,7 +550,7 @@ public class MyTracksMap extends MapActivity
     if (compass == null) {
       return;
     }
-    Log.d(MyTracksConstants.TAG,
+    Log.d(Constants.TAG,
         "MyTracksMap: Now registering sensor listeners.");
     sensorManager.registerListener(
         sensorListener, compass, SensorManager.SENSOR_DELAY_UI);
@@ -561,12 +561,12 @@ public class MyTracksMap extends MapActivity
    */
   void unregisterLocationAndSensorListeners() {
     if (locationManager != null) {
-      Log.d(MyTracksConstants.TAG,
+      Log.d(Constants.TAG,
           "MyTracksMap: Now unregistering location listeners.");
       locationManager.removeUpdates(locationListener);
     }
     if (sensorManager != null) {
-      Log.d(MyTracksConstants.TAG,
+      Log.d(Constants.TAG,
           "MyTracksMap: Now unregistering sensor listeners.");
       sensorManager.unregisterListener(sensorListener);
     }
@@ -704,7 +704,7 @@ public class MyTracksMap extends MapActivity
    * @param trackId a given track id
    */
   public void setSelectedTrack(final long trackId) {
-    Log.d(MyTracksConstants.TAG, "MyTracksMap.setSelectedTrack: "
+    Log.d(Constants.TAG, "MyTracksMap.setSelectedTrack: "
         + "selectedTrackId = " + selectedTrackId + ", trackId = " + trackId);
 
     if (selectedTrackId == trackId) {
@@ -763,7 +763,7 @@ public class MyTracksMap extends MapActivity
         timestamp);
     variation = field.getDeclination();
 
-    Log.d(MyTracksConstants.TAG,
+    Log.d(Constants.TAG,
         "MyTracksMap: Variation reset to " + variation + " degrees.");
   }
 
@@ -784,37 +784,37 @@ public class MyTracksMap extends MapActivity
         public void onCreateContextMenu(ContextMenu menu, View v,
             ContextMenuInfo menuInfo) {
           menu.setHeaderTitle(R.string.tracklist_this_track);
-          menu.add(0, MyTracksConstants.MENU_EDIT, 0,
+          menu.add(0, Constants.MENU_EDIT, 0,
               R.string.tracklist_edit_track);
           if (!isRecordingSelected()) {
-            menu.add(0, MyTracksConstants.MENU_SEND_TO_GOOGLE, 0,
+            menu.add(0, Constants.MENU_SEND_TO_GOOGLE, 0,
                 R.string.tracklist_send_to_google);
-            SubMenu share = menu.addSubMenu(0, MyTracksConstants.MENU_SHARE, 0,
+            SubMenu share = menu.addSubMenu(0, Constants.MENU_SHARE, 0,
                 R.string.tracklist_share_track);
-            share.add(0, MyTracksConstants.MENU_SHARE_LINK, 0,
+            share.add(0, Constants.MENU_SHARE_LINK, 0,
                 R.string.tracklist_share_link);
-            share.add(0, MyTracksConstants.MENU_SHARE_GPX_FILE, 0,
+            share.add(0, Constants.MENU_SHARE_GPX_FILE, 0,
                 R.string.tracklist_share_gpx_file);
-            share.add(0, MyTracksConstants.MENU_SHARE_KML_FILE, 0,
+            share.add(0, Constants.MENU_SHARE_KML_FILE, 0,
                 R.string.tracklist_share_kml_file);
-            share.add(0, MyTracksConstants.MENU_SHARE_CSV_FILE, 0,
+            share.add(0, Constants.MENU_SHARE_CSV_FILE, 0,
                 R.string.tracklist_share_csv_file);
-            share.add(0, MyTracksConstants.MENU_SHARE_TCX_FILE, 0,
+            share.add(0, Constants.MENU_SHARE_TCX_FILE, 0,
                 R.string.tracklist_share_tcx_file);
             SubMenu save = menu.addSubMenu(0,
-                MyTracksConstants.MENU_WRITE_TO_SD_CARD, 0,
+                Constants.MENU_WRITE_TO_SD_CARD, 0,
                 R.string.tracklist_write_to_sd);
-            save.add(0, MyTracksConstants.MENU_SAVE_GPX_FILE, 0,
+            save.add(0, Constants.MENU_SAVE_GPX_FILE, 0,
                 R.string.tracklist_save_as_gpx);
-            save.add(0, MyTracksConstants.MENU_SAVE_KML_FILE, 0,
+            save.add(0, Constants.MENU_SAVE_KML_FILE, 0,
                 R.string.tracklist_save_as_kml);
-            save.add(0, MyTracksConstants.MENU_SAVE_CSV_FILE, 0,
+            save.add(0, Constants.MENU_SAVE_CSV_FILE, 0,
                 R.string.tracklist_save_as_csv);
-            save.add(0, MyTracksConstants.MENU_SAVE_TCX_FILE, 0,
+            save.add(0, Constants.MENU_SAVE_TCX_FILE, 0,
                 R.string.tracklist_save_as_tcx);
-            menu.add(0, MyTracksConstants.MENU_CLEAR_MAP, 0,
+            menu.add(0, Constants.MENU_CLEAR_MAP, 0,
                 R.string.tracklist_clear_map);
-            menu.add(0, MyTracksConstants.MENU_DELETE, 0,
+            menu.add(0, Constants.MENU_DELETE, 0,
                 R.string.tracklist_delete_track);
           }
         }
@@ -825,7 +825,7 @@ public class MyTracksMap extends MapActivity
     if (!super.onMenuItemSelected(featureId, item)) {
       if (isATrackSelected()) {
         MyTracks.getInstance().onActivityResult(
-            MyTracksConstants.getActionFromMenuId(item.getItemId()), RESULT_OK,
+            Constants.getActionFromMenuId(item.getItemId()), RESULT_OK,
             new Intent());
         return true;
       }
@@ -836,10 +836,10 @@ public class MyTracksMap extends MapActivity
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     super.onCreateOptionsMenu(menu);
-    myLocation = menu.add(0, MyTracksConstants.MENU_MY_LOCATION, 0,
+    myLocation = menu.add(0, Constants.MENU_MY_LOCATION, 0,
         R.string.mylocation);
     myLocation.setIcon(android.R.drawable.ic_menu_mylocation);
-    toggleLayers = menu.add(0, MyTracksConstants.MENU_TOGGLE_LAYERS, 0,
+    toggleLayers = menu.add(0, Constants.MENU_TOGGLE_LAYERS, 0,
         R.string.switch_to_sat);
     toggleLayers.setIcon(android.R.drawable.ic_menu_mapmode);
     return true;
@@ -855,7 +855,7 @@ public class MyTracksMap extends MapActivity
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
-      case MyTracksConstants.MENU_MY_LOCATION: {
+      case Constants.MENU_MY_LOCATION: {
         Location loc = MyTracks.getInstance().getCurrentLocation();
         if (loc != null) {
           currentLocation = loc;
@@ -872,7 +872,7 @@ public class MyTracksMap extends MapActivity
         }
         return true;
       }
-      case MyTracksConstants.MENU_TOGGLE_LAYERS: {
+      case Constants.MENU_TOGGLE_LAYERS: {
         toggleLayer();
         return true;
       }
@@ -906,7 +906,7 @@ public class MyTracksMap extends MapActivity
   @Override
   public void onSharedPreferenceChanged(
       final SharedPreferences sharedPreferences, final String key) {
-    Log.d(MyTracksConstants.TAG,
+    Log.d(Constants.TAG,
         "MyTracksMap.onSharedPreferenceChanged: " + key);
     if (key != null) {
       uiHandler.post(new Runnable() {
@@ -921,14 +921,14 @@ public class MyTracksMap extends MapActivity
   private final LocationListener locationListener = new LocationListener() {
     @Override
     public void onProviderEnabled(String provider) {
-      if (provider.equals(MyTracksConstants.GPS_PROVIDER)) {
+      if (provider.equals(Constants.GPS_PROVIDER)) {
         messageText.setText(R.string.wait_for_fix);
       }
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-      if (provider.equals(MyTracksConstants.GPS_PROVIDER)) {
+      if (provider.equals(Constants.GPS_PROVIDER)) {
         messageText.setText(R.string.status_enable_gps);
         messagePane.setVisibility(View.VISIBLE);
         messagePane.setOnClickListener(MyTracksMap.this);
@@ -938,7 +938,7 @@ public class MyTracksMap extends MapActivity
 
     @Override
     public void onLocationChanged(Location location) {
-      if (location.getProvider().equals(MyTracksConstants.GPS_PROVIDER)) {
+      if (location.getProvider().equals(Constants.GPS_PROVIDER)) {
         // Recalculate the variation if there was a jump in location > 1km:
         if (currentLocation == null ||
             location.distanceTo(currentLocation) > 1000) {
@@ -954,14 +954,14 @@ public class MyTracksMap extends MapActivity
         }
         showCurrentLocation();
       } else {
-        Log.d(MyTracksConstants.TAG,
+        Log.d(Constants.TAG,
             "MyTracksMap: Network location update received.");
       }
     }
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-      if (provider.equals(MyTracksConstants.GPS_PROVIDER)) {
+      if (provider.equals(Constants.GPS_PROVIDER)) {
         switch (status) {
           case LocationProvider.OUT_OF_SERVICE:
           case LocationProvider.TEMPORARILY_UNAVAILABLE:
@@ -1019,7 +1019,7 @@ public class MyTracksMap extends MapActivity
 
   private void readAllNewTrackPoints() {
     int numPoints = mapOverlay.getNumLocations();
-    if (numPoints >= MyTracksConstants.MAX_DISPLAYED_TRACK_POINTS) {
+    if (numPoints >= Constants.MAX_DISPLAYED_TRACK_POINTS) {
       // We're about to exceed the maximum allowed number of points, so reload
       // the whole track with fewer points (the sampling frequency will be
       // lower).
@@ -1056,11 +1056,11 @@ public class MyTracksMap extends MapActivity
             // frequency
             long numTotalPoints = lastStoredLocationId - firstSeenLocationId;
             samplingFrequency = (int) (1 + numTotalPoints
-                / MyTracksConstants.TARGET_DISPLAYED_TRACK_POINTS);
+                / Constants.TARGET_DISPLAYED_TRACK_POINTS);
             // TODO: This shouldn't happen after adding currentSelectedTrackId,
             // but just to be safe until we have 100% confidence.
             if (samplingFrequency <= 0) {
-              Log.w(MyTracksConstants.TAG,
+              Log.w(Constants.TAG,
                   "readAllNewTrackPoints: samplingFreq <= 0, numTotalPoints = "
                   + numTotalPoints + ", trackId = " + currentSelectedTrackId);
               samplingFrequency = 1;
