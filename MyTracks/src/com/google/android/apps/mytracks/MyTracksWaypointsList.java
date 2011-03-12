@@ -59,7 +59,6 @@ public class MyTracksWaypointsList extends ListActivity
   private Button insertWaypointButton = null;
   private Button insertStatisticsButton = null;
   private long recordingTrackId = -1;
-  private long selectedTrackId = -1;
   private MyTracksProviderUtils providerUtils;
 
   private Cursor waypointsCursor = null;
@@ -140,6 +139,9 @@ public class MyTracksWaypointsList extends ListActivity
     insertStatisticsButton.setOnClickListener(this);
     SharedPreferences preferences =
         getSharedPreferences(MyTracksSettings.SETTINGS_NAME, 0);
+
+    // TODO: Get rid of selected and recording track IDs
+    long selectedTrackId = -1;
     if (preferences != null) {
       recordingTrackId =
           preferences.getLong(getString(R.string.recording_track_key), -1);

@@ -87,7 +87,7 @@ class MenuManager {
         return startActivity(WelcomeActivity.class);
       }
       case MyTracksConstants.MENU_CLEAR_MAP: {
-        activity.setSelectedTrackId(-1);
+        activity.clearSelectedTrack();
         return true;
       }
     }

@@ -79,13 +79,24 @@ public class MyTracksOverlay extends Overlay {
   private static class CachedLocation {
     public final boolean valid;
     public final GeoPoint geoPoint;
-    
+
+    /**
+     * Constructor for an invalid cached location.
+     */
+    public CachedLocation() {
+      this.valid = false;
+      this.geoPoint = null;
+    }
+
+    /**
+     * Constructor for a potentially valid cached location.
+     */
     public CachedLocation(Location location) {
       this.valid = MyTracksUtils.isValidLocation(location);
       this.geoPoint = valid ? MyTracksUtils.getGeoPoint(location) : null; 
     }
   };
-  
+
   public MyTracksOverlay(Context context) {
     this.context = context;
     
@@ -164,6 +175,13 @@ public class MyTracksOverlay extends Overlay {
     pendingPoints.offer(new CachedLocation(l));
   }
 
+  /**
+   * Adds a segment split to the map overlay.
+   */
+  public void addSegmentSplit() {
+    pendingPoints.offer(new CachedLocation());
+  }
+
   public void addWaypoint(Waypoint wpt) {
     // Note: We don't cache waypoints, because it's not worth the effort.
     if (wpt != null && wpt.getLocation() != null) {
@@ -172,7 +190,7 @@ public class MyTracksOverlay extends Overlay {
       }
     }
   }
-  
+
   public int getNumLocations() {
     synchronized (points) {
       return points.size() + pendingPoints.size();
