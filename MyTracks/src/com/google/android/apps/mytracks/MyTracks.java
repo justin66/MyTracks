@@ -49,15 +49,11 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.TabActivity;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Resources;
-import android.location.Location;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -93,12 +89,13 @@ import org.xml.sax.SAXException;
  * @author Leif Hendrik Wilden
  */
 public class MyTracks extends TabActivity implements OnTouchListener,
-    OnSharedPreferenceChangeListener, ProgressIndicator {
+    ProgressIndicator {
   /**
    * Singleton instance
    */
   private static MyTracks instance;
 
+  private TrackDataHub dataHub;
   private ChartActivity chartActivity;
 
   /*
@@ -141,16 +138,6 @@ public class MyTracks extends TabActivity implements OnTouchListener,
   private boolean startNewTrackRequested = false;
 
   private ITrackRecordingService trackRecordingService;
-
-  /**
-   * The id of the currently recording track.
-   */
-  private long recordingTrackId = -1;
-
-  /**
-   * The id of the currently selected track.
-   */
-  private long selectedTrackId = -1;
 
   /**		
    * Does the user want to share the current track.		
@@ -226,7 +213,7 @@ public class MyTracks extends TabActivity implements OnTouchListener,
   public boolean isRecording() {
     if (trackRecordingService == null) {
       // Fall back to alternative check method.
-      return isRecordingBasedOnSharedPreferences();
+      return dataHub.isRecording();
     }
     try {
       return trackRecordingService.isRecording();
@@ -236,14 +223,8 @@ public class MyTracks extends TabActivity implements OnTouchListener,
       Log.e(MyTracksConstants.TAG, "MyTracks: Remote exception.", e);
 
       // Fall back to alternative check method.
-      return isRecordingBasedOnSharedPreferences();
+      return dataHub.isRecording();
     }
-  }
-
-  private boolean isRecordingBasedOnSharedPreferences() {
-    // TrackRecordingService guarantees that recordingTrackId is set to
-    // -1 if the track has been stopped.
-    return recordingTrackId >= 0;
   }
 
   /*
@@ -262,6 +243,7 @@ public class MyTracks extends TabActivity implements OnTouchListener,
     }
 
     providerUtils = MyTracksProviderUtils.Factory.get(this);
+    dataHub = new TrackDataHub(this, providerUtils);
     menuManager = new MenuManager(this);
     sharedPreferences = getSharedPreferences(MyTracksSettings.SETTINGS_NAME, 0);
     dialogManager = new DialogManager(this);
@@ -304,20 +286,6 @@ public class MyTracks extends TabActivity implements OnTouchListener,
     tabHost.addView(layout);
     layout.setOnTouchListener(this);
 
-    if (sharedPreferences != null) {
-      selectedTrackId =
-          sharedPreferences.getLong(getString(R.string.selected_track_key), -1);
-      recordingTrackId = sharedPreferences.getLong(
-          getString(R.string.recording_track_key), -1);
-      sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-      Log.d(MyTracksConstants.TAG, "recordingTrackId: " + recordingTrackId
-          + ", selectedTrackId: " + selectedTrackId);
-      if (recordingTrackId > 0) {
-        Intent startIntent = new Intent(this, TrackRecordingService.class);
-        startService(startIntent);
-      }
-    }
-
     // This will show the eula until the user accepts or quits the app.
     Eula.showEulaRequireAcceptance(this);
 
@@ -349,8 +317,20 @@ public class MyTracks extends TabActivity implements OnTouchListener,
   @Override
   protected void onDestroy() {
     Log.d(MyTracksConstants.TAG, "MyTracks.onDestroy");
+    dataHub.destroy();
     tryUnbindTrackRecordingService();
     super.onDestroy();
+  }
+
+  @Override
+  protected void onStop() {
+    Log.d(MyTracksConstants.TAG, "MyTracks.onStop");
+
+    dataHub.stop();
+
+    // Clean up any temporary track files.
+    TempFileCleaner.clean();
+    super.onStop();
   }
 
   @Override
@@ -372,11 +352,10 @@ public class MyTracks extends TabActivity implements OnTouchListener,
   }
 
   @Override
-  protected void onStop() {
-    Log.d(MyTracksConstants.TAG, "MyTracks.onStop");
-    // Clean up any temporary track files.
-    TempFileCleaner.clean();
-    super.onStop();
+  protected void onStart() {
+    Log.d(MyTracksConstants.TAG, "MyTracks.onStart");
+    super.onStart();
+    dataHub.start();
   }
 
   /*
@@ -393,7 +372,7 @@ public class MyTracks extends TabActivity implements OnTouchListener,
   @Override
   public boolean onPrepareOptionsMenu(Menu menu) {
     menuManager.onPrepareOptionsMenu(menu, providerUtils.getLastTrack() != null,
-        isRecording(), selectedTrackId >= 0);
+        isRecording(), dataHub.isATrackSelected());
     return super.onPrepareOptionsMenu(menu);
   }
 
@@ -462,7 +441,8 @@ public class MyTracks extends TabActivity implements OnTouchListener,
         if (results != null) {
           final long trackId = results.getLongExtra("trackid", -1);
           if (trackId >= 0) {
-            setSelectedTrackId(trackId);
+            dataHub.loadTrack(trackId);
+
             // The track list passed the requested action as result code. Hand
             // it off to the onAcitivtyResult for further processing:
             if (resultCode != MyTracksConstants.SHOW_TRACK) {
@@ -488,14 +468,14 @@ public class MyTracks extends TabActivity implements OnTouchListener,
       }
       case MyTracksConstants.DELETE_TRACK: {
         if (results != null && resultCode == RESULT_OK) {
-          final long trackId = results.getLongExtra("trackid", selectedTrackId);
+          final long trackId = results.getLongExtra("trackid", dataHub.getSelectedTrackId());
           deleteTrack(trackId);
         }
         break;
       }
       case MyTracksConstants.EDIT_DETAILS: {
         if (results != null && resultCode == RESULT_OK) {
-          final long trackId = results.getLongExtra("trackid", selectedTrackId);
+          final long trackId = results.getLongExtra("trackid", dataHub.getSelectedTrackId());
           Intent intent = new Intent(this, MyTracksDetails.class);
           intent.putExtra("trackid", trackId);
           startActivity(intent);
@@ -510,7 +490,7 @@ public class MyTracks extends TabActivity implements OnTouchListener,
       case MyTracksConstants.GET_MAP: {
         // User picked a map to upload to
         if (resultCode == RESULT_OK) {
-          results.putExtra("trackid", selectedTrackId);
+          results.putExtra("trackid", dataHub.getSelectedTrackId());
           if (results.hasExtra("mapid")) {
             sendToMyMapsMapId = results.getStringExtra("mapid");
           }
@@ -533,7 +513,7 @@ public class MyTracks extends TabActivity implements OnTouchListener,
           if (results.hasExtra("trackid")) {
             trackId = results.getLongExtra("trackid", -1);
           } else {
-            trackId = selectedTrackId;
+            trackId = dataHub.getSelectedTrackId();
           }
 
           sendToGoogleMaps(trackId, mapId);
@@ -549,7 +529,7 @@ public class MyTracks extends TabActivity implements OnTouchListener,
           if (results.hasExtra("trackid")) {
             trackId = results.getLongExtra("trackid", -1);
           } else {
-            trackId = selectedTrackId;
+            trackId = dataHub.getSelectedTrackId();
           }
 
           sendToFusionTables(trackId);
@@ -570,7 +550,7 @@ public class MyTracks extends TabActivity implements OnTouchListener,
       case MyTracksConstants.AUTHENTICATE_TO_TRIX: {
         // Authenticated with Trix
         if (resultCode == RESULT_OK) {
-          final long trackId = results.getLongExtra("trackid", selectedTrackId);
+          final long trackId = results.getLongExtra("trackid", dataHub.getSelectedTrackId());
           sendToGoogleDocs(trackId);
         } else {
           onSendToGoogleDone();
@@ -590,19 +570,19 @@ public class MyTracks extends TabActivity implements OnTouchListener,
         if (exportFormat == null) { exportFormat = TrackFileFormat.TCX; }
 
         if (results != null && resultCode == Activity.RESULT_OK) {
-          final long trackId = results.getLongExtra("trackid", selectedTrackId);
+          final long trackId = results.getLongExtra("trackid", dataHub.getSelectedTrackId());
           if (trackId >= 0) {
             saveTrack(trackId, exportFormat);
           }
         }
         break;
       case MyTracksConstants.SHARE_LINK: {
-        Track selectedTrack = providerUtils.getTrack(selectedTrackId);
+        Track selectedTrack = providerUtils.getTrack(dataHub.getSelectedTrackId());
         if (selectedTrack != null) {
           if (!TextUtils.isEmpty(selectedTrack.getMapId())) {
             shareLinkToMap(MapsService.buildMapUrl(selectedTrack.getMapId()));
           } else if (!TextUtils.isEmpty(selectedTrack.getTableId())) {
-            shareLinkToMap(getFusionTablesUrl(selectedTrackId));
+            shareLinkToMap(getFusionTablesUrl(dataHub.getSelectedTrackId()));
           } else {
             shareRequested = true;
             dialogManager.showDialogSafely(DIALOG_SEND_TO_GOOGLE);
@@ -623,7 +603,7 @@ public class MyTracks extends TabActivity implements OnTouchListener,
         if (exportFormat == null) { exportFormat = TrackFileFormat.TCX; }
 
         if (results != null && resultCode == Activity.RESULT_OK) {
-          final long trackId = results.getLongExtra("trackid", selectedTrackId);
+          final long trackId = results.getLongExtra("trackid", dataHub.getSelectedTrackId());
           if (trackId >= 0) {
             sendTrack(trackId, exportFormat);
           }
@@ -631,7 +611,7 @@ public class MyTracks extends TabActivity implements OnTouchListener,
         break;
       }
       case MyTracksConstants.CLEAR_MAP: {
-        setSelectedTrackId(-1);
+        dataHub.unloadCurrentTrack();
         break;
       }
       case MyTracksConstants.WELCOME: {
@@ -652,19 +632,6 @@ public class MyTracks extends TabActivity implements OnTouchListener,
       navControls.show();
     }
     return false;
-  }
-
-  @Override
-  public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
-      String key) {
-    if (key != null && key.equals(getString(R.string.selected_track_key))) {
-      selectedTrackId = sharedPreferences.getLong(
-          getString(R.string.selected_track_key), -1);
-    }
-    if (key != null && key.equals(getString(R.string.recording_track_key))) {
-      recordingTrackId = sharedPreferences.getLong(
-          getString(R.string.recording_track_key), -1);
-    }
   }
 
   /**
@@ -712,7 +679,7 @@ public class MyTracks extends TabActivity implements OnTouchListener,
           }
           if (trackIdsImported != null && trackIdsImported.length > 0) {
             // select last track from import file
-            setSelectedTrackId(trackIdsImported[trackIdsImported.length - 1]);
+            dataHub.loadTrack(trackIdsImported[trackIdsImported.length - 1]);
           } else {
             dialogManager.showMessageDialog(message, false/* success */);
           }
@@ -784,8 +751,8 @@ public class MyTracks extends TabActivity implements OnTouchListener,
       public void onClick(DialogInterface dialog, int i) {
         dialog.dismiss();
         providerUtils.deleteTrack(trackId);
-        if (trackId == selectedTrackId) {
-          setSelectedTrackId(-1);
+        if (trackId == dataHub.getSelectedTrackId()) {
+          dataHub.unloadCurrentTrack();
         }
       }});
     builder.setNegativeButton(getString(R.string.no),
@@ -796,46 +763,6 @@ public class MyTracks extends TabActivity implements OnTouchListener,
     });
     dialog = builder.create();
     dialog.show();
-  }
-
-  public Location getCurrentLocation() {
-    // TODO: Let's look at more advanced algorithms to determine the best
-    // current location.
-    LocationManager locationManager =
-        (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-    if (locationManager == null) {
-      return null;
-    }
-    final long maxAgeMilliSeconds = 1000 * 60 * 1;  // 1 minute
-    final long maxAgeNetworkMilliSeconds = 1000 * 60 * 10;  // 10 minutes
-    final long now = System.currentTimeMillis();
-    Location loc = locationManager.getLastKnownLocation(
-        MyTracksConstants.GPS_PROVIDER);
-    if (loc == null || loc.getTime() < now - maxAgeMilliSeconds) {
-      // We don't have a recent GPS fix, just use cell towers if available
-      loc = locationManager.getLastKnownLocation(
-          LocationManager.NETWORK_PROVIDER);
-      if (loc == null || loc.getTime() < now - maxAgeNetworkMilliSeconds) {
-        // We don't have a recent cell tower location, let the user know:
-        Toast.makeText(this, getString(R.string.status_no_location),
-            Toast.LENGTH_LONG).show();
-        return null;
-      } else {
-       // Let the user know we have only an approximate location:
-       Toast.makeText(this, getString(R.string.status_approximate_location),
-           Toast.LENGTH_LONG).show();
-      }
-    }
-    return loc;
-  }
-
-  public Location getLastLocation() {
-    if (providerUtils.getLastLocationId(recordingTrackId) < 0) {
-      return null;
-    }
-    LocationManager locationManager =
-        (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-    return locationManager.getLastKnownLocation(MyTracksConstants.GPS_PROVIDER);
   }
 
   /**
@@ -915,9 +842,9 @@ public class MyTracks extends TabActivity implements OnTouchListener,
   private void startRecordingNewTrack(
       ITrackRecordingService trackRecordingService) {
     try {
-      recordingTrackId = trackRecordingService.startNewTrack();
+      long recordingTrackId = trackRecordingService.startNewTrack();
       // Select the recording track.
-      setSelectedTrackId(recordingTrackId);
+      dataHub.loadTrack(recordingTrackId);
       Toast.makeText(this, getString(R.string.status_now_recording),
           Toast.LENGTH_SHORT).show();
       // TODO: We catch Exception, because after eliminating the service process
@@ -952,7 +879,7 @@ public class MyTracks extends TabActivity implements OnTouchListener,
   public void stopRecording() {
     if (trackRecordingService != null) {
       // Save the track id as the shared preference will overwrite the recording track id.
-      long currentTrackId = recordingTrackId;
+      long currentTrackId = sharedPreferences.getLong(getString(R.string.recording_track_key), -1);
       try {
         trackRecordingService.endCurrentTrack();
         // TODO: We catch Exception, because after eliminating the service process
@@ -960,10 +887,13 @@ public class MyTracks extends TabActivity implements OnTouchListener,
       } catch (Exception e) {
         Log.e(MyTracksConstants.TAG, "Unable to stop recording.", e);
       }
-      Intent intent = new Intent(MyTracks.this, MyTracksDetails.class);
-      intent.putExtra("trackid", currentTrackId);
-      intent.putExtra("hasCancelButton", false);
-      startActivity(intent);
+
+      if (currentTrackId > 0) {
+        Intent intent = new Intent(MyTracks.this, MyTracksDetails.class);
+        intent.putExtra("trackid", currentTrackId);
+        intent.putExtra("hasCancelButton", false);
+        startActivity(intent);
+      }
     }
     tryUnbindTrackRecordingService();
     try {
@@ -1238,21 +1168,12 @@ public class MyTracks extends TabActivity implements OnTouchListener,
     return message.toString();
   }
 
-  /**
-   * Writes the selected track id to the shared preferences.
-   * Executed on the UI thread.
-   *
-   * @param trackId the id of the track
-   */
-  public void setSelectedTrackId(final long trackId) {
-    ApiFeatures.getInstance().getApiPlatformAdapter().applyPreferenceChanges(
-        sharedPreferences
-            .edit()
-            .putLong(getString(R.string.selected_track_key), trackId));
+  void clearSelectedTrack() {
+    dataHub.unloadCurrentTrack();
   }
 
   long getSelectedTrackId() {
-    return selectedTrackId;
+    return dataHub.getSelectedTrackId();
   }
 
   /**
@@ -1377,9 +1298,9 @@ public class MyTracks extends TabActivity implements OnTouchListener,
 
   // @VisibleForTesting
   long getRecordingTrackId() {
-    return recordingTrackId;
+    return sharedPreferences.getLong(getString(R.string.recording_track_key), -1);
   }
-  
+
   // @VisibleForTesting
   SharedPreferences getSharedPreferences() {
     return sharedPreferences;
@@ -1393,5 +1314,9 @@ public class MyTracks extends TabActivity implements OnTouchListener,
   // @VisibleForTesting
   ITrackRecordingService getTrackRecordingService() {
     return trackRecordingService;
+  }
+
+  public TrackDataHub getDataHub() {
+    return dataHub;
   }
 }

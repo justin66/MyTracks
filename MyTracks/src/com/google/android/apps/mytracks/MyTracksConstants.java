@@ -141,6 +141,12 @@ public abstract class MyTracksConstants {
   public static final int MAX_LOADED_TRACK_POINTS = 20000;
 
   /**
+   * Maximum number of track points ever loaded at once from the provider into
+   * memory in a single call to read points.
+   */
+  public static final int MAX_LOADED_TRACK_POINTS_PER_BATCH = 1000;
+
+  /**
    * Maximum number of way points displayed by the map overlay.
    */
   public static final int MAX_DISPLAYED_WAYPOINTS_POINTS = 128;
