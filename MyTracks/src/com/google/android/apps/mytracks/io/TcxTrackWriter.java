@@ -239,10 +239,17 @@ public class TcxTrackWriter implements TrackFormatWriter {
     pw.format("<Name>My Tracks %s by Google</Name>\n", MyTracksUtils.getMyTracksVersion(context));
 
     pw.println("<Build>");
+
+    // The TCX spec for the Version tag is too strict to allow us to use our
+    // user-visible version number, so we use our version code instead.  We
+    // also set the minor version to 1 if this is a development build to
+    // signify that this build is newer than the one associated with the
+    // version code given in VersionMajor.
     pw.println("<Version>");
     pw.format("<VersionMajor>%d</VersionMajor>\n", MyTracksUtils.getMyTracksVersionCode(context));
-    pw.println("<VersionMinor>0</VersionMinor>");
+    pw.format("<VersionMinor>%d</VersionMinor>\n", MyTracksUtils.isRelease(context) ? 0 : 1);
     pw.println("</Version>");
+
     pw.format("<Type>%s</Type>\n", MyTracksUtils.isRelease(context) ? TCX_TYPE_RELEASE
         : TCX_TYPE_INTERNAL);
     pw.println("</Build>");
