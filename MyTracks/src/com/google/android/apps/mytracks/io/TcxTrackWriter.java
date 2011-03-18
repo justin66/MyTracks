@@ -246,7 +246,7 @@ public class TcxTrackWriter implements TrackFormatWriter {
     // signify that this build is newer than the one associated with the
     // version code given in VersionMajor.
     pw.println("<Version>");
-    pw.format("<VersionMajor>%d</VersionMajor>\n", MyTracksUtils.getMyTracksVersionCode(context));
+    pw.format("<VersionMajor>%d</VersionMajor>\n", MyTracksUtils.getMyTracksVersion(context));
     pw.format("<VersionMinor>%d</VersionMinor>\n", MyTracksUtils.isRelease(context) ? 0 : 1);
     pw.println("</Version>");
 

@@ -112,24 +112,24 @@ public class StatsActivity extends Activity
 
     public UIUpdateThread() {
       super();
-      Log.i(MyTracksConstants.TAG, "Created UI update thread");
+      Log.i(Constants.TAG, "Created UI update thread");
     }
 
     @Override
     public void run() {
-      Log.i(MyTracksConstants.TAG, "Started UI update thread");
+      Log.i(Constants.TAG, "Started UI update thread");
       while (MyTracks.getInstance().isRecording()) {
         long sleeptime = 1000;
         runOnUiThread(updateResults);
         try {
           Thread.sleep(sleeptime);
         } catch (InterruptedException e) {
-          Log.w(MyTracksConstants.TAG,
+          Log.w(Constants.TAG,
               "StatsActivity: Caught exception on sleep.", e);
           break;
         }
       }
-      Log.w(MyTracksConstants.TAG, "UIUpdateThread finished.");
+      Log.w(Constants.TAG, "UIUpdateThread finished.");
     }
   }
 
@@ -155,7 +155,7 @@ public class StatsActivity extends Activity
     observer = new ContentObserver(contentHandler) {
       @Override
       public void onChange(boolean selfChange) {
-        Log.d(MyTracksConstants.TAG, "StatsActivity: ContentObserver.onChange");
+        Log.d(Constants.TAG, "StatsActivity: ContentObserver.onChange");
         restoreStats();
         super.onChange(selfChange);
       }
@@ -217,7 +217,7 @@ public class StatsActivity extends Activity
   @Override
   public void onSharedPreferenceChanged(
       final SharedPreferences sharedPreferences, final String key) {
-    Log.d(MyTracksConstants.TAG,
+    Log.d(Constants.TAG,
         "StatsActivity: onSharedPreferences changed " + key);
     if (key != null) {
       runOnUiThread(new Runnable() {
@@ -255,7 +255,7 @@ public class StatsActivity extends Activity
             utils.updateUnits();
             utils.setSpeedLabel(
                 R.id.speed_label, R.string.speed, R.string.pace_label);
-            Log.w(MyTracksConstants.TAG, "Setting speed labels");
+            Log.w(Constants.TAG, "Setting speed labels");
             utils.setSpeedLabels();
             restoreStats();
           }
@@ -268,14 +268,14 @@ public class StatsActivity extends Activity
   public boolean onCreateOptionsMenu(Menu menu) {
     super.onCreateOptionsMenu(menu);
     MenuItem currentSegment = menu.add(0,
-        MyTracksConstants.MENU_CURRENT_SEGMENT, 0, R.string.current_segment);
+        Constants.MENU_CURRENT_SEGMENT, 0, R.string.current_segment);
     currentSegment.setIcon(R.drawable.ic_menu_lastsegment);
     return true;
   }
 
   @Override
   public boolean onPrepareOptionsMenu(Menu menu) {
-    MenuItem item = menu.findItem(MyTracksConstants.MENU_CURRENT_SEGMENT);
+    MenuItem item = menu.findItem(Constants.MENU_CURRENT_SEGMENT);
     if (item != null) {
       item.setTitle(showCurrentSegment
           ? getString(R.string.current_track)
@@ -287,7 +287,7 @@ public class StatsActivity extends Activity
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
-      case MyTracksConstants.MENU_CURRENT_SEGMENT:
+      case Constants.MENU_CURRENT_SEGMENT:
         showCurrentSegment = !showCurrentSegment;
         restoreStats();
         return true;
@@ -327,13 +327,13 @@ public class StatsActivity extends Activity
         (LocationManager) getSystemService(Context.LOCATION_SERVICE);
     if (locationManager != null) {
       LocationProvider gpsProvider =
-          locationManager.getProvider(MyTracksConstants.GPS_PROVIDER);
+          locationManager.getProvider(Constants.GPS_PROVIDER);
       if (gpsProvider == null) {
         Toast.makeText(this, getString(R.string.error_no_gps_location_provider),
             Toast.LENGTH_LONG).show();
         return;
       } else {
-        Log.d(MyTracksConstants.TAG, "StatsActivity: Using location provider "
+        Log.d(Constants.TAG, "StatsActivity: Using location provider "
             + gpsProvider.getName());
       }
       locationManager.requestLocationUpdates(gpsProvider.getName(),

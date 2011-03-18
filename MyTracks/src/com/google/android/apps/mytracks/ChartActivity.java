@@ -88,9 +88,9 @@ public class ChartActivity extends Activity implements
   private long recordingTrackId = -1;
 
   private final DoubleBuffer elevationBuffer =
-      new DoubleBuffer(MyTracksConstants.ELEVATION_SMOOTHING_FACTOR);
+      new DoubleBuffer(Constants.ELEVATION_SMOOTHING_FACTOR);
   private final DoubleBuffer speedBuffer =
-      new DoubleBuffer(MyTracksConstants.SPEED_SMOOTHING_FACTOR);
+      new DoubleBuffer(Constants.SPEED_SMOOTHING_FACTOR);
 
   private Mode mode = Mode.BY_DISTANCE;
 
@@ -200,7 +200,7 @@ public class ChartActivity extends Activity implements
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    Log.w(MyTracksConstants.TAG, "ChartActivity.onCreate");
+    Log.w(Constants.TAG, "ChartActivity.onCreate");
     super.onCreate(savedInstanceState);
     MyTracks.getInstance().setChartActivity(this);
     providerUtils = MyTracksProviderUtils.Factory.get(this);
@@ -258,7 +258,7 @@ public class ChartActivity extends Activity implements
     observer = new ContentObserver(contentHandler) {
       @Override
       public void onChange(boolean selfChange) {
-        Log.d(MyTracksConstants.TAG, "ChartActivity: ContentObserver.onChange");
+        Log.d(Constants.TAG, "ChartActivity: ContentObserver.onChange");
         // Check for any new locations and append them to the currently
         // recording track.
         if (recordingTrackId < 0) {
@@ -279,7 +279,7 @@ public class ChartActivity extends Activity implements
     waypointObserver = new ContentObserver(contentHandler) {
       @Override
       public void onChange(boolean selfChange) {
-        Log.d(MyTracksConstants.TAG,
+        Log.d(Constants.TAG,
             "MyTracksMap: ContentObserver.onChange waypoints");
         if (selectedTrackId < 0) {
           return;
@@ -385,7 +385,7 @@ public class ChartActivity extends Activity implements
       // We will silently drop extra waypoints to make the app responsive.
       cursor =
           providerUtils.getWaypointsCursor(selectedTrackId, 0,
-              MyTracksConstants.MAX_DISPLAYED_TRACK_POINTS);
+              Constants.MAX_DISPLAYED_TRACK_POINTS);
       if (cursor != null) {
         if (cursor.moveToFirst()) {
           do {
@@ -395,7 +395,7 @@ public class ChartActivity extends Activity implements
         }
       }
     } catch (RuntimeException e) {
-      Log.w(MyTracksConstants.TAG, "Caught an unexpected exception.", e);
+      Log.w(Constants.TAG, "Caught an unexpected exception.", e);
     } finally {
       if (cursor != null) {
         cursor.close();
@@ -407,7 +407,7 @@ public class ChartActivity extends Activity implements
   public boolean onCreateOptionsMenu(Menu menu) {
     super.onCreateOptionsMenu(menu);
     chartSettingsMenuItem =
-        menu.add(0, MyTracksConstants.MENU_CHART_SETTINGS, 0,
+        menu.add(0, Constants.MENU_CHART_SETTINGS, 0,
             R.string.chart_settings);
     chartSettingsMenuItem.setIcon(R.drawable.chart_settings);
     return true;
@@ -416,7 +416,7 @@ public class ChartActivity extends Activity implements
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
-      case MyTracksConstants.MENU_CHART_SETTINGS:
+      case Constants.MENU_CHART_SETTINGS:
         MyTracks.getInstance().getDialogManager().showDialogSafely(
             DialogManager.DIALOG_CHART_SETTINGS);
         return true;
@@ -492,7 +492,7 @@ public class ChartActivity extends Activity implements
         result[0] = (location.getTime() - startTime);
         break;
       default:
-        Log.w(MyTracksConstants.TAG, "ChartActivity unknown mode: " + mode);
+        Log.w(Constants.TAG, "ChartActivity unknown mode: " + mode);
     }
 
     elevationBuffer.setNext(metricUnits
@@ -573,10 +573,10 @@ public class ChartActivity extends Activity implements
    * Read all new track points.
    */
   private void readNewTrackPoints() {
-    Log.i(MyTracksConstants.TAG, "MyTracks: Updating chart last seen: " + lastSeenLocationId);
+    Log.i(Constants.TAG, "MyTracks: Updating chart last seen: " + lastSeenLocationId);
     Track track = providerUtils.getTrack(recordingTrackId);
     if (track == null) {
-      Log.w(MyTracksConstants.TAG, "MyTracks: track not found");
+      Log.w(Constants.TAG, "MyTracks: track not found");
       return;
     }
     chartView.addDataPoints(readPointsToList(track));
@@ -585,7 +585,7 @@ public class ChartActivity extends Activity implements
         chartView.invalidate();
       }
     });
-    Log.i(MyTracksConstants.TAG, "MyTracks: Updated chart last seen: " + lastSeenLocationId);
+    Log.i(Constants.TAG, "MyTracks: Updated chart last seen: " + lastSeenLocationId);
   }
 
   /**

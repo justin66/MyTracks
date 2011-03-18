@@ -61,16 +61,16 @@ limitations under the License.
               android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|fontScale"
               android:exported="false" />
 
-    <activity android:name="com.google.android.apps.mytracks.MyTracksList"
+    <activity android:name="com.google.android.apps.mytracks.TrackList"
               android:label="Recorded Tracks" />
 
-    <activity android:name="com.google.android.apps.mytracks.MyTracksWaypointsList"
+    <activity android:name="com.google.android.apps.mytracks.WaypointsList"
               android:label="Recorded Waypoints" />
 
-    <activity android:name="com.google.android.apps.mytracks.MyTracksDetails"
+    <activity android:name="com.google.android.apps.mytracks.TrackDetails"
               android:label="@string/trackdetails_title" />
 
-    <activity android:name="com.google.android.apps.mytracks.MyTracksWaypointDetails"
+    <activity android:name="com.google.android.apps.mytracks.WaypointDetails"
               android:label="@string/waypointdetails_title" />
 
     <activity android:name="com.google.android.apps.mytracks.MyTracksSettings"

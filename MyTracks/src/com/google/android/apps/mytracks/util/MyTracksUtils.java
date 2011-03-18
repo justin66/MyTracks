@@ -1,12 +1,12 @@
 /*
  * Copyright 2008 Google Inc.
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -15,9 +15,10 @@
  */
 package com.google.android.apps.mytracks.util;
 
-import com.google.android.apps.mytracks.MyTracksConstants;
+import com.google.android.apps.mytracks.Constants;
 import com.google.android.apps.mytracks.content.Track;
 import com.google.android.apps.mytracks.stats.TripStatistics;
+
 import com.google.android.maps.GeoPoint;
 
 import android.app.Activity;
@@ -37,7 +38,7 @@ import java.util.Stack;
 
 /**
  * Utility class for decimating tracks at a given level of precision.
- *
+ * 
  * @author Leif Hendrik Wilden
  */
 public class MyTracksUtils {
@@ -46,7 +47,7 @@ public class MyTracksUtils {
   /**
    * Computes the distance on the two sphere between the point c0 and the line
    * segment c1 to c2.
-   *
+   * 
    * @param c0 the first coordinate
    * @param c1 the beginning of the line segment
    * @param c2 the end of the lone segment
@@ -88,7 +89,7 @@ public class MyTracksUtils {
   /**
    * Decimates the given locations for a given zoom level. This uses a
    * Douglas-Peucker decimation algorithm.
-   *
+   * 
    * @param tolerance in meters
    * @param locations input
    * @param decimated output
@@ -145,13 +146,13 @@ public class MyTracksUtils {
       }
       idx++;
     }
-    Log.d(MyTracksConstants.TAG, "Decimating " + n + " points to " + i
+    Log.d(Constants.TAG, "Decimating " + n + " points to " + i
         + " w/ tolerance = " + tolerance);
   }
 
   /**
    * Decimates the given track for the given precision.
-   *
+   * 
    * @param track a track
    * @param precision desired precision in meters
    */
@@ -164,7 +165,7 @@ public class MyTracksUtils {
   /**
    * Limits number of points by dropping any points beyond the given number of
    * points. Note: That'll actually discard points.
-   *
+   * 
    * @param track a track
    * @param numberOfPoints maximum number of points
    */
@@ -178,7 +179,7 @@ public class MyTracksUtils {
   /**
    * Splits a track in multiple tracks where each piece has less or equal than
    * maxPoints.
-   *
+   * 
    * @param track the track to split
    * @param maxPoints maximum number of points for each piece
    * @return a list of one or more track pieces
@@ -213,7 +214,7 @@ public class MyTracksUtils {
 
   /**
    * Test if a given GeoPoint is valid, i.e. within physical bounds.
-   *
+   * 
    * @param geoPoint the point to be tested
    * @return true, if it is a physical location on earth.
    */
@@ -227,7 +228,7 @@ public class MyTracksUtils {
    * on Earth. Note: The special separator locations (which have latitude =
    * 100) will not qualify as valid. Neither will locations with lat=0 and lng=0
    * as these are most likely "bad" measurements which often cause trouble.
-   *
+   * 
    * @param location the location to test
    * @return true if the location is a valid location.
    */
@@ -238,7 +239,7 @@ public class MyTracksUtils {
 
   /**
    * Gets a location from a GeoPoint.
-   *
+   * 
    * @param p a GeoPoint
    * @return the corresponding location
    */
@@ -258,17 +259,17 @@ public class MyTracksUtils {
    * Returns whether or not this is a release build.
    */
   public static boolean isRelease(Context context) {
-    PackageInfo packageInfo = getPackageInfo(context, PackageManager.GET_SIGNATURES);
-    if (packageInfo == null) {
-      return false;
-    }
-
-    for (Signature sig : packageInfo.signatures) {
-      if (sig.hashCode() == RELEASE_SIGNATURE_HASHCODE) {
-        return true;
+    try {
+      Signature [] sigs = context.getPackageManager().getPackageInfo(
+          context.getPackageName(), PackageManager.GET_SIGNATURES).signatures;
+      for (Signature sig : sigs) {
+        if (sig.hashCode() == RELEASE_SIGNATURE_HASHCODE) {
+          return true;
+        }
       }
+    } catch (NameNotFoundException e) {
+      Log.e(Constants.TAG, "Unable to get signatures", e);
     }
-
     return false;
   }
 
@@ -278,52 +279,35 @@ public class MyTracksUtils {
    * @return the version, or an empty string in case of failure.
    */
   public static String getMyTracksVersion(Context context) {
-    PackageInfo packageInfo = getPackageInfo(context, PackageManager.GET_META_DATA);
-    return packageInfo == null ? "" : packageInfo.versionName;
-  }
-
-  /**
-   * Return the My Tracks version code from the manifest.
-   *
-   * @return the version code, or an empty string in case of failure.
-   */
-  public static int getMyTracksVersionCode(Context context) {
-    PackageInfo packageInfo = getPackageInfo(context, PackageManager.GET_META_DATA);
-    return packageInfo == null ? -1 : packageInfo.versionCode;
-  }
-
-  private static PackageInfo getPackageInfo(Context context, int flags) {
-    if (context == null) {
-      Log.w(MyTracksConstants.TAG, "No context found when attempting to get PackageInfo");
-      return null;
-    }
     try {
-      return context.getPackageManager().getPackageInfo(
-          "com.google.android.maps.mytracks", flags);
+      PackageInfo pi = context.getPackageManager().getPackageInfo(
+          "com.google.android.maps.mytracks",
+          PackageManager.GET_META_DATA);
+      return pi.versionName;
     } catch (NameNotFoundException e)  {
-      Log.w(MyTracksConstants.TAG, "Failed to get version info.", e);
-      return null;
+      Log.w(Constants.TAG, "Failed to get version info.", e);
+      return "";
     }
   }
-
+  
   /**
    * Tries to acquire a partial wake lock if not already acquired. Logs errors
    * and gives up trying in case the wake lock cannot be acquired.
    */
   public static WakeLock acquireWakeLock(Activity activity, WakeLock wakeLock) {
-    Log.i(MyTracksConstants.TAG, "MyTracksUtils: Acquiring wake lock.");
+    Log.i(Constants.TAG, "MyTracksUtils: Acquiring wake lock.");
     try {
       PowerManager pm = (PowerManager) activity
           .getSystemService(Context.POWER_SERVICE);
       if (pm == null) {
-        Log.e(MyTracksConstants.TAG, "MyTracksUtils: Power manager not found!");
+        Log.e(Constants.TAG, "MyTracksUtils: Power manager not found!");
         return wakeLock;
       }
       if (wakeLock == null) {
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-            MyTracksConstants.TAG);
+            Constants.TAG);
         if (wakeLock == null) {
-          Log.e(MyTracksConstants.TAG,
+          Log.e(Constants.TAG,
               "MyTracksUtils: Could not create wake lock (null).");
         }
         return wakeLock;
@@ -331,12 +315,12 @@ public class MyTracksUtils {
       if (!wakeLock.isHeld()) {
         wakeLock.acquire();
         if (!wakeLock.isHeld()) {
-          Log.e(MyTracksConstants.TAG,
+          Log.e(Constants.TAG,
               "MyTracksUtils: Could not acquire wake lock.");
         }
       }
     } catch (RuntimeException e) {
-      Log.e(MyTracksConstants.TAG,
+      Log.e(Constants.TAG,
           "MyTracksUtils: Caught unexpected exception: " + e.getMessage(), e);
     }
     return wakeLock;
