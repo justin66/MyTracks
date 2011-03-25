@@ -15,6 +15,9 @@
  */
 package com.google.android.apps.mytracks.services;
 
+import com.google.android.apps.mytracks.services.tasks.PeriodicTask;
+import com.google.android.apps.mytracks.services.tasks.StatusAnnouncerFactory;
+import com.google.android.apps.mytracks.services.tasks.StatusAnnouncerTask;
 import com.google.android.apps.mytracks.util.ApiFeatures;
 
 import android.media.AudioManager;

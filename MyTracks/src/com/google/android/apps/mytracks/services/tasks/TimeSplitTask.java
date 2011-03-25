@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 Google Inc.
+ * Copyright 2010 Google Inc.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -14,26 +14,28 @@
  * the License.
  */
 
-package com.google.android.apps.mytracks.services;
+package com.google.android.apps.mytracks.services.tasks;
+
+import com.google.android.apps.mytracks.content.WaypointCreationRequest;
+import com.google.android.apps.mytracks.services.TrackRecordingService;
+
 
 /**
- * This is interface for a task that will be executed on some schedule.
- *
+ * A simple task to insert statistics markers every n minutes.
  * @author Sandor Dornbush
  */
-public interface PeriodicTask {
-  /**
-   * Sets up this task for subsequent calls to the run method.
-   */
-  public void start();
-  
-  /**
-   * This method will be called periodically.
-   */
-  public void run(TrackRecordingService service);
+public class TimeSplitTask implements PeriodicTask {
 
-  /**
-   * Shuts down this task and clean up resources.
-   */
-  public void shutdown();
+  @Override
+  public void run(TrackRecordingService service) {
+    service.insertWaypoint(WaypointCreationRequest.DEFAULT_STATISTICS);
+  }
+
+  @Override
+  public void shutdown() {
+  }
+
+  @Override
+  public void start() {
+  }
 }

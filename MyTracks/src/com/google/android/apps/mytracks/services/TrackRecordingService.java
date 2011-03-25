@@ -32,6 +32,9 @@ import com.google.android.apps.mytracks.content.WaypointsColumns;
 import com.google.android.apps.mytracks.content.Sensor.SensorDataSet;
 import com.google.android.apps.mytracks.services.sensors.SensorManager;
 import com.google.android.apps.mytracks.services.sensors.SensorManagerFactory;
+import com.google.android.apps.mytracks.services.tasks.PeriodicTask;
+import com.google.android.apps.mytracks.services.tasks.PeriodicTaskExecuter;
+import com.google.android.apps.mytracks.services.tasks.StatusAnnouncerFactory;
 import com.google.android.apps.mytracks.stats.TripStatistics;
 import com.google.android.apps.mytracks.stats.TripStatisticsBuilder;
 import com.google.android.apps.mytracks.util.ApiFeatures;
@@ -115,7 +118,7 @@ public class TrackRecordingService extends Service implements LocationListener {
    * Status announcer executer.
    */
   private PeriodicTaskExecuter announcementExecuter;
-  private SplitManager splitManager;
+  private PeriodicTaskExecuter splitExecuter;
 
   private SensorManager sensorManager;
   
@@ -274,7 +277,8 @@ public class TrackRecordingService extends Service implements LocationListener {
           "Caught SQLiteException: " + e.getMessage(), e);
       return false;
     }
-    splitManager.updateSplits();
+    announcementExecuter.update();
+    splitExecuter.update();
     return true;
   }
 
@@ -428,7 +432,6 @@ public class TrackRecordingService extends Service implements LocationListener {
     statsBuilder.setMinRecordingDistance(minRecordingDistance);
     setUpAnnouncer();
 
-    splitManager.restore();
     length = 0;
     lastValidLocation = null;
 
@@ -476,7 +479,8 @@ public class TrackRecordingService extends Service implements LocationListener {
       }
     }
 
-    splitManager.calculateNextSplit();
+    announcementExecuter.restore();
+    splitExecuter.restore();
   }
 
   /*
@@ -663,7 +667,6 @@ public class TrackRecordingService extends Service implements LocationListener {
     notificationManager =
         (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-    splitManager = new SplitManager(this);
 
     prefManager = new PreferenceManager(this);
     registerLocationListener();
@@ -714,10 +717,10 @@ public class TrackRecordingService extends Service implements LocationListener {
             }
 
             // TODO: Either use TaskExecuterManager everywhere, or get rid of it
-            announcementExecuter = new PeriodicTaskExecuter(announcer,
-                TrackRecordingService.this);
+            announcementExecuter = new PeriodicTaskExecuter(
+                TrackRecordingService.this, announcer);
           }
-          announcementExecuter.scheduleTask(announcementFrequency * 60000);
+          announcementExecuter.setTaskFrequency(announcementFrequency * 60000);
         }
       });
     }
@@ -749,8 +752,10 @@ public class TrackRecordingService extends Service implements LocationListener {
     timer.purge();
     unregisterLocationListener();
     shutdownAnnouncer();
-    splitManager.shutdown();
-    splitManager = null;
+    announcementExecuter.shutdown();
+    announcementExecuter = null;
+    splitExecuter.shutdown();
+    splitExecuter = null;
     if (sensorManager != null) {
       sensorManager.shutdown();
       sensorManager = null;
@@ -1109,7 +1114,8 @@ public class TrackRecordingService extends Service implements LocationListener {
     length = 0;
     showNotification();
     registerLocationListener();
-    splitManager.restore();
+    announcementExecuter.restore();
+    splitExecuter.restore();
     sensorManager = SensorManagerFactory.getSensorManager(this);
     if (sensorManager != null) {
       sensorManager.onStartTrack();
@@ -1252,7 +1258,12 @@ public class TrackRecordingService extends Service implements LocationListener {
     this.autoResumeTrackTimeout = autoResumeTrackTimeout;
   }
 
-  public SplitManager getSplitManager() {
-    return splitManager;
+  public void setSplitFrequency(int frequency) {
+    splitExecuter.setTaskFrequency(frequency);
+  }
+
+  public void setMetricUnits(boolean metric) {
+    announcementExecuter.setMetricUnits(metric);
+    splitExecuter.setMetricUnits(metric);
   }
 }

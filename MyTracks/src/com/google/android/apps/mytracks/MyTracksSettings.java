@@ -19,8 +19,8 @@ import static com.google.android.apps.mytracks.Constants.TAG;
 
 import com.google.android.apps.mytracks.io.backup.BackupActivityHelper;
 import com.google.android.apps.mytracks.io.backup.BackupPreferencesListener;
-import com.google.android.apps.mytracks.services.StatusAnnouncerFactory;
 import com.google.android.apps.mytracks.services.sensors.ant.AntUtils;
+import com.google.android.apps.mytracks.services.tasks.StatusAnnouncerFactory;
 import com.google.android.apps.mytracks.util.ApiFeatures;
 import com.google.android.apps.mytracks.util.BluetoothDeviceUtils;
 import com.google.android.maps.mytracks.R;

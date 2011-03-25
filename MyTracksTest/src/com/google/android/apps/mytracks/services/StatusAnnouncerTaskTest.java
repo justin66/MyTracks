@@ -20,6 +20,7 @@ import static com.google.android.testing.mocking.AndroidMock.eq;
 import static com.google.android.testing.mocking.AndroidMock.expect;
 import static com.google.android.testing.mocking.AndroidMock.same;
 
+import com.google.android.apps.mytracks.services.tasks.StatusAnnouncerTask;
 import com.google.android.apps.mytracks.stats.TripStatistics;
 import com.google.android.apps.mytracks.util.StringUtils;
 import com.google.android.testing.mocking.AndroidMock;

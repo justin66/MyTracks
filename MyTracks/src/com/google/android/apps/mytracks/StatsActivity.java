@@ -22,7 +22,7 @@ import com.google.android.apps.mytracks.content.MyTracksProviderUtilsImpl;
 import com.google.android.apps.mytracks.content.Track;
 import com.google.android.apps.mytracks.content.TracksColumns;
 import com.google.android.apps.mytracks.content.WaypointsColumns;
-import com.google.android.apps.mytracks.services.StatusAnnouncerFactory;
+import com.google.android.apps.mytracks.services.tasks.StatusAnnouncerFactory;
 import com.google.android.apps.mytracks.util.ApiFeatures;
 import com.google.android.maps.mytracks.R;
 

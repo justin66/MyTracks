@@ -14,12 +14,13 @@
  * the License.
  */
 
-package com.google.android.apps.mytracks.services;
+package com.google.android.apps.mytracks.services.tasks;
 
 import static com.google.android.apps.mytracks.Constants.TAG;
 
 import com.google.android.apps.mytracks.Constants;
 import com.google.android.apps.mytracks.MyTracksSettings;
+import com.google.android.apps.mytracks.services.TrackRecordingService;
 import com.google.android.apps.mytracks.stats.TripStatistics;
 import com.google.android.apps.mytracks.util.StringUtils;
 import com.google.android.apps.mytracks.util.UnitConversions;
