@@ -251,9 +251,9 @@ public class MyTracks extends TabActivity implements OnTouchListener,
     }
 
     providerUtils = MyTracksProviderUtils.Factory.get(this);
-    dataHub = new TrackDataHub(this, providerUtils);
-    menuManager = new MenuManager(this);
     sharedPreferences = getSharedPreferences(Constants.SETTINGS_NAME, 0);
+    dataHub = new TrackDataHub(this, sharedPreferences, providerUtils);
+    menuManager = new MenuManager(this);
     dialogManager = new DialogManager(this);
 
     // The volume we want to control is the Text-To-Speech volume

@@ -17,6 +17,7 @@ package com.google.android.apps.mytracks;
 
 import static com.google.android.apps.mytracks.Constants.TAG;
 
+import com.google.android.apps.mytracks.TrackDataHub.ListenerDataType;
 import com.google.android.apps.mytracks.content.Track;
 import com.google.android.apps.mytracks.content.Waypoint;
 import com.google.android.apps.mytracks.services.StatusAnnouncerFactory;
@@ -33,6 +34,8 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
+import java.util.EnumSet;
 
 /**
  * An activity that displays track statistics to the user.
@@ -127,7 +130,13 @@ public class StatsActivity extends Activity implements TrackDataListener {
 
   @Override
   protected void onStart() {
-    dataHub.registerTrackDataListener(this);
+    dataHub.registerTrackDataListener(this, EnumSet.of(
+        ListenerDataType.SELECTED_TRACK_CHANGED,
+        ListenerDataType.TRACK_UPDATES,
+        ListenerDataType.WAYPOINT_UPDATES,
+        ListenerDataType.LOCATION_UPDATES,
+        ListenerDataType.COMPASS_UPDATES,
+        ListenerDataType.DISPLAY_PREFERENCES));
 
     super.onStart();
   }

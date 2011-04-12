@@ -18,6 +18,7 @@ package com.google.android.apps.mytracks;
 import static com.google.android.apps.mytracks.Constants.TAG;
 
 import com.google.android.apps.mytracks.ChartView.Mode;
+import com.google.android.apps.mytracks.TrackDataHub.ListenerDataType;
 import com.google.android.apps.mytracks.content.MyTracksLocation;
 import com.google.android.apps.mytracks.content.Sensor;
 import com.google.android.apps.mytracks.content.Sensor.SensorDataSet;
@@ -45,6 +46,7 @@ import android.widget.LinearLayout;
 import android.widget.ZoomControls;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 
 /**
  * An activity that displays a chart from the track point provider.
@@ -138,7 +140,12 @@ public class ChartActivity extends Activity implements TrackDataListener {
   protected void onStart() {
     super.onStart();
 
-    dataHub.registerTrackDataListener(this);
+    dataHub.registerTrackDataListener(this, EnumSet.of(
+        ListenerDataType.SELECTED_TRACK_CHANGED,
+        ListenerDataType.POINT_UPDATES,
+        ListenerDataType.SAMPLED_OUT_POINT_UPDATES,
+        ListenerDataType.WAYPOINT_UPDATES,
+        ListenerDataType.DISPLAY_PREFERENCES));
   }
 
   @Override
@@ -164,7 +171,7 @@ public class ChartActivity extends Activity implements TrackDataListener {
     if (this.mode != newMode) {
       this.mode = newMode;
       chartView.setMode(this.mode);
-      dataHub.reloadDataFor(this);
+      dataHub.reloadDataForListener(this);
     }
   }
 
