@@ -17,6 +17,7 @@ package com.google.android.apps.mytracks;
 
 import static com.google.android.apps.mytracks.Constants.TAG;
 
+import com.google.android.apps.mytracks.TrackDataHub.ListenerDataType;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
 import com.google.android.apps.mytracks.content.Track;
 import com.google.android.apps.mytracks.content.Waypoint;
@@ -48,6 +49,8 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.util.EnumSet;
 
 /**
  * The map view activity of the MyTracks application.
@@ -176,7 +179,12 @@ public class MapActivity extends com.google.android.maps.MapActivity
     Log.d(TAG, "MapActivity.onStart");
     super.onStart();
 
-    dataHub.registerTrackDataListener(this);
+    dataHub.registerTrackDataListener(this, EnumSet.of(
+        ListenerDataType.SELECTED_TRACK_CHANGED,
+        ListenerDataType.POINT_UPDATES,
+        ListenerDataType.WAYPOINT_UPDATES,
+        ListenerDataType.LOCATION_UPDATES,
+        ListenerDataType.COMPASS_UPDATES));
   }
 
   @Override

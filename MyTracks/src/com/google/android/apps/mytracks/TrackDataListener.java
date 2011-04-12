@@ -58,9 +58,6 @@ public interface TrackDataListener {
    */
   void onCurrentHeadingChanged(double heading);
 
-  // This is always followed by calls to onTrackUpdated/onNewTrackPoints/onWaypointsChanged
-  // The recipient has a chance to unregister here before that happens.
-
   /**
    * Called when the currently-selected track changes.
    * This will be followed by calls to data methods such as
@@ -73,26 +70,12 @@ public interface TrackDataListener {
    */
   void onSelectedTrackChanged(Track track, boolean isRecording);
 
-  // Called when the already-selected track gets updated
-
   /**
    * Called when the track and/or its statistics have been updated.
    *
    * @param track the updated version of the track
    */
   void onTrackUpdated(Track track);
-
-  // Map, chart - points, waypoints
-  // Stats - track
-  // Points are loaded progressively in batches
-  // Track is always loaded
-  // Waypoints are always fully loaded (limit to MyTracksConstants.MAX_DISPLAYED_WAYPOINTS_POINTS)
-
-
-  // Initial load - clear + N * onNewTrackPoint + onNewTrackPointsDone
-  // New points - onNewTrackPoint + onNewTrackPointsDone
-  // Points passed in are already sampled (but can be invalid to denote a split)
-  // If needs to resample, repeats initial load
 
   /**
    * Called to clear any previously-sent track points.

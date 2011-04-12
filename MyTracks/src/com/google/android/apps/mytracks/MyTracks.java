@@ -251,9 +251,9 @@ public class MyTracks extends TabActivity implements OnTouchListener,
     }
 
     providerUtils = MyTracksProviderUtils.Factory.get(this);
-    dataHub = new TrackDataHub(this, providerUtils);
-    menuManager = new MenuManager(this);
     sharedPreferences = getSharedPreferences(Constants.SETTINGS_NAME, 0);
+    dataHub = new TrackDataHub(this, sharedPreferences, providerUtils);
+    menuManager = new MenuManager(this);
     dialogManager = new DialogManager(this);
 
     // The volume we want to control is the Text-To-Speech volume
@@ -441,8 +441,13 @@ public class MyTracks extends TabActivity implements OnTouchListener,
   @Override
   public void onActivityResult(int requestCode, int resultCode,
       final Intent results) {
+    Log.d(TAG, "MyTracks.onActivityResult");
     TrackFileFormat exportFormat = null;
-    final long trackId = results.getLongExtra("trackid", dataHub.getSelectedTrackId());
+    long trackId = dataHub.getSelectedTrackId();
+    if (results != null) {
+      trackId = results.getLongExtra("trackid", trackId);
+    }
+
     switch (requestCode) {
       case Constants.GET_LOGIN: {
         if (resultCode != RESULT_OK || auth == null || !auth.authResult(resultCode, results)) {

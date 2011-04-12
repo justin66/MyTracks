@@ -32,6 +32,12 @@ public abstract class Constants {
    */
   public static final String GPS_PROVIDER = "gps";
 
+  /** Maximum age of a GPS location to be considered current. */
+  public static final long MAX_LOCATION_AGE_MS = 60 * 1000;  // 1 minute
+
+  /** Maximum age of a network location to be considered current. */
+  public static final long MAX_NETWORK_AGE_MS = 1000 * 60 * 10;  // 10 minutes
+  
   /**
    * Name of the top-level directory inside the SD card where our files will
    * be read from/written to.
