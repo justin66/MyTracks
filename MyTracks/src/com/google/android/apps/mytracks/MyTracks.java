@@ -23,6 +23,7 @@ import static com.google.android.apps.mytracks.DialogManager.DIALOG_SEND_TO_GOOG
 import com.google.android.accounts.Account;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
 import com.google.android.apps.mytracks.content.Track;
+import com.google.android.apps.mytracks.content.TrackDataHub;
 import com.google.android.apps.mytracks.content.WaypointCreationRequest;
 import com.google.android.apps.mytracks.io.AuthManager;
 import com.google.android.apps.mytracks.io.AuthManagerFactory;

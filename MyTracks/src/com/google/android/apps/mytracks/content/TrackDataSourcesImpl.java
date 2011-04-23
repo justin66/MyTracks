@@ -13,11 +13,12 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.android.apps.mytracks;
+package com.google.android.apps.mytracks.content;
 
 import static com.google.android.apps.mytracks.Constants.MAX_LOCATION_AGE_MS;
 import static com.google.android.apps.mytracks.Constants.MAX_NETWORK_AGE_MS;
 
+import com.google.android.apps.mytracks.Constants;
 import com.google.android.maps.mytracks.R;
 
 import android.content.ContentResolver;

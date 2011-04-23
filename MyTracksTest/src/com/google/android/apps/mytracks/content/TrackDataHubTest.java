@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.android.apps.mytracks;
+package com.google.android.apps.mytracks.content;
 
 import static com.google.android.testing.mocking.AndroidMock.anyInt;
 import static com.google.android.testing.mocking.AndroidMock.capture;
@@ -23,13 +23,17 @@ import static com.google.android.testing.mocking.AndroidMock.isA;
 import static com.google.android.testing.mocking.AndroidMock.leq;
 import static com.google.android.testing.mocking.AndroidMock.same;
 
-import com.google.android.apps.mytracks.TrackDataHub.ListenerDataType;
-import com.google.android.apps.mytracks.TrackDataListener.ProviderState;
+import com.google.android.apps.mytracks.Constants;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
 import com.google.android.apps.mytracks.content.Track;
+import com.google.android.apps.mytracks.content.TrackDataHub;
+import com.google.android.apps.mytracks.content.TrackDataListener;
+import com.google.android.apps.mytracks.content.TrackDataSources;
 import com.google.android.apps.mytracks.content.TracksColumns;
 import com.google.android.apps.mytracks.content.Waypoint;
 import com.google.android.apps.mytracks.content.WaypointsColumns;
+import com.google.android.apps.mytracks.content.TrackDataHub.ListenerDataType;
+import com.google.android.apps.mytracks.content.TrackDataListener.ProviderState;
 import com.google.android.apps.mytracks.services.TrackRecordingServiceTest.MockContext;
 import com.google.android.maps.mytracks.R;
 import com.google.android.testing.mocking.AndroidMock;
