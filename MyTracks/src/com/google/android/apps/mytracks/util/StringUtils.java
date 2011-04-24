@@ -25,6 +25,7 @@ import com.google.android.maps.mytracks.R;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.text.DecimalFormat;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -63,6 +64,20 @@ public class StringUtils implements DescriptionGenerator {
    */
   public static String formatTimeAlwaysShowingHours(long time) {
     return formatTimeInternal(time, true);
+  }
+
+  private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.#");
+
+  /**
+   * Formats a double precision number as decimal number with a single decimal
+   * place.
+   *
+   * @param number A double precision number
+   * @return A string representation of a decimal number, derived from the input
+   *         double, with a single decimal place
+   */
+  public static final String formatDecimal(double number) {
+    return DECIMAL_FORMAT.format(number);
   }
 
   /**
