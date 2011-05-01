@@ -276,6 +276,7 @@ limitations under the License.
     <item>None</item>
     <item>ANT+ Sensors</item>
     <item>SRM ANT+ Bridge</item>
+    <item>Polar Bluetooth</item>
     <item>Zephyr Bluetooth</item>
   </array>
 
