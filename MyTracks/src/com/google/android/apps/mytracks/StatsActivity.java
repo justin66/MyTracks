@@ -131,18 +131,18 @@ public class StatsActivity extends Activity implements TrackDataListener {
   }
 
   @Override
-  protected void onStart() {
+  protected void onResume() {
     dataHub.registerTrackDataListener(this, EnumSet.of(
         ListenerDataType.SELECTED_TRACK_CHANGED,
         ListenerDataType.TRACK_UPDATES,
         ListenerDataType.LOCATION_UPDATES,
         ListenerDataType.DISPLAY_PREFERENCES));
 
-    super.onStart();
+    super.onResume();
   }
 
   @Override
-  protected void onStop() {
+  protected void onPause() {
     dataHub.unregisterTrackDataListener(this);
 
     if (thread != null) {
@@ -155,6 +155,9 @@ public class StatsActivity extends Activity implements TrackDataListener {
 
   @Override
   public boolean onUnitsChanged(boolean metric) {
+    // Ignore if unchanged.
+    if (metric == utils.isMetricUnits()) return false;
+
     utils.setMetricUnits(metric);
     updateLabels();
 
@@ -163,6 +166,9 @@ public class StatsActivity extends Activity implements TrackDataListener {
 
   @Override
   public boolean onReportSpeedChanged(boolean displaySpeed) {
+    // Ignore if unchanged.
+    if (displaySpeed == utils.isReportSpeed()) return false;
+
     utils.setReportSpeed(displaySpeed);
     updateLabels();
   
