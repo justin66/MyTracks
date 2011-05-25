@@ -35,7 +35,6 @@ import android.view.WindowManager.BadTokenException;
  */
 public class DialogManager {
 
-  public static final int DIALOG_CHART_SETTINGS = 1;
   public static final int DIALOG_IMPORT_PROGRESS = 2;
   public static final int DIALOG_PROGRESS = 3;
   public static final int DIALOG_SEND_TO_GOOGLE = 4;
@@ -43,7 +42,6 @@ public class DialogManager {
   private ProgressDialog progressDialog;
   private ProgressDialog importProgressDialog;
   private SendDialog sendToGoogleDialog;
-  private ChartSettingsDialog chartSettingsDialog;
 
   private MyTracks activity;
 
@@ -53,9 +51,6 @@ public class DialogManager {
 
   protected Dialog onCreateDialog(int id, Bundle args) {
     switch (id) {
-      case DIALOG_CHART_SETTINGS:
-        chartSettingsDialog = new ChartSettingsDialog(activity);
-        return chartSettingsDialog;
       case DIALOG_IMPORT_PROGRESS:
         importProgressDialog = new ProgressDialog(activity);
         importProgressDialog.setIcon(android.R.drawable.ic_dialog_info);
@@ -85,10 +80,6 @@ public class DialogManager {
     switch (id) {
       case DIALOG_SEND_TO_GOOGLE:
         activity.resetSendToGoogleStatus();
-        break;
-      case DIALOG_CHART_SETTINGS:
-        Log.d(TAG, "MyTracks.onPrepare chart dialog");
-        chartSettingsDialog.setup(activity.getChartActivity());
         break;
     }
   }
