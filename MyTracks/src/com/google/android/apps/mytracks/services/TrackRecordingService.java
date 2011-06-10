@@ -20,6 +20,7 @@ import static com.google.android.apps.mytracks.Constants.RESUME_TRACK_EXTRA_NAME
 
 import com.google.android.apps.mytracks.MyTracks;
 import com.google.android.apps.mytracks.Constants;
+import com.google.android.apps.mytracks.TrackDataHub;
 import com.google.android.apps.mytracks.content.MyTracksLocation;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
 import com.google.android.apps.mytracks.content.Sensor;
@@ -89,8 +90,8 @@ public class TrackRecordingService extends Service implements LocationListener {
   private int minRequiredAccuracy =
       Constants.DEFAULT_MIN_REQUIRED_ACCURACY;
   private int autoResumeTrackTimeout =
-      Constants.DEFAULT_AUTO_RESUME_TRACK_TIMEOUT; 
-  
+      Constants.DEFAULT_AUTO_RESUME_TRACK_TIMEOUT;
+
   private long recordingTrackId = -1;
 
   private long currentWaypointId = -1;
@@ -120,9 +121,9 @@ public class TrackRecordingService extends Service implements LocationListener {
   private PeriodicTaskExecutor splitExecutor;
 
   private SensorManager sensorManager;
-  
+
   private PreferenceManager prefManager;
-  
+
   /**
    * The interval in milliseconds that we have requested to be notified of gps
    * readings.
@@ -171,7 +172,7 @@ public class TrackRecordingService extends Service implements LocationListener {
    * The most recent recording track.
    */
   private Track recordingTrack;
-  
+
   /**
    * Is the service currently recording a track?
    */
@@ -276,6 +277,11 @@ public class TrackRecordingService extends Service implements LocationListener {
     }
     announcementExecutor.update();
     splitExecutor.update();
+
+    // Send broadcast that the track has been updated.
+    sendTrackBroadcast(R.string.track_updated_broadcast_action,
+        recordingTrack.getId());
+
     return true;
   }
 
@@ -411,7 +417,7 @@ public class TrackRecordingService extends Service implements LocationListener {
     Log.d(TAG,
         "Location listener now unregistered w/ TrackRecordingService.");
   }
-  
+
   private Track getRecordingTrack() {
     if (recordingTrackId < 0) {
       return null;
@@ -423,7 +429,7 @@ public class TrackRecordingService extends Service implements LocationListener {
   private void restoreStats(Track track) {
     Log.d(TAG,
         "Restoring stats of track with ID: " + track.getId());
-    
+
     TripStatistics stats = track.getStatistics();
     statsBuilder = new TripStatisticsBuilder(stats.getStartTime());
     statsBuilder.setMinRecordingDistance(minRecordingDistance);
@@ -700,7 +706,7 @@ public class TrackRecordingService extends Service implements LocationListener {
         this, new StatusAnnouncerFactory(ApiFeatures.getInstance()));
     splitExecutor = new PeriodicTaskExecutor(this, new SplitTask.Factory());
   }
-  
+
   private void shutdownTaskExecutors() {
     Log.d(TAG, "TrackRecordingService.shutdownExecuters");
     try {
@@ -743,7 +749,7 @@ public class TrackRecordingService extends Service implements LocationListener {
 
     // This should be the last operation.
     releaseWakeLock();
-    
+
     super.onDestroy();
   }
 
@@ -765,7 +771,7 @@ public class TrackRecordingService extends Service implements LocationListener {
     unregisterLocationListener();
     return super.stopService(name);
   }
-  
+
   @Override
   public void onStart(Intent intent, int startId) {
     handleStartCommand(intent, startId);
@@ -781,40 +787,49 @@ public class TrackRecordingService extends Service implements LocationListener {
     Log.d(TAG,
         "TrackRecordingService.handleStartCommand: " + startId);
 
-    // Check if called on phone reboot with resume intent.
-    if (intent != null &&
-        intent.getBooleanExtra(RESUME_TRACK_EXTRA_NAME, false)) {
-      Log.d(TAG, "TrackRecordingService: requested resume");
-      
-      // Make sure that the current track exists and is fresh enough.
-      if (recordingTrack == null || !shouldResumeTrack(recordingTrack)) {
-        Log.i(TAG,
-            "TrackRecordingService: Not resuming, because the previous track ("
-            + recordingTrack + ") doesn't exist or is too old");
-        isRecording = false;
-        prefManager.setRecordingTrack(recordingTrackId = -1); 
-        stopSelfResult(startId);
-        return;
+    if (intent != null) {
+      // Check if called on phone reboot with resume intent.
+      if (intent.getBooleanExtra(RESUME_TRACK_EXTRA_NAME, false)) {
+        Log.d(TAG, "TrackRecordingService: requested resume");
+
+        // Make sure that the current track exists and is fresh enough.
+        if (recordingTrack == null || !shouldResumeTrack(recordingTrack)) {
+          Log.i(TAG,
+              "TrackRecordingService: Not resuming, because the previous track ("
+              + recordingTrack + ") doesn't exist or is too old");
+          isRecording = false;
+          prefManager.setRecordingTrack(recordingTrackId = -1);
+          stopSelfResult(startId);
+          return;
+        }
+
+        Log.i(TAG, "TrackRecordingService: resuming");
+      } else {
+        // Process actions for controlling the service.
+        String action = intent.getAction();
+        if (getString(R.string.start_new_track_action).equals(action)) {
+          startNewTrack();
+        } else if (getString(R.string.end_current_track_action).equals(action)) {
+          endCurrentTrack();
+        }
       }
-      
-      Log.i(TAG, "TrackRecordingService: resuming");
     }
   }
-  
+
   private void setAutoResumeTrackRetries(
       SharedPreferences sharedPreferences, int retryAttempts) {
     Log.d(TAG,
         "Updating auto-resume retry attempts to: " + retryAttempts);
     prefManager.setAutoResumeTrackCurrentRetry(retryAttempts);
   }
-  
+
   private boolean shouldResumeTrack(Track track) {
     Log.d(TAG, "shouldResumeTrack: autoResumeTrackTimeout = "
         + autoResumeTrackTimeout);
 
     // Check if we haven't exceeded the maximum number of retry attempts.
     SharedPreferences sharedPreferences =
-        getSharedPreferences(Constants.SETTINGS_NAME, 0); 
+        getSharedPreferences(Constants.SETTINGS_NAME, 0);
     int retries = sharedPreferences.getInt(
         getString(R.string.auto_resume_track_current_retry_key), 0);
     Log.d(TAG,
@@ -832,7 +847,7 @@ public class TrackRecordingService extends Service implements LocationListener {
 
     // Check for special cases.
     if (autoResumeTrackTimeout == 0) {
-      // Never resume.  
+      // Never resume.
       Log.d(TAG,
           "shouldResumeTrack: Auto-resume disabled (never resume)");
       return false;
@@ -850,7 +865,7 @@ public class TrackRecordingService extends Service implements LocationListener {
         "shouldResumeTrack: lastModified = " + lastModified
         + ", autoResumeTrackTimeout: " + autoResumeTrackTimeout);
     return lastModified > 0 && System.currentTimeMillis() - lastModified <=
-        autoResumeTrackTimeout * 60 * 1000;  
+        autoResumeTrackTimeout * 60 * 1000;
   }
 
   public boolean isRecording() {
@@ -940,27 +955,27 @@ public class TrackRecordingService extends Service implements LocationListener {
     // Create a new stats keeper for the next marker.
     waypointStatsBuilder = new TripStatisticsBuilder(time);
   }
- 
+
   private ServiceBinder binder = new ServiceBinder(this);
-  
+
   /**
    * TODO: There is a bug in Android that leaks Binder instances.  This bug is
    * especially visible if we have a non-static class, as there is no way to
    * nullify reference to the outer class (the service).
    * A workaround is to use a static class and explicitly clear service
    * and detach it from the underlying Binder.  With this approach, we minimize
-   * the leak to 24 bytes per each service instance. 
+   * the leak to 24 bytes per each service instance.
    *
    * For more details, see the following bug:
    * http://code.google.com/p/android/issues/detail?id=6426.
    */
   private static class ServiceBinder extends ITrackRecordingService.Stub {
     private TrackRecordingService service;
-    
+
     public ServiceBinder(TrackRecordingService service) {
       this.service = service;
     }
-    
+
     /**
      * Clears the reference to the outer class to minimize the leak.
      */
@@ -968,7 +983,7 @@ public class TrackRecordingService extends Service implements LocationListener {
       this.service = null;
       attachInterface(null, null);
     }
-    
+
     @Override
     public boolean isRecording() {
       checkService();
@@ -983,13 +998,13 @@ public class TrackRecordingService extends Service implements LocationListener {
 
     @Override
     public long getRecordingTrackId() {
-      checkService();      
+      checkService();
       return service.recordingTrackId;
     }
 
     @Override
     public boolean hasRecorded() {
-      checkService();      
+      checkService();
       return service.providerUtils.getLastTrackId() >= 0;
     }
 
@@ -1027,13 +1042,13 @@ public class TrackRecordingService extends Service implements LocationListener {
 
     @Override
     public void recordLocation(Location loc) {
-      checkService();      
+      checkService();
       service.onLocationChanged(loc);
     }
 
     @Override
     public byte[] getSensorData() {
-      checkService();      
+      checkService();
       if (service.sensorManager == null) {
         Log.d(TAG, "No sensor manager for data.");
         return null;
@@ -1047,7 +1062,7 @@ public class TrackRecordingService extends Service implements LocationListener {
 
     @Override
     public int getSensorState() {
-      checkService();      
+      checkService();
       if (service.sensorManager == null) {
         Log.d(TAG, "No sensor manager for data.");
         return Sensor.SensorState.NONE.getNumber();
@@ -1097,6 +1112,9 @@ public class TrackRecordingService extends Service implements LocationListener {
     // Persist the current recording track.
     prefManager.setRecordingTrack(recordingTrackId);
 
+    TrackDataHub dataHub = MyTracks.getInstance().getDataHub();
+    dataHub.loadTrack(track.getId());
+
     // Notify the world that we're now recording.
     sendTrackBroadcast(
         R.string.track_started_broadcast_action, recordingTrackId);
@@ -1135,12 +1153,12 @@ public class TrackRecordingService extends Service implements LocationListener {
     showNotification();
     long recordedTrackId = recordingTrackId;
     prefManager.setRecordingTrack(recordingTrackId = -1);
-    
+
     if (sensorManager != null) {
       sensorManager.shutdown();
       sensorManager = null;
     }
-    
+
     releaseWakeLock();
 
     // Notify the world that we're no longer recording.
@@ -1209,11 +1227,11 @@ public class TrackRecordingService extends Service implements LocationListener {
       LocationListenerPolicy locationListenerPolicy) {
     this.locationListenerPolicy = locationListenerPolicy;
   }
-  
+
   public int getAutoResumeTrackTimeout() {
     return autoResumeTrackTimeout;
   }
-  
+
   public void setAutoResumeTrackTimeout(int autoResumeTrackTimeout) {
     this.autoResumeTrackTimeout = autoResumeTrackTimeout;
   }
