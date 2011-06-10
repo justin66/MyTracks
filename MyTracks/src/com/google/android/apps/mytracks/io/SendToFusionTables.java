@@ -15,6 +15,7 @@
  */
 package com.google.android.apps.mytracks.io;
 
+import static com.google.android.apps.mytracks.Constants.TAG;
 import com.google.android.apps.mytracks.Constants;
 import com.google.android.apps.mytracks.ProgressIndicator;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
@@ -156,6 +157,11 @@ public class SendToFusionTables implements Runnable {
   }
 
   public static String getMapVisualizationUrl(Track track) {
+    if (track == null || track.getStatistics() == null || track.getTableId() == null) {
+      Log.w(TAG, "Unable to get track URL");
+      return null;
+    }
+
     // TODO(leifhendrik): Determine correct bounding box and zoom level that will show the entire track.
     TripStatistics stats = track.getStatistics();
     double latE6 = stats.getBottom() + (stats.getTop() - stats.getBottom()) / 2;

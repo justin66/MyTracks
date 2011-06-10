@@ -130,8 +130,12 @@ public abstract class AntSensorManager extends SensorManager {
   @Override
   public void onDestroy() {
     Log.i(TAG, "destroying AntSensorManager");
-    context.unregisterReceiver(statusReceiver);
-    context.unregisterReceiver(dataReceiver);
+    try {
+      context.unregisterReceiver(statusReceiver);
+      context.unregisterReceiver(dataReceiver);
+    } catch (IllegalArgumentException e) {
+      Log.w(TAG, "Failed to unregister ANT receivers", e);
+    }
 
     try {
       antReceiver.releaseInterface();

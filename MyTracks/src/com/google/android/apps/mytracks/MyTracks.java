@@ -582,7 +582,10 @@ public class MyTracks extends TabActivity implements OnTouchListener,
           if (!TextUtils.isEmpty(selectedTrack.getMapId())) {
             shareLinkToMap(MapsFacade.buildMapUrl(selectedTrack.getMapId()));
           } else if (!TextUtils.isEmpty(selectedTrack.getTableId())) {
-            shareLinkToMap(getFusionTablesUrl(dataHub.getSelectedTrackId()));
+            String url = getFusionTablesUrl(dataHub.getSelectedTrackId());
+            if (url != null) {
+              shareLinkToMap(url);
+            }
           } else {
             shareRequested = true;
             dialogManager.showDialogSafely(DIALOG_SEND_TO_GOOGLE);
@@ -1169,7 +1172,7 @@ public class MyTracks extends TabActivity implements OnTouchListener,
 
   protected String getFusionTablesUrl(long trackId) {
     Track track = providerUtils.getTrack(trackId);
-    return track == null ? "" : SendToFusionTables.getMapVisualizationUrl(track);
+    return SendToFusionTables.getMapVisualizationUrl(track);
   }
 
   /**
