@@ -133,6 +133,11 @@ public class DialogManager {
    * @param message resource string id
    */
   public void showMessageDialog(final int message, final boolean success) {
+    if (activity.isFinishing()) {
+      Log.w(TAG, "Activity finishing - not showing dialog");
+      return;
+    }
+
     activity.runOnUiThread(new Runnable() {
       public void run() {
         AlertDialog dialog = null;
@@ -156,6 +161,11 @@ public class DialogManager {
    * @param id the dialog id
    */
   public void showDialogSafely(final int id) {
+    if (activity.isFinishing()) {
+      Log.w(TAG, "Activity finishing - not showing dialog");
+      return;
+    }
+
     activity.runOnUiThread(new Runnable() {
       public void run() {
         try {
@@ -174,6 +184,11 @@ public class DialogManager {
    * dialog instance.
    */
   public static void showDialogSafely(Activity activity, final Dialog dialog) {
+    if (activity.isFinishing()) {
+      Log.w(TAG, "Activity finishing - not showing dialog");
+      return;
+    }
+
     activity.runOnUiThread(new Runnable() {
       public void run() {
         try {
@@ -191,6 +206,11 @@ public class DialogManager {
    * Dismisses the progress dialog if it is showing. Executed on the UI thread.
    */
   public void dismissDialogSafely(final int id) {
+    if (activity.isFinishing()) {
+      Log.w(TAG, "Activity finishing - not dismissing dialog");
+      return;
+    }
+
     activity.runOnUiThread(new Runnable() {
       public void run() {
         try {
@@ -207,6 +227,11 @@ public class DialogManager {
    * dialog instance.
    */
   public static void dismissDialogSafely(Activity activity, final Dialog dialog) {
+    if (activity.isFinishing()) {
+      Log.w(TAG, "Activity finishing - not dismissing dialog");
+      return;
+    }
+
     activity.runOnUiThread(new Runnable() {
       public void run() {
         try {
