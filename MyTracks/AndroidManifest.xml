@@ -121,8 +121,7 @@ limitations under the License.
 
     <activity android:name="com.google.android.apps.mytracks.io.sendtogoogle.SendActivity"
               android:label="@string/sendtogoogle_title"
-              android:theme="@android:style/Theme.Translucent.NoTitleBar"
-              android:noHistory="true">
+              android:theme="@android:style/Theme.Translucent.NoTitleBar">
       <intent-filter>
         <action android:name="android.intent.action.SEND" />
         <data android:mimeType="vnd.android.cursor.item/vnd.google.track" />
@@ -170,7 +169,7 @@ limitations under the License.
     <receiver android:name="com.google.android.apps.mytracks.BootReceiver">
       <intent-filter>
         <action android:name="android.intent.action.BOOT_COMPLETED" />
-	  </intent-filter>
+      </intent-filter>
     </receiver>
   </application>
 
