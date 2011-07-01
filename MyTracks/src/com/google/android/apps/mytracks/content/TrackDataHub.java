@@ -444,7 +444,7 @@ public class TrackDataHub {
       // called. When it is called, we'll do both things.
       if (!isStarted()) return;
 
-      reloadDataForListener(registration);
+      loadNewDataForListener(registration);
 
       dataSourceManager.updateAllListeners(getNeededListenerTypes());
     }
@@ -469,7 +469,8 @@ public class TrackDataHub {
     ListenerRegistration registration;
     synchronized (listeners) {
       registration = listeners.getRegistration(listener);
-      reloadDataForListener(registration);
+      registration.resetState();
+      loadNewDataForListener(registration);
     }
   }
 
@@ -478,12 +479,13 @@ public class TrackDataHub {
    *
    * Assumes it's called from a block that synchronizes on {@link #listeners}.
    */
-  private void reloadDataForListener(final ListenerRegistration registration) {
+  private void loadNewDataForListener(final ListenerRegistration registration) {
     if (!isStarted()) {
       Log.w(TAG, "Not started, not reloading");
       return;
     }
     if (registration == null) {
+      Log.w(TAG, "Not reloading for null registration");
       return;
     }
 
@@ -650,7 +652,7 @@ public class TrackDataHub {
           // TODO: Do the reloading just once for all interested listeners
           if (listener.onReportSpeedChanged(reportSpeed)) {
             synchronized (listeners) {
-              reloadDataForListener(listeners.getRegistration(listener));
+              reloadDataForListener(listener);
             }
           }
         }
@@ -670,7 +672,7 @@ public class TrackDataHub {
         for (TrackDataListener listener : displayListeners) {
           if (listener.onUnitsChanged(useMetricUnits)) {
             synchronized (listeners) {
-              reloadDataForListener(listeners.getRegistration(listener));
+              reloadDataForListener(listener);
             }
           }
         }

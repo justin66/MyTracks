@@ -77,7 +77,6 @@ public class ChartActivity extends Activity implements TrackDataListener {
   private double trackMaxSpeed;
 
   // Modes of operation
-  private Mode mode = Mode.BY_DISTANCE;
   private boolean metricUnits;
   private boolean reportSpeed;
 
@@ -97,6 +96,10 @@ public class ChartActivity extends Activity implements TrackDataListener {
   private final Runnable updateChart = new Runnable() {
     @Override
     public void run() {
+      if (isFinishing()) {
+        return;
+      }
+
       busyPane.setVisibility(View.GONE);
       zoomControls.setIsZoomInEnabled(chartView.canZoomIn());
       zoomControls.setIsZoomOutEnabled(chartView.canZoomOut());
@@ -119,7 +122,6 @@ public class ChartActivity extends Activity implements TrackDataListener {
     setContentView(R.layout.mytracks_charts);
     ViewGroup layout = (ViewGroup) findViewById(R.id.elevation_chart);
     chartView = new ChartView(this);
-    chartView.setMode(this.mode);
     LayoutParams params =
         new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
     layout.addView(chartView, params);
@@ -174,21 +176,11 @@ public class ChartActivity extends Activity implements TrackDataListener {
     zoomControls.setIsZoomOutEnabled(chartView.canZoomOut());
   }
 
-  public void setMode(Mode newMode) {
-    if (this.mode != newMode) {
-      this.mode = newMode;
-      chartView.setMode(this.mode);
+  private void setMode(Mode newMode) {
+    if (chartView.getMode() != newMode) {
+      chartView.setMode(newMode);
       dataHub.reloadDataForListener(this);
     }
-  }
-
-  public Mode getMode() {
-    return mode;
-  }
-
-  public void setSeriesEnabled(int index, boolean enabled) {
-    chartView.getChartValueSeries(index).setEnabled(enabled);
-    runOnUiThread(updateChart);
   }
 
   @Override
@@ -223,7 +215,7 @@ public class ChartActivity extends Activity implements TrackDataListener {
           }
 
           for (int i = 0; i < ChartView.NUM_SERIES; i++) {
-            chartView.getChartValueSeries(i).setEnabled(settingsDialog.isSeriesEnabled(i));
+            chartView.setChartValueSeriesEnabled(i, settingsDialog.isSeriesEnabled(i));
           }
           setMode(settingsDialog.getMode());
           chartView.postInvalidate();
@@ -244,10 +236,10 @@ public class ChartActivity extends Activity implements TrackDataListener {
     }
   }
 
-  private void prepareSettingsDialog(final ChartSettingsDialog settingsDialog) {
-    settingsDialog.setMode(mode);
+  private void prepareSettingsDialog(ChartSettingsDialog settingsDialog) {
+    settingsDialog.setMode(chartView.getMode());
     for (int i = 0; i < ChartView.NUM_SERIES; i++) {
-      settingsDialog.setSeriesEnabled(i, chartView.getChartValueSeries(i).isEnabled());
+      settingsDialog.setSeriesEnabled(i, chartView.isChartValueSeriesEnabled(i));
     }
   }
 
@@ -297,6 +289,7 @@ public class ChartActivity extends Activity implements TrackDataListener {
     }
 
     // TODO: Account for segment splits?
+    Mode mode = chartView.getMode();
     switch (mode) {
       case BY_DISTANCE:
         timeOrDistance = profileLength / 1000.0;
