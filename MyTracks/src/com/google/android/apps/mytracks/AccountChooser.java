@@ -113,6 +113,10 @@ public class AccountChooser {
     builder.show();
   }
 
+  public void setChosenAccount(String accountName, String accountType) {
+    selectedAccount = new Account(accountName, accountType);
+  }
+
   /**
    * Puts up a dialog alerting the user that no suitable account was found.
    */

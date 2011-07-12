@@ -27,6 +27,7 @@ import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
 import com.google.android.apps.mytracks.content.Track;
 import com.google.android.apps.mytracks.content.TracksColumns;
 import com.google.android.apps.mytracks.io.AuthManager;
+import com.google.android.apps.mytracks.io.AuthManager.AuthCallback;
 import com.google.android.apps.mytracks.io.AuthManagerFactory;
 import com.google.android.apps.mytracks.io.SendToDocs;
 import com.google.android.apps.mytracks.io.SendToFusionTables;
@@ -63,10 +64,9 @@ import java.util.List;
  */
 public class SendActivity extends Activity implements ProgressIndicator {
   // Keys for saved state variables.
-  private static final String STATE_ACCOUNT_TYPE = "accountType";
-  private static final String STATE_ACCOUNT_NAME = "accountName";
-  private static final String STATE_TABLE_ID = "tableId";
-  private static final String STATE_MAP_ID = "mapId";
+  private static final String STATE_SEND_TO_MAPS = "mapsSend";
+  private static final String STATE_SEND_TO_FUSION_TABLES = "fusionSend";
+  private static final String STATE_SEND_TO_DOCS = "docsSend";
   private static final String STATE_DOCS_MESSAGE = "docsMsg";
   private static final String STATE_FUSION_TABLES_MESSAGE = "fusionMsg";
   private static final String STATE_MAPS_MESSAGE = "mapsMsg";
@@ -74,7 +74,11 @@ public class SendActivity extends Activity implements ProgressIndicator {
   private static final String STATE_FUSION_SUCCESS = "fusionSuccess";
   private static final String STATE_MAPS_SUCCESS = "mapsSuccess";
   private static final String STATE_STATE = "state";
-  private static final String EXTRA_SHARE_LINK = "share_link";
+  private static final String EXTRA_SHARE_LINK = "shareLink";
+  private static final String STATE_ACCOUNT_TYPE = "accountType";
+  private static final String STATE_ACCOUNT_NAME = "accountName";
+  private static final String STATE_TABLE_ID = "tableId";
+  private static final String STATE_MAP_ID = "mapId";
 
   /** States for the state machine that defines the upload process. */
   private enum SendState {
@@ -104,7 +108,6 @@ public class SendActivity extends Activity implements ProgressIndicator {
   static final int DONE_DIALOG = 3;
 
   // UI
-  private SendDialog sendDialog;
   private ProgressDialog progressDialog;
 
   // Services
@@ -114,8 +117,7 @@ public class SendActivity extends Activity implements ProgressIndicator {
 
   // Authentication
   private AuthManager lastAuth;
-  private final HashMap<String, AuthManager> authMap =
-    new HashMap<String, AuthManager>();
+  private final HashMap<String, AuthManager> authMap = new HashMap<String, AuthManager>();
   private final AccountChooser accountChooser = new AccountChooser();
   private String lastAccountName;
   private String lastAccountType;
@@ -123,6 +125,10 @@ public class SendActivity extends Activity implements ProgressIndicator {
   // Send request information.
   private boolean shareRequested = false;
   private long sendTrackId;
+  private boolean sendToMyMaps;
+  private boolean sendToMyMapsNewMap;
+  private boolean sendToFusionTables;
+  private boolean sendToDocs;
 
   // Send result information, used by results dialog.
   private boolean sendToMyMapsSuccess = false;
@@ -155,22 +161,34 @@ public class SendActivity extends Activity implements ProgressIndicator {
     providerUtils = MyTracksProviderUtils.Factory.get(this);
     sharedPreferences = getSharedPreferences(Constants.SETTINGS_NAME, 0);
 
-    resetState();
-
     tracker = GoogleAnalyticsTracker.getInstance();
     // Start the tracker in manual dispatch mode...
-    tracker.start(getString(R.string.google_analytics_id), getApplicationContext());
-    tracker.setProductVersion("android-mytracks", SystemUtils.getMyTracksVersion(this));
+    tracker.start(getString(R.string.google_analytics_id),
+        getApplicationContext());
+    tracker.setProductVersion("android-mytracks",
+        SystemUtils.getMyTracksVersion(this));
 
-    if (!handleIntent()) {
-      finish();
-      return;
-    }
+    resetState();
+
     if (savedInstanceState != null) {
       restoreInstanceState(savedInstanceState);
     }
 
-    executeStateMachine(null);
+    if (currentState == SendState.DONE) {
+      currentState = SendState.SEND_OPTIONS;
+    }
+
+    // Only consider the intent if we're not restoring from a previous state.
+    if (currentState == SendState.SEND_OPTIONS) {
+      if (!handleIntent()) {
+        finish();
+        return;
+      }
+    }
+
+    // Execute the state machine, at the start or restored state.
+    Log.w(TAG, "Starting at state " + currentState);
+    executeStateMachine(currentState);
   }
 
   private boolean handleIntent() {
@@ -206,7 +224,7 @@ public class SendActivity extends Activity implements ProgressIndicator {
   }
 
   private Dialog createSendDialog() {
-    sendDialog = new SendDialog(this);
+    final SendDialog sendDialog = new SendDialog(this);
     sendDialog.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(DialogInterface dialog, int which) {
@@ -217,6 +235,11 @@ public class SendActivity extends Activity implements ProgressIndicator {
 
         dialog.dismiss();
 
+        sendToMyMaps = sendDialog.getSendToMyMaps();
+        sendToMyMapsNewMap = sendDialog.getCreateNewMap();
+        sendToFusionTables = sendDialog.getSendToFusionTables();
+        sendToDocs = sendDialog.getSendToDocs();
+
         executeStateMachine(SendState.START);
       }
     });
@@ -226,6 +249,10 @@ public class SendActivity extends Activity implements ProgressIndicator {
 
   private void restoreInstanceState(Bundle savedInstanceState) {
     currentState = SendState.values()[savedInstanceState.getInt(STATE_STATE)];
+
+    sendToMyMaps = savedInstanceState.getBoolean(STATE_SEND_TO_MAPS);
+    sendToFusionTables = savedInstanceState.getBoolean(STATE_SEND_TO_FUSION_TABLES);
+    sendToDocs = savedInstanceState.getBoolean(STATE_SEND_TO_DOCS);
 
     sendToMyMapsSuccess = savedInstanceState.getBoolean(STATE_MAPS_SUCCESS);
     sendToFusionTablesSuccess = savedInstanceState.getBoolean(STATE_FUSION_SUCCESS);
@@ -240,6 +267,9 @@ public class SendActivity extends Activity implements ProgressIndicator {
 
     lastAccountName = savedInstanceState.getString(STATE_ACCOUNT_NAME);
     lastAccountType = savedInstanceState.getString(STATE_ACCOUNT_TYPE);
+    if (lastAccountName != null && lastAccountType != null) {
+      accountChooser.setChosenAccount(lastAccountName, lastAccountType);
+    }
   }
 
   @Override
@@ -268,7 +298,7 @@ public class SendActivity extends Activity implements ProgressIndicator {
 
   @Override
   protected void onStop() {
-    Log.d(TAG, "SendActivity.onStop" + currentState);
+    Log.d(TAG, "SendActivity.onStop, state=" + currentState);
     tracker.dispatch();
     tracker.stop();
 
@@ -282,9 +312,7 @@ public class SendActivity extends Activity implements ProgressIndicator {
   }
 
   private void executeStateMachine(SendState startState) {
-    if (startState != null) {
-      currentState = startState;
-    }
+    currentState = startState;
 
     // If a state handler returns NOT_READY, it means it's waiting for some
     // event, and will call this method again when it happens.
@@ -350,13 +378,13 @@ public class SendActivity extends Activity implements ProgressIndicator {
   private SendState startSend() {
     showDialog(PROGRESS_DIALOG);
 
-    if (sendDialog.getSendToMyMaps()) {
+    if (sendToMyMaps) {
       return SendState.AUTHENTICATE_MAPS;
-    } else if (sendDialog.getSendToFusionTables()) {
+    } else if (sendToFusionTables) {
       return SendState.AUTHENTICATE_FUSION_TABLES;
-    } else if (sendDialog.getSendToDocs()) {
+    } else if (sendToDocs) {
       return SendState.AUTHENTICATE_DOCS;
-    } else  {
+    } else {
       Log.w(TAG, "Nowhere to upload to");
       return SendState.FINISH;
     }
@@ -385,7 +413,7 @@ public class SendActivity extends Activity implements ProgressIndicator {
   }
 
   private SendState pickMap() {
-    if (!sendDialog.getCreateNewMap()) {
+    if (!sendToMyMapsNewMap) {
       // Ask the user to choose a map to upload into
       Intent listIntent = new Intent(this, MyMapsList.class);
       listIntent.putExtra(MyMapsList.EXTRA_ACCOUNT_NAME, lastAccountName);
@@ -442,9 +470,9 @@ public class SendActivity extends Activity implements ProgressIndicator {
   }
 
   private SendState onSendToGoogleMapsDone() {
-    if (sendDialog.getSendToFusionTables()) {
+    if (sendToFusionTables) {
       return SendState.AUTHENTICATE_FUSION_TABLES;
-    } else if (sendDialog.getSendToDocs()) {
+    } else if (sendToDocs) {
       return SendState.AUTHENTICATE_DOCS;
     } else {
       return SendState.SHOW_RESULTS;
@@ -501,7 +529,7 @@ public class SendActivity extends Activity implements ProgressIndicator {
   }
 
   private SendState onSendToFusionTablesDone() {
-    if (sendDialog.getSendToDocs()) {
+    if (sendToDocs) {
       return SendState.AUTHENTICATE_DOCS;
     } else {
       return SendState.SHOW_RESULTS;
@@ -629,42 +657,33 @@ public class SendActivity extends Activity implements ProgressIndicator {
     return ResultDialogFactory.makeDialog(this, results, onOkListener, onShareListener, finishOnCancelListener);
   }
 
-  private SendState shareLink() {
-    boolean sentToMyMaps = sendDialog.getSendToMyMaps();
-    boolean sentToFusionTables = sendDialog.getSendToFusionTables();
-    if (!shareLinkToMap(sentToMyMaps, sentToFusionTables)) {
-      Log.w(TAG, "Failed to share link");
-    }
-    return SendState.FINISH;
-  }
-
   private SendState onAllDone() {
     Log.d(TAG, "All sending done.");
     removeDialog(PROGRESS_DIALOG);
     removeDialog(SEND_DIALOG);
     removeDialog(DONE_DIALOG);
     progressDialog = null;
-    sendDialog = null;
     finish();
     return SendState.DONE;
   }
 
-  boolean shareLinkToMap(boolean sentToMyMaps, boolean sentToFusionTables) {
+  private SendState shareLink() {
     String url = null;
-    if (sentToMyMaps && sendToMyMapsSuccess) {
+    if (sendToMyMaps && sendToMyMapsSuccess) {
       // Prefer a link to My Maps
       url = MapsFacade.buildMapUrl(sendToMyMapsMapId);
-    } else if (sentToFusionTables && sendToFusionTablesSuccess) {
+    } else if (sendToFusionTables && sendToFusionTablesSuccess) {
       // Otherwise try using the link to fusion tables
       url = getFusionTablesUrl(sendTrackId);
     }
 
     if (url != null) {
       shareLinkToMap(url);
-      return true;
+    } else {
+      Log.w(TAG, "Failed to share link");
     }
 
-    return false;
+    return SendState.FINISH;
   }
 
   /**
@@ -698,13 +717,14 @@ public class SendActivity extends Activity implements ProgressIndicator {
    */
   private List<SendResult> makeSendToGoogleResults() {
     List<SendResult> results = new ArrayList<SendResult>();
-    if (sendDialog.getSendToMyMaps()) {
+    if (sendToMyMaps) {
       results.add(new SendResult(SendType.MYMAPS, sendToMyMapsSuccess));
     }
-    if (sendDialog.getSendToFusionTables()) {
-      results.add(new SendResult(SendType.FUSION_TABLES, sendToFusionTablesSuccess));
+    if (sendToFusionTables) {
+      results.add(new SendResult(SendType.FUSION_TABLES,
+          sendToFusionTablesSuccess));
     }
-    if (sendDialog.getSendToDocs()) {
+    if (sendToDocs) {
       results.add(new SendResult(SendType.DOCS, sendToDocsSuccess));
     }
 
@@ -759,10 +779,16 @@ public class SendActivity extends Activity implements ProgressIndicator {
   }
 
   private void doLogin(final int requestCode, final String service, final Object account) {
-    lastAuth.doLogin(new Runnable() {
-      public void run() {
-        Log.i(TAG, "Login success for " + service + "!");
-        onActivityResult(requestCode, RESULT_OK, new Intent());
+    lastAuth.doLogin(new AuthCallback() {
+      @Override
+      public void onAuthResult(boolean success) {
+        Log.i(TAG, "Login success for " + service + ": " + success);
+        if (!success) {
+          executeStateMachine(SendState.SHOW_RESULTS);
+          return;
+        }
+
+        onLoginSuccess(requestCode);
       }
     }, account);
   }
@@ -770,16 +796,17 @@ public class SendActivity extends Activity implements ProgressIndicator {
   @Override
   public void onActivityResult(int requestCode, int resultCode,
       final Intent results) {
-    Log.w(TAG, "Result: req=" + requestCode + "; res=" + resultCode + "; result=" + results);
     SendState nextState = null;
     switch (requestCode) {
       case Constants.GET_LOGIN: {
-        // TODO: This is a result from inside the auth manager,
-        //       make this return path explicit.
-        if (resultCode != RESULT_OK || lastAuth == null ||
-            !lastAuth.authResult(resultCode, results)) {
+        if (resultCode == RESULT_CANCELED || lastAuth == null) {
           nextState = SendState.FINISH;
+          break;
         }
+
+        // This will invoke onAuthResult appropriately.
+        lastAuth.authResult(resultCode, results);
+        break;
       }
       case Constants.GET_MAP: {
         // User picked a map to upload to
@@ -794,45 +821,8 @@ public class SendActivity extends Activity implements ProgressIndicator {
         }
         break;
       }
-      case Constants.AUTHENTICATE_TO_MY_MAPS: {
-        // Authenticated with Google My Maps
-        if (results != null && resultCode == RESULT_OK) {
-          nextState = SendState.PICK_MAP;
-        } else {
-          nextState = SendState.SHOW_RESULTS;
-        }
-        break;
-      }
-      case Constants.AUTHENTICATE_TO_FUSION_TABLES: {
-        // Authenticated with Google Fusion Tables
-        if (results != null && resultCode == RESULT_OK) {
-          nextState = SendState.SEND_TO_FUSION_TABLES;
-        } else {
-          nextState = SendState.SHOW_RESULTS;
-        }
-        break;
-      }
-      case Constants.AUTHENTICATE_TO_DOCLIST: {
-        // Authenticated with Google Docs
-        if (resultCode == RESULT_OK) {
-          nextState = SendState.AUTHENTICATE_TRIX;
-        } else {
-          nextState = SendState.SHOW_RESULTS;
-        }
-        break;
-      }
-      case Constants.AUTHENTICATE_TO_TRIX: {
-        // Authenticated with Trix
-        if (resultCode == RESULT_OK) {
-          nextState = SendState.SEND_TO_DOCS;
-        } else {
-          nextState = SendState.SHOW_RESULTS;
-        }
-        break;
-      }
-
       default: {
-        Log.w(TAG, "Warning unhandled request code: " + requestCode);
+        Log.e(TAG, "Unrequested result: " + requestCode);
         return;
       }
     }
@@ -840,6 +830,35 @@ public class SendActivity extends Activity implements ProgressIndicator {
     if (nextState != null) {
       executeStateMachine(nextState);
     }
+  }
+
+  private void onLoginSuccess(int requestCode) {
+    SendState nextState;
+    switch (requestCode) {
+      case Constants.AUTHENTICATE_TO_MY_MAPS:
+        // Authenticated with Google My Maps
+        nextState = SendState.PICK_MAP;
+        break;
+      case Constants.AUTHENTICATE_TO_FUSION_TABLES:
+        // Authenticated with Google Fusion Tables
+        nextState = SendState.SEND_TO_FUSION_TABLES;
+        break;
+      case Constants.AUTHENTICATE_TO_DOCLIST:
+        // Authenticated with Google Docs
+        nextState = SendState.AUTHENTICATE_TRIX;
+        break;
+      case Constants.AUTHENTICATE_TO_TRIX:
+        // Authenticated with Trix
+        nextState = SendState.SEND_TO_DOCS;
+        break;
+
+      default: {
+        Log.e(TAG, "Unrequested login code: " + requestCode);
+        return;
+      }
+    }
+
+    executeStateMachine(nextState);
   }
 
   /**
