@@ -15,10 +15,10 @@
  */
 package com.google.android.apps.mytracks;
 
-import com.google.android.accounts.Account;
-import com.google.android.accounts.AccountManager;
 import com.google.android.maps.mytracks.R;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;

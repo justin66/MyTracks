@@ -17,7 +17,6 @@ package com.google.android.apps.mytracks;
 
 import static com.google.android.apps.mytracks.Constants.TAG;
 
-import com.google.android.accounts.Account;
 import com.google.android.apps.mytracks.io.AuthManager;
 import com.google.android.apps.mytracks.io.AuthManager.AuthCallback;
 import com.google.android.apps.mytracks.io.AuthManagerFactory;
@@ -25,6 +24,7 @@ import com.google.android.apps.mytracks.io.mymaps.MapsFacade;
 import com.google.android.apps.mytracks.io.mymaps.MyMapsConstants;
 import com.google.android.maps.mytracks.R;
 
+import android.accounts.Account;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;

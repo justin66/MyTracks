@@ -17,7 +17,6 @@ package com.google.android.apps.mytracks.io.sendtogoogle;
 
 import static com.google.android.apps.mytracks.Constants.TAG;
 
-import com.google.android.accounts.Account;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.google.android.apps.mytracks.AccountChooser;
 import com.google.android.apps.mytracks.Constants;
@@ -39,6 +38,7 @@ import com.google.android.apps.mytracks.util.SystemUtils;
 import com.google.android.apps.mytracks.util.UriUtils;
 import com.google.android.maps.mytracks.R;
 
+import android.accounts.Account;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;

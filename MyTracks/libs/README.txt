@@ -5,9 +5,6 @@ licenses or the JAR's authors.
 
 References are provided to the libraries:
 
-accounts.jar (Android accounts library):
-http://code.google.com/p/libs-for-android/wiki/AccountsLibrary
-
 google-api-client-*.jar (GData client):
 http://code.google.com/p/google-api-java-client/
 

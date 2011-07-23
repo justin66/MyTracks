@@ -17,15 +17,15 @@ package com.google.android.apps.mytracks.io;
 
 import static com.google.android.apps.mytracks.Constants.TAG;
 
-import com.google.android.accounts.Account;
-import com.google.android.accounts.AccountManager;
-import com.google.android.accounts.AccountManagerCallback;
-import com.google.android.accounts.AccountManagerFuture;
-import com.google.android.accounts.AuthenticatorException;
-import com.google.android.accounts.OperationCanceledException;
 import com.google.android.apps.mytracks.AccountChooser;
 import com.google.android.apps.mytracks.Constants;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AccountManagerCallback;
+import android.accounts.AccountManagerFuture;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
