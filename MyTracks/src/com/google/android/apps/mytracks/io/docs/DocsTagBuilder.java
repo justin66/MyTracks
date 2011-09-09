@@ -18,7 +18,6 @@ package com.google.android.apps.mytracks.io.docs;
 import com.google.android.apps.mytracks.util.StringUtils;
 import com.google.android.apps.mytracks.util.UnitConversions;
 
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 /**
@@ -46,9 +45,9 @@ class DocsTagBuilder {
   // TODO(simmonmt): These formats aren't I18N-compatible.  Not everyone uses
   // commas for thousands and dots for the decimal point.
   private static final NumberFormat LARGE_UNIT_FORMAT =
-    new DecimalFormat("#,###,###.00");
+      NumberFormat.getNumberInstance();
   private static final NumberFormat SMALL_UNIT_FORMAT =
-    new DecimalFormat("###,###");
+      NumberFormat.getNumberInstance();
 
   protected final boolean metricUnits;
   protected final StringBuilder stringBuilder;

@@ -44,6 +44,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -55,15 +57,15 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class DocsHelper {
   private static final String DOCS_FEED_URL =
-    "http://docs.google.com/feeds/documents/private/full";
+    "https://docs.google.com/feeds/documents/private/full";
   private static final String DOCS_SPREADSHEET_URL =
-      "http://docs.google.com/feeds/documents/private/full/spreadsheet%3A";
+      "https://docs.google.com/feeds/documents/private/full/spreadsheet%3A";
   private static final String DOCS_WORKSHEETS_URL_FORMAT =
-    "http://spreadsheets.google.com/feeds/worksheets/%s/private/full";
+    "https://spreadsheets.google.com/feeds/worksheets/%s/private/full";
   private static final String DOCS_MY_SPREADSHEETS_FEED_URL =
-    "http://docs.google.com/feeds/documents/private/full?category=mine,spreadsheet";
+    "https://docs.google.com/feeds/documents/private/full?category=mine,spreadsheet";
   private static final String DOCS_SPREADSHEET_URL_FORMAT =
-    "http://spreadsheets.google.com/feeds/list/%s/%s/private/full";
+    "https://spreadsheets.google.com/feeds/list/%s/%s/private/full";
 
   private static final String CONTENT_TYPE_PARAM = "Content-Type";
   private static final String OPENDOCUMENT_SPREADSHEET_MIME_TYPE =
@@ -289,7 +291,7 @@ public class DocsHelper {
     DocsTagBuilder tagBuilder = new DocsTagBuilder(metricUnits)
         .append("name", track.getName())
         .append("description", track.getDescription())
-        .append("date", String.format("%tc", stats.getStartTime()))
+        .append("date", DateFormat.getDateTimeInstance(DateFormat.SHORT,DateFormat.SHORT).format(new Date(stats.getStartTime())))
         .append("totaltime", StringUtils.formatTimeAlwaysShowingHours(
             stats.getTotalTime()))
         .append("movingtime", StringUtils.formatTimeAlwaysShowingHours(
