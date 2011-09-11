@@ -58,7 +58,8 @@ public class SettingsActivity extends PreferenceActivity {
 
   private BackupPreferencesListener backupListener;
   private SharedPreferences preferences;
-
+  private boolean displaySettingsOnly = false;
+  
   /** Called when the activity is first created. */
   @Override
   protected void onCreate(Bundle icicle) {
@@ -82,7 +83,23 @@ public class SettingsActivity extends PreferenceActivity {
 
     // Load the preferences to be displayed
     addPreferencesFromResource(R.xml.preferences);
+    
+    processIntent();
 
+    // Disable TTS announcement preference if not available
+    if (!apiFeatures.hasTextToSpeech()) {
+      IntegerListPreference announcementFrequency =
+          (IntegerListPreference) findPreference(
+              getString(R.string.announcement_frequency_key));
+      announcementFrequency.setEnabled(false);
+      announcementFrequency.setValue("-1");
+      announcementFrequency.setSummary(
+          R.string.settings_not_available_summary);
+    }
+
+    if (displaySettingsOnly)
+       return;
+      
     // Hook up switching of displayed list entries between metric and imperial
     // units
     CheckBoxPreference metricUnitsPreference =
@@ -102,17 +119,6 @@ public class SettingsActivity extends PreferenceActivity {
 
     customizeSensorOptionsPreferences();
 
-    // Disable TTS announcement preference if not available
-    if (!apiFeatures.hasTextToSpeech()) {
-      IntegerListPreference announcementFrequency =
-          (IntegerListPreference) findPreference(
-              getString(R.string.announcement_frequency_key));
-      announcementFrequency.setEnabled(false);
-      announcementFrequency.setValue("-1");
-      announcementFrequency.setSummary(
-          R.string.settings_not_available_summary);
-    }
-
     // Hook up action for resetting all settings
     Preference resetPreference = findPreference(getString(R.string.reset_key));
     resetPreference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
@@ -122,6 +128,18 @@ public class SettingsActivity extends PreferenceActivity {
         return true;
       }
     });
+  }
+  
+  private void processIntent() {
+    Bundle bundle = getIntent().getExtras();
+    PreferenceScreen preferenceScreen;
+    if (bundle != null) {
+      preferenceScreen = (PreferenceScreen)findPreference(bundle.getString("Open"));
+      if (preferenceScreen != null) {
+         displaySettingsOnly = true;
+         setPreferenceScreen(preferenceScreen);
+      }
+    }
   }
 
   private void customizeSensorOptionsPreferences() {
@@ -174,6 +192,10 @@ public class SettingsActivity extends PreferenceActivity {
   @Override
   protected void onResume() {
     super.onResume();
+    
+    // If we only need the display setting screen nothing else needs to load.
+    if (displaySettingsOnly)
+      return;
 
     configureBluetoothPreferences();
     Preference backupNowPreference =
