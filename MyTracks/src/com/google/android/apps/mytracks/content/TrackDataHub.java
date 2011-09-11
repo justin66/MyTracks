@@ -240,22 +240,24 @@ public class TrackDataHub {
    */
   public void start() {
     Log.i(TAG, "TrackDataHub.start");
-    if (startedInstance != null) {
-      Log.w(TAG, "Already started, ignoring");
-      return;
+    synchronized (this) {
+      if (startedInstance != null) {
+        Log.w(TAG, "Already started, ignoring");
+        return;
+      }
+      startedInstance = this;
+
+      listenerHandlerThread = new HandlerThread("trackDataContentThread");
+      listenerHandlerThread.start();
+      listenerHandler = new Handler(listenerHandlerThread.getLooper());
+      dataSources = newDataSources();
+      dataSourceManager = new DataSourceManager(dataSourceListener, dataSources);
+
+      // This may or may not register internal listeners, depending on whether
+      // we already had external listeners.
+      dataSourceManager.updateAllListeners(getNeededListenerTypes());
+      loadSharedPreferences();
     }
-    startedInstance = this;
-
-    listenerHandlerThread = new HandlerThread("trackDataContentThread");
-    listenerHandlerThread.start();
-    listenerHandler = new Handler(listenerHandlerThread.getLooper());
-    dataSources = newDataSources();
-    dataSourceManager = new DataSourceManager(dataSourceListener, dataSources);
-
-    // This may or may not register internal listeners, depending on whether
-    // we already had external listeners.
-    dataSourceManager.updateAllListeners(getNeededListenerTypes());
-    loadSharedPreferences();
 
     // If there were listeners already registered, make sure they become up-to-date.
     loadDataForAllListeners();
@@ -286,21 +288,23 @@ public class TrackDataHub {
    */
   public void stop() {
     Log.i(TAG, "TrackDataHub.stop");
-    if (!isStarted()) {
-      Log.w(TAG, "Not started, ignoring");
-      return;
+    synchronized (this) {
+      if (!isStarted()) {
+        Log.w(TAG, "Not started, ignoring");
+        return;
+      }
+
+      // Unregister internal listeners even if there are external listeners registered.
+      dataSourceManager.unregisterAllListeners();
+      listenerHandlerThread.getLooper().quit();
+
+      startedInstance = null;
+
+      dataSources = null;
+      dataSourceManager = null;
+      listenerHandlerThread = null;
+      listenerHandler = null;
     }
-
-    // Unregister internal listeners even if there are external listeners registered.
-    dataSourceManager.unregisterAllListeners();
-    listenerHandlerThread.getLooper().quit();
-
-    startedInstance = null;
-
-    dataSources = null;
-    dataSourceManager = null;
-    listenerHandlerThread = null;
-    listenerHandler = null;
   }
 
   private boolean isStarted() {
