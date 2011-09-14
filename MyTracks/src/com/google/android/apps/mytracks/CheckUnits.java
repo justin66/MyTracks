@@ -25,6 +25,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+
 import java.util.Locale;
 
 /**
@@ -79,6 +80,7 @@ class CheckUnits {
   private static void accept(Context context, SharedPreferences preferences) {
     recordCheckPerformed(preferences);
     Intent startIntent = new Intent(context, SettingsActivity.class);
+    startIntent.putExtra("Open", context.getString(R.string.settings_display));
     context.startActivity(startIntent);
   }
 
