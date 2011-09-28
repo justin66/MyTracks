@@ -289,14 +289,21 @@ public class TrackRecordingService extends Service {
         resumeTrack(startId);
       } else {
         // Process actions for controlling the service.
+        
         String action = intent.getAction();
-        if (getString(R.string.start_new_track_action).equals(action)) {
-          startNewTrack();
-          if (intent.getBooleanExtra(getString(R.string.select_new_track_extra), false)) {
-            prefManager.setSelectedTrack(recordingTrackId);
+        try {
+          if (getString(R.string.start_new_track_action).equals(action)) {
+            startNewTrack();
+            if (intent.getBooleanExtra(getString(R.string.select_new_track_extra), false)) {
+              prefManager.setSelectedTrack(recordingTrackId);
+            }
+          } else if (getString(R.string.end_current_track_action).equals(action)) {
+            endCurrentTrack();
           }
-        } else if (getString(R.string.end_current_track_action).equals(action)) {
-          endCurrentTrack();
+        }
+        catch (IllegalStateException e) {
+          if (!intent.getBooleanExtra(getString(R.string.omit_illegal_state), false))
+             throw e;
         }
       }
     }

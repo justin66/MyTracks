@@ -198,6 +198,7 @@ public class TrackWidgetProvider
   private void setButtonIntent(
       RemoteViews views, Context context, int action, int icon, int extra) {
     Intent intent = new Intent(context, TrackRecordingService.class);
+    intent.putExtra(context.getString(R.string.omit_illegal_state), true);
     intent.setAction(context.getString(action));
     if (extra != -1) {
       intent.putExtra(context.getString(extra), true);
