@@ -23,7 +23,6 @@ import com.google.android.apps.mytracks.Constants;
 import com.google.android.apps.mytracks.MyMapsList;
 import com.google.android.apps.mytracks.ProgressIndicator;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
-import com.google.android.apps.mytracks.content.MyTracksProviderUtilsFactory;
 import com.google.android.apps.mytracks.content.Track;
 import com.google.android.apps.mytracks.content.TracksColumns;
 import com.google.android.apps.mytracks.io.AuthManager;
@@ -159,7 +158,7 @@ public class SendActivity extends Activity implements ProgressIndicator {
     Log.d(TAG, "SendActivity.onCreate");
     super.onCreate(savedInstanceState);
 
-    providerUtils = MyTracksProviderUtilsFactory.get(this);
+    providerUtils = MyTracksProviderUtils.Factory.get(this);
     sharedPreferences = getSharedPreferences(Constants.SETTINGS_NAME, 0);
 
     tracker = GoogleAnalyticsTracker.getInstance();
@@ -198,8 +197,9 @@ public class SendActivity extends Activity implements ProgressIndicator {
     String action = intent.getAction();
     String type = intent.getType();
     Uri data = intent.getData();
-    if (!Intent.ACTION_SEND.equals(action) || !TracksColumns.CONTENT_ITEMTYPE.equals(type)
-        || !UriUtils.matchesContentUri(data, TracksColumns.DATABASE_CONTENT_URI)) {
+    if (!Intent.ACTION_SEND.equals(action) ||
+        !TracksColumns.CONTENT_ITEMTYPE.equals(type) ||
+        !UriUtils.matchesContentUri(data, TracksColumns.CONTENT_URI)) {
       Log.e(TAG, "Got bad send intent: " + intent);
       return false;
     }
@@ -911,7 +911,7 @@ public class SendActivity extends Activity implements ProgressIndicator {
   }
 
   public static void sendToGoogle(Context ctx, long trackId, boolean shareLink) {
-    Uri uri = ContentUris.withAppendedId(TracksColumns.DATABASE_CONTENT_URI, trackId);
+    Uri uri = ContentUris.withAppendedId(TracksColumns.CONTENT_URI, trackId);
 
     Intent intent = new Intent(ctx, SendActivity.class);
     intent.setAction(Intent.ACTION_SEND);

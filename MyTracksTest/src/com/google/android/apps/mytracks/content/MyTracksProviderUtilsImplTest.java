@@ -46,12 +46,12 @@ public class MyTracksProviderUtilsImplTest extends AndroidTestCase {
     RenamingDelegatingContext targetContext = new RenamingDelegatingContext(
         getContext(), getContext(), "test.");
     context = new MockContext(mockContentResolver, targetContext);
-    DatabaseProvider provider = new DatabaseProvider();
+    MyTracksProvider provider = new MyTracksProvider();
     provider.attachInfo(context, null);
-    mockContentResolver.addProvider(MyTracksProviderUtils.DATABASE_AUTHORITY, provider);
+    mockContentResolver.addProvider(MyTracksProviderUtils.AUTHORITY, provider);
     setContext(context);
 
-    providerUtils = MyTracksProviderUtilsFactory.get(context);
+    providerUtils = MyTracksProviderUtils.Factory.get(context);
   }
 
   public void testLocationIterator_noPoints() {

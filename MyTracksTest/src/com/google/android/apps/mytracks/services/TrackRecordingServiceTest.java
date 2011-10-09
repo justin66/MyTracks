@@ -18,10 +18,8 @@ package com.google.android.apps.mytracks.services;
 import static com.google.android.apps.mytracks.Constants.RESUME_TRACK_EXTRA_NAME;
 
 import com.google.android.apps.mytracks.Constants;
-import com.google.android.apps.mytracks.content.DatabaseProvider;
 import com.google.android.apps.mytracks.content.MyTracksProvider;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
-import com.google.android.apps.mytracks.content.MyTracksProviderUtilsFactory;
 import com.google.android.apps.mytracks.content.Track;
 import com.google.android.apps.mytracks.content.Waypoint;
 import com.google.android.apps.mytracks.content.WaypointCreationRequest;
@@ -146,18 +144,12 @@ public class TrackRecordingServiceTest
     RenamingDelegatingContext targetContext = new RenamingDelegatingContext(
         getContext(), getContext(), "test.");
     context = new MockContext(mockContentResolver, targetContext);
-
-    MyTracksProvider myTracksProvider = new MyTracksProvider();
-    myTracksProvider.attachInfo(context, null);
-    mockContentResolver.addProvider(MyTracksProviderUtils.AUTHORITY, myTracksProvider);
-    
-    DatabaseProvider databaseProvider = new DatabaseProvider();
-    databaseProvider.attachInfo(context, null);
-    mockContentResolver.addProvider(MyTracksProviderUtils.DATABASE_AUTHORITY, databaseProvider);
-    
+    MyTracksProvider provider = new MyTracksProvider();
+    provider.attachInfo(context, null);
+    mockContentResolver.addProvider(MyTracksProviderUtils.AUTHORITY, provider);
     setContext(context);
 
-    providerUtils = MyTracksProviderUtilsFactory.get(context);
+    providerUtils = MyTracksProviderUtils.Factory.get(context);
 
     sharedPreferences = context.getSharedPreferences(
         Constants.SETTINGS_NAME, 0);
@@ -413,10 +405,12 @@ public class TrackRecordingServiceTest
     ITrackRecordingService service = bindAndGetService(createStartIntent());
     assertTrue(service.isRecording());
 
-    // Starting a new track again should just return -1.
-    long newTrack = service.startNewTrack();
-    assertEquals(-1L, newTrack);
-
+    try {
+      service.startNewTrack();
+      fail("Expecting IllegalStateException");
+    } catch (IllegalStateException e) {
+      // Expected.
+    }
     assertEquals(123, sharedPreferences.getLong(
         context.getString(R.string.recording_track_key), 0));
     assertEquals(123, service.getRecordingTrackId());
@@ -458,12 +452,13 @@ public class TrackRecordingServiceTest
     ITrackRecordingService service = bindAndGetService(createStartIntent());
     assertFalse(service.isRecording());
 
-    /*
-     * Ending the current track when no track is been recording should not cause
-     * any error.
-     */
-    service.endCurrentTrack();
-    
+    // End the current track.
+    try {
+      service.endCurrentTrack();
+      fail("Expecting IllegalStateException");
+    } catch (IllegalStateException e) {
+      // Expected.
+    }
     assertEquals(-1, sharedPreferences.getLong(
         context.getString(R.string.recording_track_key), 0));
     assertEquals(-1, service.getRecordingTrackId());

@@ -16,11 +16,9 @@
 package com.google.android.apps.mytracks.io;
 
 import static com.google.android.apps.mytracks.Constants.TAG;
-
 import com.google.android.apps.mytracks.Constants;
 import com.google.android.apps.mytracks.ProgressIndicator;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
-import com.google.android.apps.mytracks.content.MyTracksProviderUtilsFactory;
 import com.google.android.apps.mytracks.content.Track;
 import com.google.android.apps.mytracks.content.Waypoint;
 import com.google.android.apps.mytracks.io.mymaps.MapsFacade;
@@ -89,7 +87,7 @@ public class SendToMyMaps implements Runnable {
     this.progressIndicator = progressIndicator;
     this.onCompletion = onCompletion;
     this.stringUtils = new StringUtils(context);
-    this.providerUtils = MyTracksProviderUtilsFactory.get(context);
+    this.providerUtils = MyTracksProviderUtils.Factory.get(context);
   }
 
   @Override

@@ -18,7 +18,6 @@ package com.google.android.apps.mytracks.io.file;
 import static com.google.android.apps.mytracks.Constants.TAG;
 
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
-import com.google.android.apps.mytracks.content.MyTracksProviderUtilsFactory;
 import com.google.android.apps.mytracks.content.TracksColumns;
 import com.google.android.apps.mytracks.util.UriUtils;
 import com.google.android.maps.mytracks.R;
@@ -65,7 +64,7 @@ public class ImportActivity extends Activity {
   public void onCreate(Bundle savedState) {
     super.onCreate(savedState);
 
-    providerUtils = MyTracksProviderUtilsFactory.get(this);
+    providerUtils = MyTracksProviderUtils.Factory.get(this);
   }
 
   @Override
@@ -148,7 +147,7 @@ public class ImportActivity extends Activity {
 
   protected void showImportedTrack() {
     long lastTrackId = importedTrackIds[importedTrackIds.length - 1];
-    Uri trackUri = ContentUris.withAppendedId(TracksColumns.DATABASE_CONTENT_URI, lastTrackId);
+    Uri trackUri = ContentUris.withAppendedId(TracksColumns.CONTENT_URI, lastTrackId);
 
     Intent intent = new Intent(Intent.ACTION_VIEW);
     intent.setDataAndType(trackUri, TracksColumns.CONTENT_ITEMTYPE);

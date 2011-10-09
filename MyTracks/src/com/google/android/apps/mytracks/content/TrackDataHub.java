@@ -202,7 +202,7 @@ public class TrackDataHub {
    */
   public synchronized static TrackDataHub newInstance(Context context) {
     SharedPreferences preferences = context.getSharedPreferences(Constants.SETTINGS_NAME, 0);
-    MyTracksProviderUtils providerUtils = MyTracksProviderUtilsFactory.get(context);
+    MyTracksProviderUtils providerUtils = MyTracksProviderUtils.Factory.get(context);
     return new TrackDataHub(context,
         new TrackDataListeners(),
         preferences, providerUtils,

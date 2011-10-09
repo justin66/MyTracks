@@ -15,7 +15,6 @@
  */
 package com.google.android.apps.mytracks;
 
-import com.google.android.apps.mytracks.content.MyTracksProviderUtilsFactory;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
 import com.google.android.apps.mytracks.io.file.GpxImporter;
 import com.google.android.apps.mytracks.util.FileUtils;
@@ -133,7 +132,7 @@ public class ImportAllTracks {
    * been acquired.
    */
   private void importAll() {
-    MyTracksProviderUtils providerUtils = MyTracksProviderUtilsFactory.get(activity);
+    MyTracksProviderUtils providerUtils = MyTracksProviderUtils.Factory.get(activity);
 
     if (!fileUtils.isSdCardAvailable()) {
       return;

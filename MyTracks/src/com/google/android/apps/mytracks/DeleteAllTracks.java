@@ -15,7 +15,7 @@
  */
 package com.google.android.apps.mytracks;
 
-import com.google.android.apps.mytracks.content.MyTracksProviderUtilsFactory;
+import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
 import com.google.android.apps.mytracks.util.ApiFeatures;
 import com.google.android.maps.mytracks.R;
 
@@ -59,7 +59,7 @@ public class DeleteAllTracks extends Handler {
           public void onClick(DialogInterface dialogInterface, int i) {
             dialogInterface.dismiss();
             Log.w(Constants.TAG, "deleting all!");
-            MyTracksProviderUtilsFactory.get(context).deleteAllTracks();
+            MyTracksProviderUtils.Factory.get(context).deleteAllTracks();
             SharedPreferences prefs =
                 context.getSharedPreferences(Constants.SETTINGS_NAME, 0);
             SharedPreferences.Editor editor = prefs.edit();

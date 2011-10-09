@@ -63,6 +63,7 @@ public class MapOverlayTest extends AndroidTestCase {
     assertEquals(2, myTracksOverlay.getNumLocations());
     assertEquals(0, myTracksOverlay.getNumWaypoints());
     assertNotNull(myTracksOverlay.getLastPath());
+    assertEquals(2, ((MockPath)myTracksOverlay.getLastPath()).totalPoints);
     
     myTracksOverlay.draw(canvas, mockView, true);
     assertEquals(2, myTracksOverlay.getNumLocations());
@@ -151,8 +152,11 @@ public class MapOverlayTest extends AndroidTestCase {
     // No shadow.
     myTracksOverlay.draw(canvas, mockView, false);
     assertNotNull(myTracksOverlay.getLastPath());
+    assertTrue(myTracksOverlay.getLastPath() instanceof MockPath);
+    MockPath path = (MockPath) myTracksOverlay.getLastPath();
     assertEquals(40, myTracksOverlay.getNumWaypoints());
     assertEquals(100, myTracksOverlay.getNumLocations());
+    assertEquals(100, path.totalPoints);
     // TODO: Check the points from the path (and the segments).
   }
 }

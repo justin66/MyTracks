@@ -1,6 +1,5 @@
 package com.google.android.apps.mytracks;
 
-import com.google.android.apps.mytracks.content.MyTracksProviderUtilsFactory;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
 import com.google.android.apps.mytracks.content.Track;
 import com.google.android.apps.mytracks.stats.TripStatistics;
@@ -58,7 +57,7 @@ public class AggregatedStatsActivity extends Activity implements
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    this.tracksProvider = MyTracksProviderUtilsFactory.get(this);
+    this.tracksProvider = MyTracksProviderUtils.Factory.get(this);
 
     // We don't need a window title bar:
     requestWindowFeature(Window.FEATURE_NO_TITLE);

@@ -16,7 +16,7 @@
 package com.google.android.apps.mytracks.content;
 
 import static com.google.android.apps.mytracks.lib.MyTracksLibConstants.TAG;
-
+import com.google.android.apps.mytracks.content.Sensor;
 import com.google.android.apps.mytracks.stats.TripStatistics;
 import com.google.protobuf.InvalidProtocolBufferException;
 
@@ -40,39 +40,13 @@ import java.util.NoSuchElementException;
 public class MyTracksProviderUtilsImpl implements MyTracksProviderUtils {
 
   private final ContentResolver contentResolver;
-  private final String authority; // authority of the content provider
 
   private int defaultCursorBatchSize = 2000;
 
-  public MyTracksProviderUtilsImpl(ContentResolver contentResolver, String authority) {
+  public MyTracksProviderUtilsImpl(ContentResolver contentResolver) {
     this.contentResolver = contentResolver;
-    this.authority = authority;
-  }
-  
-  /**
-   * Gets the tracks table URI.
-   */
-  private Uri getTracksUri() {
-    return authority.equals(DATABASE_AUTHORITY) ? TracksColumns.DATABASE_CONTENT_URI
-        : TracksColumns.CONTENT_URI;
   }
 
-  /**
-   * Gets the track points table URI.
-   */
-  private Uri getTrackPointsUri() {
-    return authority.equals(DATABASE_AUTHORITY) ? TrackPointsColumns.DATABASE_CONTENT_URI
-        : TrackPointsColumns.CONTENT_URI;
-  }
-
-  /**
-   * Gets the waypoints table URI.
-   */
-  private Uri getWaypointsUri() {
-    return authority.equals(DATABASE_AUTHORITY) ? WaypointsColumns.DATABASE_CONTENT_URI
-        : WaypointsColumns.CONTENT_URI;
-  }
-  
   /**
    * Creates the ContentValues for a given location object.
    *
@@ -544,20 +518,24 @@ public class MyTracksProviderUtilsImpl implements MyTracksProviderUtils {
 
   @Override
   public void deleteAllTracks() {
-    contentResolver.delete(getTracksUri(), null, null);
-    contentResolver.delete(getTrackPointsUri(), null, null);
-    contentResolver.delete(getWaypointsUri(), null, null);
+    contentResolver.delete(TracksColumns.CONTENT_URI, null, null);
+    contentResolver.delete(TrackPointsColumns.CONTENT_URI,
+        null, null);
+    contentResolver.delete(WaypointsColumns.CONTENT_URI, null, null);
   }
 
   @Override
   public void deleteTrack(long trackId) {
     Track track = getTrack(trackId);
     if (track != null) {
-      contentResolver.delete(getTrackPointsUri(),
-          "_id>=" + track.getStartId() + " AND _id<=" + track.getStopId(), null);
+      contentResolver.delete(TrackPointsColumns.CONTENT_URI,
+          "_id>=" + track.getStartId() + " AND _id<=" + track.getStopId(),
+          null);
     }
-    contentResolver.delete(getWaypointsUri(), WaypointsColumns.TRACKID + "=" + trackId, null);
-    contentResolver.delete(getTracksUri(), "_id=" + trackId, null);
+    contentResolver.delete(WaypointsColumns.CONTENT_URI,
+        WaypointsColumns.TRACKID + "=" + trackId, null);
+    contentResolver.delete(
+        TracksColumns.CONTENT_URI, "_id=" + trackId, null);
   }
 
   @Override
@@ -581,7 +559,8 @@ public class MyTracksProviderUtilsImpl implements MyTracksProviderUtils {
         Log.d(TAG, "No statistics marker after the deleted one was found.");
       }
     }
-    contentResolver.delete(getWaypointsUri(), "_id=" + waypointId, null);
+    contentResolver.delete(
+        WaypointsColumns.CONTENT_URI, "_id=" + waypointId, null);
   }
 
   @Override
@@ -593,7 +572,7 @@ public class MyTracksProviderUtilsImpl implements MyTracksProviderUtils {
     Cursor cursor = null;
     try {
       cursor = contentResolver.query(
-          getWaypointsUri(),
+          WaypointsColumns.CONTENT_URI,
           null /*projection*/,
           selection,
           null /*selectionArgs*/,
@@ -615,7 +594,7 @@ public class MyTracksProviderUtilsImpl implements MyTracksProviderUtils {
   public boolean updateWaypoint(Waypoint waypoint) {
     try {
       final int rows = contentResolver.update(
-          getWaypointsUri(),
+          WaypointsColumns.CONTENT_URI,
           createContentValues(waypoint),
           "_id=" + waypoint.getId(),
           null /*selectionArgs*/);
@@ -635,7 +614,8 @@ public class MyTracksProviderUtilsImpl implements MyTracksProviderUtils {
   private Location findLocationBy(String select) {
     Cursor cursor = null;
     try {
-      cursor = contentResolver.query(getTrackPointsUri(), null, select, null, null);
+      cursor = contentResolver.query(
+          TrackPointsColumns.CONTENT_URI, null, select, null, null);
       if (cursor != null && cursor.moveToNext()) {
         return createLocation(cursor);
       }
@@ -658,7 +638,8 @@ public class MyTracksProviderUtilsImpl implements MyTracksProviderUtils {
   private Track findTrackBy(String select) {
     Cursor cursor = null;
     try {
-      cursor = contentResolver.query(getTracksUri(), null, select, null, null);
+      cursor = contentResolver.query(
+          TracksColumns.CONTENT_URI, null, select, null, null);
       if (cursor != null && cursor.moveToNext()) {
         return createTrack(cursor);
       }
@@ -684,7 +665,7 @@ public class MyTracksProviderUtilsImpl implements MyTracksProviderUtils {
     }
 
     Cursor cursor = contentResolver.query(
-        getWaypointsUri(),
+        WaypointsColumns.CONTENT_URI,
         null /*projection*/,
         "trackid=" + trackId,
         null /*selectionArgs*/,
@@ -710,7 +691,7 @@ public class MyTracksProviderUtilsImpl implements MyTracksProviderUtils {
     }
 
     Cursor cursor = contentResolver.query(
-        getWaypointsUri(),
+        WaypointsColumns.CONTENT_URI,
         null /*projection*/,
         "_id=" + waypointId,
         null /*selectionArgs*/,
@@ -737,7 +718,7 @@ public class MyTracksProviderUtilsImpl implements MyTracksProviderUtils {
 
     final String[] projection = {"_id"};
     Cursor cursor = contentResolver.query(
-        getTrackPointsUri(),
+        TrackPointsColumns.CONTENT_URI,
         projection,
         "_id=(select max(_id) from trackpoints WHERE trackid=" + trackId + ")",
         null /*selectionArgs*/,
@@ -765,7 +746,7 @@ public class MyTracksProviderUtilsImpl implements MyTracksProviderUtils {
 
     final String[] projection = {"_id"};
     Cursor cursor = contentResolver.query(
-        getWaypointsUri(),
+        WaypointsColumns.CONTENT_URI,
         projection,
         "trackid=" + trackId,
         null /*selectionArgs*/,
@@ -793,7 +774,7 @@ public class MyTracksProviderUtilsImpl implements MyTracksProviderUtils {
 
     final String[] projection = {"_id"};
     Cursor cursor = contentResolver.query(
-        getWaypointsUri(),
+        WaypointsColumns.CONTENT_URI,
         projection,
         WaypointsColumns.TRACKID + "=" + trackId,
         null /*selectionArgs*/,
@@ -818,7 +799,8 @@ public class MyTracksProviderUtilsImpl implements MyTracksProviderUtils {
     Cursor cursor = null;
     try {
       cursor = contentResolver.query(
-          getTracksUri(), null, "_id=(select max(_id) from tracks)", null, null);
+          TracksColumns.CONTENT_URI, null, "_id=(select max(_id) from tracks)",
+          null, null);
       if (cursor != null && cursor.moveToNext()) {
         return createTrack(cursor);
       }
@@ -836,7 +818,8 @@ public class MyTracksProviderUtilsImpl implements MyTracksProviderUtils {
   public long getLastTrackId() {
     String[] proj = { TracksColumns._ID };
     Cursor cursor = contentResolver.query(
-        getTracksUri(), proj, "_id=(select max(_id) from tracks)", null, null);
+        TracksColumns.CONTENT_URI, proj, "_id=(select max(_id) from tracks)",
+        null, null);
     if (cursor != null) {
       try {
         if (cursor.moveToFirst()) {
@@ -881,7 +864,7 @@ public class MyTracksProviderUtilsImpl implements MyTracksProviderUtils {
       sortOrder += " LIMIT " + maxLocations;
     }
 
-    return contentResolver.query(getTrackPointsUri(), null, selection, null, sortOrder);
+    return contentResolver.query(TrackPointsColumns.CONTENT_URI, null, selection, null, sortOrder);
   }
 
   @Override
@@ -906,7 +889,8 @@ public class MyTracksProviderUtilsImpl implements MyTracksProviderUtils {
       sortOrder += " LIMIT " + maxWaypoints;
     }
 
-    return contentResolver.query(getWaypointsUri(), null, selection, null, sortOrder);
+    return contentResolver.query(
+        WaypointsColumns.CONTENT_URI, null, selection, null, sortOrder);
   }
 
   @Override
@@ -940,20 +924,23 @@ public class MyTracksProviderUtilsImpl implements MyTracksProviderUtils {
 
   @Override
   public Cursor getTracksCursor(String selection) {
-    Cursor cursor = contentResolver.query(getTracksUri(), null, selection, null, "_id");
+    Cursor cursor = contentResolver.query(
+        TracksColumns.CONTENT_URI, null, selection, null, "_id");
     return cursor;
   }
 
   @Override
   public Uri insertTrack(Track track) {
     Log.d(TAG, "MyTracksProviderUtilsImpl.insertTrack");
-    return contentResolver.insert(getTracksUri(), createContentValues(track));
+    return contentResolver.insert(TracksColumns.CONTENT_URI,
+        createContentValues(track));
   }
 
   @Override
   public Uri insertTrackPoint(Location location, long trackId) {
     Log.d(TAG, "MyTracksProviderUtilsImpl.insertTrackPoint");
-    return contentResolver.insert(getTrackPointsUri(), createContentValues(location, trackId));
+    return contentResolver.insert(TrackPointsColumns.CONTENT_URI,
+        createContentValues(location, trackId));
   }
 
   @Override
@@ -965,14 +952,15 @@ public class MyTracksProviderUtilsImpl implements MyTracksProviderUtils {
       values[i] = createContentValues(locations[i], trackId);
     }
 
-    return contentResolver.bulkInsert(getTrackPointsUri(), values);
+    return contentResolver.bulkInsert(TrackPointsColumns.CONTENT_URI, values);
   }
 
   @Override
   public Uri insertWaypoint(Waypoint waypoint) {
     Log.d(TAG, "MyTracksProviderUtilsImpl.insertWaypoint");
     waypoint.setId(-1);
-    return contentResolver.insert(getWaypointsUri(), createContentValues(waypoint));
+    return contentResolver.insert(WaypointsColumns.CONTENT_URI,
+        createContentValues(waypoint));
   }
 
   @Override
@@ -985,7 +973,7 @@ public class MyTracksProviderUtilsImpl implements MyTracksProviderUtils {
     try {
       final String[] projection = { TracksColumns._ID };
       cursor = contentResolver.query(
-          getTracksUri(),
+          TracksColumns.CONTENT_URI,
           projection,
           TracksColumns._ID + "=" + id/*selection*/,
           null/*selectionArgs*/,
@@ -1004,8 +992,8 @@ public class MyTracksProviderUtilsImpl implements MyTracksProviderUtils {
   @Override
   public void updateTrack(Track track) {
     Log.d(TAG, "MyTracksProviderUtilsImpl.updateTrack");
-    contentResolver.update(
-        getTracksUri(), createContentValues(track), "_id=" + track.getId(), null);
+    contentResolver.update(TracksColumns.CONTENT_URI,
+        createContentValues(track), "_id=" + track.getId(), null);
   }
 
   @Override
