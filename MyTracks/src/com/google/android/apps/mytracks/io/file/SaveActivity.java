@@ -16,6 +16,7 @@
 package com.google.android.apps.mytracks.io.file;
 
 import static com.google.android.apps.mytracks.Constants.TAG;
+import static com.google.android.apps.mytracks.Constants.TRACK_ID;
 
 import com.google.android.apps.mytracks.Constants;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
@@ -139,6 +140,7 @@ public class SaveActivity extends Activity {
     shareIntent.setType(format.getMimeType());
     Uri u = Uri.fromFile(new File(writer.getAbsolutePath()));
     shareIntent.putExtra(Intent.EXTRA_STREAM, u);
+    shareIntent.putExtra(TRACK_ID, trackId);
     startActivity(Intent.createChooser(shareIntent,
         getResources().getText(R.string.share_track).toString()));
   }
