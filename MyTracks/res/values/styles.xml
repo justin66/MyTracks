@@ -86,8 +86,8 @@ limitations under the License.
     <item name="android:width">160px</item>
   </style>
   
-  <!-- The style for the buttons on the bottom of a dialog. -->
-  <style name="DialogButton">
+  <!-- The style for the bottom buttons. -->
+  <style name="Button">
     <item name="android:layout_height">48dip</item>
     <item name="android:layout_weight">1</item>
     <item name="android:layout_width">0dip</item>
@@ -95,8 +95,8 @@ limitations under the License.
     <item name="android:textSize">14dip</item>
   </style>
   
-  <!--  The style for the spacer on the left and right of the dialog buttons. -->
-  <style name="DialogButtonSpacer">
+  <!--  The style for the spacer on the left and right of the bottom buttons. -->
+  <style name="ButtonSpacer">
     <item name="android:layout_height">wrap_content</item>
     <item name="android:layout_weight">0.25</item>
     <item name="android:layout_width">0dip</item>
