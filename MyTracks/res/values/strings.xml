@@ -51,21 +51,21 @@ limitations under the License.
 
   <!--  Additional menu items for the map view. -->
   <string name="mylocation"
-    translation_description="In the menu, to display user's current location.">
+    translation_description="In the menu for the map view, to display user's current location.">
     My Location
   </string>
     <string name="switch_to_sat"
-    translation_description="In the menu, to switch the display to the satellite mode.">
+    translation_description="In the menu for the map view, to switch the display to the satellite mode.">
     Satellite Mode
   </string>
   <string name="switch_to_map"
-    translation_description="In the menu, to switch the display to the map mode.">
+    translation_description="In the menu for the map view, to switch the display to the map mode.">
     Map Mode
   </string>
   
   <!--  Additional menu items for the chart view. -->
   <string name="chart_settings"
-    translation_description="In the menu, to change the chart settings.">
+    translation_description="In the menu for the chart view, to change the chart settings.">
     Chart Settings
   </string>  
   
