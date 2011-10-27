@@ -103,8 +103,6 @@ limitations under the License.
   <string name="success">Fet</string>
   <string name="waypoint">Punt de referència</string>
   <string name="cancel">Cancel·la</string>
-  <string name="close">Tanca</string>
-  <string name="edit">Edita</string>
   <string name="save">Desa</string>
 
   <!-- Placemark labels for start and end of track -->

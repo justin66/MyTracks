@@ -101,8 +101,6 @@ limitations under the License.
   <string name="success">Successo</string>
   <string name="waypoint">Punto di passaggio</string>
   <string name="cancel">Annulla</string>
-  <string name="close">Chiudi</string>
-  <string name="edit">Modifica</string>
   <string name="save">Salva</string>
 
   <!-- Placemark labels for start and end of track -->

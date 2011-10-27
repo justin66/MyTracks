@@ -116,8 +116,6 @@ limitations under the License.
   <string name="waypoint">Путевая точка</string>
   <string name="license">Лицензия</string>
   <string name="cancel">Отмена</string>
-  <string name="close">Закрыть</string>
-  <string name="edit">Правка</string>
   <string name="save">Сохранить</string>
 
   <!-- Placemark labels for start and end of track -->

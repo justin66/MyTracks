@@ -101,8 +101,6 @@ limitations under the License.
   <string name="error">Erreur</string>
   <string name="waypoint">Point de passage</string>
   <string name="cancel">Annuler</string>
-  <string name="close">Fermer</string>
-  <string name="edit">Modifier</string>
   <string name="save">Enregistrer</string>
 
   <!-- Placemark labels for start and end of track -->

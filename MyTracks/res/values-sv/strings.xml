@@ -102,8 +102,6 @@ limitations under the License.
   <string name="success">Lyckades</string>
   <string name="waypoint">Positionsmärke</string>
   <string name="cancel">Avbryt</string>
-  <string name="close">Stäng</string>
-  <string name="edit">Ändra</string>
   <string name="save">Spara</string>
 
   <!-- Placemark labels for start and end of track -->

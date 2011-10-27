@@ -113,8 +113,6 @@ limitations under the License.
   <string name="waypoint">ウェイポイント</string>
   <string name="license">ライセンス</string>
   <string name="cancel">キャンセル</string>
-  <string name="close">閉じる</string>
-  <string name="edit">編集</string>
   <string name="save">保存</string>
 
   <!-- Placemark labels for start and end of track -->

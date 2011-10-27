@@ -117,8 +117,6 @@ limitations under the License.
   <string name="waypoint">Reittipiste</string>
   <string name="license">Lisenssi</string>
   <string name="cancel">Peruuta</string>
-  <string name="close">Sulje</string>
-  <string name="edit">Muokkaa</string>
   <string name="save">Tallenna</string>
 
   <!-- Placemark labels for start and end of track -->

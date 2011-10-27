@@ -104,8 +104,6 @@ limitations under the License.
   <string name="waypoint">Wegpunkt</string>
   <string name="license">Lizenz</string>
   <string name="cancel">Abbrechen</string>
-  <string name="close">Schließen</string>
-  <string name="edit">Bearbeiten</string>
   <string name="save">Sichern</string>
 
   <!-- Placemark labels for start and end of track -->
