@@ -16,6 +16,7 @@
 package com.google.android.apps.mytracks.io;
 
 import static com.google.android.apps.mytracks.Constants.TAG;
+
 import com.google.android.apps.mytracks.Constants;
 import com.google.android.apps.mytracks.ProgressIndicator;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
@@ -357,7 +358,7 @@ public class SendToMyMaps implements Runnable {
    * Prepares a buffer of locations for transmission to google maps.
    *
    * @param track the original track with meta data
-   * @param buffer a buffer of locations on the track
+   * @param locations a buffer of locations on the track
    * @return an array of tracks each with a sub section of the points in the
    *         original buffer
    */
