@@ -309,7 +309,7 @@ limitations under the License.
   <string name="maps_list_failed">¡No se pudieron cargar sus mapas en este momento!</string>
   <string name="open_map">Seleccionar este mapa</string>
   <string name="edit_map_details">Editar detalles del mapa</string>
-  <string name="share_track">Compartir recorrido</string>
+  <string name="share_track_url">Compartir recorrido</string>
   <string name="delete_map">Borrar mapa de su cuenta</string>
   <string name="map_title">Titulo del mapa:</string>
   <string name="map_description">Descripción del mapa:</string>
@@ -319,13 +319,13 @@ limitations under the License.
   <string name="map_not_searchable">Este mapa y sus contenidos no aparecerán en los resultados de busquedas, aunque pueden ser vistos por otros a traves de su enlace directo</string>
 
   <!-- Sharing -->
-  <string name="share_map">Compartir mapa con amigos</string>
+  <string name="share_track_picker_title">Compartir mapa con amigos</string>
   <string name="share_map_subject">Me gustaría compartir un mapa contigo</string>
-  <string name="share_map_body_format">Creo que este mapa pudiera interesarte:
+  <string name="share_track_url_body_format">Creo que este mapa pudiera interesarte:
   
       %s</string>
-  <string name="send_track_subject">Me gustaría compartir un recorrido contigo</string>
-  <string name="send_track_body_format">Creo que este recorrido pudiera interesarte.
+  <string name="share_track_subject">Me gustaría compartir un recorrido contigo</string>
+  <string name="share_track_file_body_format">Creo que este recorrido pudiera interesarte.
 
     Para ver este recorrido usa Google Earth o algún otro software de mapeo.</string>
 

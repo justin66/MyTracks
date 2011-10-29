@@ -228,16 +228,16 @@ limitations under the License.
   <string name="mytracks_sky">Satellites GPS</string>
 
   <!-- Sharing -->
-  <string name="share_map">Partager.</string>
+  <string name="share_track_picker_title">Partager.</string>
   <string name="share_map_subject">Je voudrais partager ma carte avec vous</string>
-  <string name="share_map_body_format">Je pense que cette carte vous intéressera :
+  <string name="share_track_url_body_format">Je pense que cette carte vous intéressera :
 
       %s</string>
-  <string name="send_track_subject">Je voudrais partager un parcours avec vous</string>
-  <string name="send_track_body_format">Je pense que ce parcours vous intéressera.
+  <string name="share_track_subject">Je voudrais partager un parcours avec vous</string>
+  <string name="share_track_file_body_format">Je pense que ce parcours vous intéressera.
 
     Pour voir ce parcours, utilisez Google Earth ou tout autre logiciel de cartographie.</string>
-  <string name="share_track">Partager des parcours.</string>
+  <string name="share_track_url">Partager des parcours.</string>
 
   <!-- Visibility -->
   <string name="unlisted_map">Carte non listée</string>

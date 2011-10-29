@@ -249,16 +249,16 @@ limitations under the License.
   <string name="mytracks_sky">GPS-Satelliten</string>
 
   <!-- Sharing -->
-  <string name="share_map">Karte mit Freunden teilen</string>
+  <string name="share_track_picker_title">Karte mit Freunden teilen</string>
   <string name="share_map_subject">Ich möchte gerne eine Karte mit Dir teilen.</string>
-  <string name="share_map_body_format">Vielleicht interessierst Du Dich für diese Karte:
+  <string name="share_track_url_body_format">Vielleicht interessierst Du Dich für diese Karte:
 
       %s</string>
-  <string name="send_track_subject">Ich möchte einen GPS-Track mit Dir teilen</string>
-  <string name="send_track_body_format">Vielleicht interessierst Du Dich für diese Track:
+  <string name="share_track_subject">Ich möchte einen GPS-Track mit Dir teilen</string>
+  <string name="share_track_file_body_format">Vielleicht interessierst Du Dich für diese Track:
 
       Der Track kann mit Google Earth oder anderer Karten-Software visualisiert werden.</string>
-  <string name="share_track">Track mit Freunden teilen</string>
+  <string name="share_track_url">Track mit Freunden teilen</string>
 
   <!-- Visibility -->
   <string name="public_map">Öffentlich</string>

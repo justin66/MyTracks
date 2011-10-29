@@ -241,14 +241,14 @@ limitations under the License.
 
   <!-- Sharing -->
   <string name="share_map_subject">M\'agradaria compartir un mapa amb tu</string>
-  <string name="share_map_body_format">Em sembla que estaràs interessat en aquest mapa:
+  <string name="share_track_url_body_format">Em sembla que estaràs interessat en aquest mapa:
 
       %s</string>
-  <string name="send_track_subject">M\'agradaria compartir una ruta amb tu</string>
-  <string name="send_track_body_format">Em sembla que estaràs interessat en aquesta ruta.
+  <string name="share_track_subject">M\'agradaria compartir una ruta amb tu</string>
+  <string name="share_track_file_body_format">Em sembla que estaràs interessat en aquesta ruta.
 
     Per veure aquesta ruta fes servir Google Earth o altre programari de mapes.</string>
-  <string name="share_track">Comparteix la ruta amb amics</string>
+  <string name="share_track_url">Comparteix la ruta amb amics</string>
 
   <!-- Visibility -->
   <string name="public_map">Públic</string>

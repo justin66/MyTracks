@@ -472,8 +472,9 @@ limitations under the License.
   <!--  'Share with friends...' menu options. -->
   <string name="tracklist_share_link"
     translation_description="In the context menu for a track, under the 'Share with friends...'
-      option, the menu option to share the track's link to My Maps or Fusion Tables with friends.">
-    A link to My Maps or Fusion Tables
+      option, the menu option to save a track to My Maps or Fusion Tables and share the URL with
+      friends.">
+    My Map or Fusion Table URL
   </string>
   <string name="tracklist_share_gpx_file"
     translation_description="In the context menu for a track, under the 'Share with friends...'
@@ -723,8 +724,6 @@ limitations under the License.
   <string name="settings_reset_dialog_message">All your settings will be erased and reverted to the default values. Saved tracks will be preserved. Are you sure?</string>
   <string name="settings_reset_done">All settings have been reverted to their defaults.</string>
 
-  <string name="pace_label">Pace</string>
-
   <string name="eclair_required">Only supported in Android 2.0 or above</string>
   <string name="settings_sensor_type">Sensor Type</string>
   <string name="settings_sensor_type_summary">The type of sensor to connect to</string>
@@ -765,65 +764,146 @@ limitations under the License.
   <!-- MyTracksSky -->
   <string name="mytracks_sky">GPS Satellites</string>
 
-  <!-- My Maps -->
-  <string name="select_map_message">Pick a map from your account:</string>
-  <string name="create_new_map">Create new map...</string>
-  <string name="map_list_title">Send to Google My Maps</string>
-  <string name="maps_list_loading">Loading maps...</string>
-  <string name="maps_list_failed">Your maps could not be loaded at this time!</string>
-  <string name="open_map">Select this Map</string>
-  <string name="edit_map_details">Edit Map Details</string>
-  <string name="share_track">Share Track</string>
-  <string name="delete_map">Delete Map from your Account</string>
-  <string name="map_title">Map Title:</string>
-  <string name="map_description">Map Description:</string>
-  <string name="map_searchable_edit">Make this map and its contents show up in search results</string>
-  <string name="map_not_searchable_edit">Do not let this map or its contents show up in search results, though they may still be viewed be others through the direct URL</string>
-  <string name="map_searchable">This map and its contents will show in search results</string>
-  <string name="map_not_searchable">Neither this map nor its contents will show in search results, but they may still be viewed by others through a direct link</string>
+  <!-- Google My Maps -->
+  <string name="map_list_title"
+    translation_description="When sending a track to an existing Google My Map, the title of the
+      page listing the user's maps in Google My Maps.">
+    Your Google My Maps
+  </string>
+  <string name="select_map_message"
+    translation_description="When sending a track to an existing Google My Map, the text on 'Your
+      Google My Maps' page asking the user to pick one of his maps.">
+    Pick a map:
+  </string>
+  <string name="mapslist_no_maps_available"
+    translation_description="When showing a track to an existing Google My Map, the text on 'Your
+      Google My Maps' page informing the user that he doesn't have any map."> 
+    You don\'t have any map.
+  </string>
+  <string name="maps_list_loading"
+    translation_description="When sending a track to an existing Google My Map, a progress message
+      informing the user that My Tracks is loading his maps.">
+    Loading maps...
+  </string>
+  <string name="maps_list_failed"
+     translation_description="When sending a track to an existing Google My Map, a message informing
+       the user that My Tracks cannot load his maps.">
+    Your maps could not be loaded at this time.
+  </string>
+  <string name="public_map"
+    translation_description="In the 'Your Google My Maps' page, tag next to the maps that are public
+      (as opposed to being not listed).">
+    Public
+  </string>
+  <string name="unlisted_map"
+    translation_description="In the 'Your Google My Maps' page, tag next to the maps that are not
+      listed (as opposed to being public).">
+    Unlisted
+  </string>
+  
+  <!-- Share Track -->
+  <string name="share_track_url"
+    translation_description="After sending a track to Google, in the confirmation dialog, a
+      button to share the track URL with friends.">    
+    Share track URL
+  </string>
+  <string name="share_track_picker_title"
+    translation_description="When sharing a track with friends, the title on the picker to
+      ask the user which application he wants to use.">
+    Share track using:
+  </string>
+  <string name="share_track_subject"
+    translation_description="When sharing a track with friends, the subject line.">    
+    I would like to share a track with you
+  </string>
+  <string name="share_track_url_body_format"
+    translation_description="When sharing a track URL with friends, the body of the message. E.g.,
+    'I think you might be interested in this track:\n\nhttps://maps.google.com/maps'.">
+    I think you might be interested in this track:\n\n%s
+  </string>
+  <string name="share_track_file_body_format"
+    translation_description="When sharing a track file with friends, the body of the message.">
+    I think you might be interested in this track.\n\nTo view this track use Google Earth or other
+    mapping software.
+  </string>
 
-  <!-- Sharing -->
-  <string name="share_map">Share map with friends</string>
-  <string name="share_map_subject">I would like to share a track with you</string>
-  <string name="share_map_body_format">I think you might be interested in this track:
-
-      %s</string>
-  <string name="send_track_subject">I would like to share a track with you</string>
-  <string name="send_track_body_format">I think you might be interested in this track.
-
-    To view this track use Google Earth or other mapping software.</string>
-
-  <!-- Visibility -->
-  <string name="public_map">Public</string>
-  <string name="unlisted_map">Unlisted</string>
-  <string name="mapslist_no_maps_available">You don\'t have any maps, yet.</string>
-
-  <!-- Statistics View -->
-  <!-- Average Moving -->
-  <string name="average_moving_speed_label">Average Moving Speed</string>
-  <string name="average_moving_pace_label">Average Moving Pace</string>
-
-  <!-- Average -->
-  <string name="average_speed_label">Average Speed</string>
-  <string name="average_pace_label">Average Pace</string>
-
-  <string name="elevation_chart_name">Elevation Chart</string>
-  <string name="elevation_gain_label">Elevation Gain</string>
-  <string name="elevation_label">Elevation</string>
-  <string name="latitude_label">Latitude</string>
-  <string name="longitude_label">Longitude</string>
-
-  <!-- Min -->
-  <string name="min_elevation_label">Min Elevation</string>
-  <string name="min_grade_label">Min Grade</string>
-  <string name="min_pace_label">Min Pace</string>
-
-  <!-- Max -->
-  <string name="max_elevation_label">Max Elevation</string>
-  <string name="max_grade_label">Max Grade</string>
-  <string name="max_speed_label">Max Speed</string>
-
-  <string name="loading_track">Loading track...</string>
+  <!-- Statistics view -->
+  <string name="speed"
+    translation_description="In the Statistic view, the speed like miles per hour.">    
+    Speed
+  </string>
+  <string name="pace_label"
+    translation_description="In the Statistic view, the pace like hours per mile.">    
+    Pace
+  </string> 
+  <string name="total_distance_label"
+    translation_description="In the Statistic view, the total distance.">    
+    Total Distance
+  </string>
+  <string name="total_time_label"
+    translation_description="In the Statistic view, the total time.">    
+    Total Time
+  </string>
+  <string name="moving_time_label"
+    translation_description="In the Statistic view, the moving time.">  
+    Moving Time
+  </string>      
+  <string name="max_speed_label"
+    translation_description="In the Statistic view, the maximum speed.">    
+    Max Speed
+  </string>
+  <string name="average_speed_label"
+    translation_description="In the Statistic view, the average speed.">    
+    Average Speed
+  </string>
+  <string name="average_moving_speed_label"
+    translation_description="In the Statistic view, the average moving speed.">    
+    Average Moving Speed
+  </string>    
+  <string name="min_pace_label"
+    translation_description="In the Statistic view, the minimum pace.">    
+    Min Pace
+  </string>
+  <string name="average_pace_label"
+    translation_description="In the Statistic view, the average pace.">    
+    Average Pace
+  </string>
+  <string name="average_moving_pace_label"
+    translation_description="In the Statistic view, the average moving pace.">    
+    Average Moving Pace
+  </string>  
+  <string name="elevation_label"
+    translation_description="In the Statistic view, the current elevation.">  
+    Elevation
+  </string>
+  <string name="elevation_gain_label"
+    translation_description="In the Statistic view, the elevation gain.">
+    Elevation Gain
+  </string>
+  <string name="max_elevation_label"
+    translation_description="In the Statistic view, the maximum elevation.">
+    Max Elevation
+  </string>
+  <string name="min_elevation_label"
+    translation_description="In the Statistic view, the minimum elevation.">
+    Min Elevation
+  </string>    
+  <string name="min_grade_label"
+    translation_description="In the Statistic view, the minimum grade.">
+    Min Grade
+  </string>
+  <string name="max_grade_label"
+    translation_description="In the Statistic view, the maximum grade.">
+    Max Grade
+  </string>  
+  <string name="latitude_label"
+    translation_description="In the Statistic view, the current latitude.">
+    Latitude
+  </string>
+  <string name="longitude_label"
+    translation_description="In the Statistic view, the current longitude.">
+    Longitude
+  </string>
 
   <!-- Chart Settings -->
   <!-- X Axis -->
@@ -872,14 +952,9 @@ limitations under the License.
   <string name="battery_level">Battery Level</string>
 
   <!-- Stats Labels -->
-  <string name="moving_time_label">Moving Time</string>
-  <string name="total_time_label">Total Time</string>
   <string name="time_label">Time</string>
   <string name="sd_unavail">SD Unavailable</string>
-  <string name="speed">Speed</string>
   <string name="start_trip">You must start a trip.</string>
-
-  <string name="total_distance_label">Total Distance</string>
   <string name="distance_label">Distance</string>
   <string name="power">Power</string>
   <string name="cadence">Cadence</string>

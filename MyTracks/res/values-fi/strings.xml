@@ -290,7 +290,7 @@ limitations under the License.
   <string name="maps_list_failed">Karttoja ei voitu ladata!</string>
   <string name="open_map">Valitse tämä kartta</string>
   <string name="edit_map_details">Muokkaa kartan tietoja</string>
-  <string name="share_track">Jaa reitti</string>
+  <string name="share_track_url">Jaa reitti</string>
   <string name="delete_map">Poista kartta tililtä</string>
   <string name="map_title">Kartan otsikko:</string>
   <string name="map_description">Kartan kuvaus:</string>
@@ -300,13 +300,13 @@ limitations under the License.
   <string name="map_not_searchable">Kartta tai sen sisältö ei näy hakutuloksissa. Tiedot näkyvät muille kuitenkin suoralla URL-linkillä</string>
 
   <!-- Sharing -->
-  <string name="share_map">Jaa kartta</string>
+  <string name="share_track_picker_title">Jaa kartta</string>
   <string name="share_map_subject">Haluaisin jakaa kartan kanssasi</string>
-  <string name="share_map_body_format">Saattaisit olla kiinnostunut tästä reitistä:
+  <string name="share_track_url_body_format">Saattaisit olla kiinnostunut tästä reitistä:
 
       %s</string>
-  <string name="send_track_subject">Haluaisin jakaa reitin kanssasi</string>
-  <string name="send_track_body_format">Saattaisit olla kiinnostunut tästä reitistä.
+  <string name="share_track_subject">Haluaisin jakaa reitin kanssasi</string>
+  <string name="share_track_file_body_format">Saattaisit olla kiinnostunut tästä reitistä.
 
     Käytä Google Earthia tai jotain muuta karttaohjelmistoa kartan katsomiseen.</string>
 
