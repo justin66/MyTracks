@@ -826,80 +826,210 @@ limitations under the License.
   <string name="loading_track">Loading track...</string>
 
   <!-- Chart Settings -->
-  <!-- X Axis -->
-  <string name="x_axis">X Axis</string>
-  <string name="by_distance">By Distance</string>
-  <string name="by_time">By Time</string>
+  <string name="x_axis"
+    translation_description="In the Chart Settings, the section label for configuring the X axis.">
+    X Axis
+  </string>
+  <string name="by_distance"
+    translation_description="In the Chart Settings, under the 'X Axis' section, the radio option 
+      to show the graphics by distance. The other radio option is to show by time. User can only
+      choose one of the options.">
+    By Distance
+  </string>
+  <string name="by_time"
+    translation_description="In the Chart Settings, under the 'X Axis' section, the radio option 
+      to show the graphics by time. The other radio option is to show by distance. User can only
+      choose one of the options.">
+    By Time
+  </string>
+  <string name="y_axis"
+    translation_description="In the Chart Settings, the section label for configuring the Y axis.">
+    Y Axis
+  </string>
+  <string name="power"
+    translation_description="In the Chart Settings, under the 'Y Axis' section, the checkbox option
+      to graph power (for cycling, the power output of the rider).">    
+    Power
+  </string>
+  <string name="cadence"
+    translation_description="In the Chart Settings, under the 'Y Axis' section, the checkbox option
+      to graph cadence (for cycling, the number of revolutions of the crank per minute).">    
+    Cadence
+  </string>
+  <string name="heart_rate"
+    translation_description="In the Chart Settings, under the 'Y Axis' section, the checkbox option
+      to graph heart rate.">
+    Heart Rate
+  </string>
+      
+  <!-- Voice announcements  -->
+  <string name="hour"
+    translation_description="For voice announcement, to say hour like 'one hour'.">
+    hour
+  </string>
+  <string name="hours"
+    translation_description="For voice announcement, to say hours like 'two hours'.">  
+    hours
+  </string>
+  <string name="minute"
+    translation_description="For voice announcement, to say minute like 'one minute'.">
+    minute
+  </string>
+  <string name="minutes"
+    translation_description="For voice announcement, to say minutes like 'two minutes'.">
+    minutes
+  </string>
+  <string name="second"
+    translation_description="For voice announcement, to say second like 'one second'.">
+    second
+  </string>
+  <string name="seconds"
+    translation_description="For voice announcement, to say seconds like 'two seconds'.">
+    seconds
+  </string>
+  <string name="kilometers_long"
+    translation_description="For voice announcement, to say kilometers like 'two kilometers'.">
+    kilometers
+  </string>
+  <string name="miles_long"
+    translation_description="For voice announcement, to say miles like 'two miles'.">
+    miles
+  </string>
+  <string name="kilometer_per_hour_long"
+    translation_description="For voice announcement, to say 'kilometers per hour' for speed like
+      'two kilometers per hour'.">
+    kilometers per hour
+  </string>
+  <string name="mile_per_hour_long"
+    translation_description="For voice announcement, to say 'miles per hour' for speed like 'two
+      miles per hour'.">
+    miles per hour
+  </string>
+  <string name="per_kilometer"
+    translation_description="For voice announcement, to say 'per kilometer' for pace like 'two
+      minutes per kilometer'.">
+    per kilometer
+  </string>
+  <string name="per_mile"
+    translation_description="For voice announcement, to say 'per mile' for pace like 'two minutes
+      per mile'.">
+    per mile
+  </string>
+      
+  <!-- time -->
+  <string name="hr"
+    translation_description="Abbreviation for hours. E.g, '2 hr'.">
+    hr
+  </string>
+  <string name="min"
+    translation_description="Abbreviation for minutes. E.g, '2 min'.">
+    min
+  </string>
 
-  <!-- Y Axis -->
-  <string name="y_axis">Y Axis</string>
+  <!--  distance -->
+  <string name="kilometer"
+    translation_description="Abbreviation for kilometers. E.g., '2 km'.">
+    km
+  </string>
+  <string name="meter"
+    translation_description="Abbreviation for meters. E.g., '2 m'.">
+    m
+  </string>
+  <string name="mile"
+    translation_description="Abbreviation for miles. E.g., '2 mi'.">
+    mi
+  </string>
+  <string name="feet"
+    translation_description="Abbreviation for feet. E.g., '2 ft'.">
+    ft
+  </string>
 
-  <!-- Units -->
-  <!-- Time  -->
-  <string name="hour">hour</string>
-  <string name="hours">hours</string>
-  <string name="hr">hr</string>
-  <string name="min">min</string>
-  <string name="minute">minute</string>
-  <string name="minutes">minutes</string>
-  <string name="second">second</string>
-  <string name="seconds">seconds</string>
-  <string name="milliseconds">ms</string>
-
-  <!-- Distance -->
-  <string name="meter">m</string>
-  <string name="kilometer">km</string>
-  <string name="kilometers_long">kilometers</string>
-  <string name="feet">ft</string>
-  <string name="mile">mi</string>
-  <string name="miles_long">miles</string>
-
-  <!-- Speed and Pace -->
-  <string name="kilometer_per_hour">km/h</string>
-  <string name="kilometer_per_hour_long">kilometers per hour</string>
-  <string name="min_per_kilometer">min/km</string>
-  <string name="per_kilometer">per kilometer</string>
-  <string name="mile_per_hour">mi/h</string>
-  <string name="mile_per_hour_long">miles per hour</string>
-  <string name="min_per_mile">min/mi</string>
-  <string name="per_mile">per mile</string>
-
-  <!-- Sensors -->
-  <string name="watts">W</string>
-
-  <string name="revolutions_per_minute">rpm</string>
-  <string name="bpm">bpm</string>
-  <string name="battery_level">Battery Level</string>
-
+  <!-- Speed unit -->
+  <string name="kilometer_per_hour"
+    translation_description="For speed unit, abbreviation for kilometers per hour. E.g, '5 km/h'.">
+    km/h
+  </string>
+  <string name="mile_per_hour"
+    translation_description="For speed unit, abbreviation for miles per hour. E.g, '5 mi/h'.">
+    mi/h
+  </string>
+  
+  <!-- Pace unit -->
+  <string name="min_per_kilometer"
+    translation_description="For pace unit, abbreviation for minutes per kilometer. E.g,
+      '5 min/km'.">
+    min/km
+  </string>
+  <string name="min_per_mile"
+    translation_description="For pace unit, abbreviation for minutes per mile. E.g, '5 min/mi'.">
+    min/mi
+  </string>
+      
+  <!-- Sensor State -->    
+  <string name="battery_level"
+    translation_description="In the Sensor State page, the label for battery level on the bike
+      sensor. E.g, battery level like '50 %'.">
+    Battery Level
+  </string>
+  
+  <!-- Sensor State unit -->
+  <string name="watts"
+    translation_description="Abbreviation for watts, unit for power. E.g., power of '80 W'.">  
+    W
+  </string>
+  <string name="revolutions_per_minute"
+    translation_description="Abbreviation for revolutions per minute, unit for cadence. E.g.,
+    cadence of '80 rpm'.">  
+    rpm
+  </string>
+  <string name="bpm"
+    translation_description="Abbreviation for beats per minute, unit for heart rate. E.g.,
+    heart rate of '80 bpm'.">
+    bpm
+  </string>
+  
   <!-- Stats Labels -->
   <string name="moving_time_label">Moving Time</string>
   <string name="total_time_label">Total Time</string>
-  <string name="time_label">Time</string>
-  <string name="sd_unavail">SD Unavailable</string>
-  <string name="speed">Speed</string>
-  <string name="start_trip">You must start a trip.</string>
-
+  <string name="speed">Speed</string> 
   <string name="total_distance_label">Total Distance</string>
-  <string name="distance_label">Distance</string>
-  <string name="power">Power</string>
-  <string name="cadence">Cadence</string>
-  <string name="heart_rate">Heart Rate</string>
-  <string name="max_heart_rate">Max Heart Rate</string>
-  <string name="unknown">-</string>
-  <string name="waiting">Waiting...</string>
-  <string name="elevation">Elevation</string>
 
   <!-- End User License Agreement -->
-  <string name="eula_title">End User License Agreement</string>
-  <string name="accept">Accept</string>
-  <string name="decline">Decline</string>
+  <string name="eula_title"
+    translation_description="The title for the terms of service dialog, asking the user to accept
+      or decline.">
+    End User License Agreement
+  </string>
+  <string name="accept"
+    translation_description="In the 'End User License Agreement' dialog, the button to accept.">
+    Accept
+  </string>
+  <string name="decline"
+    translation_description="In the 'End User License Agreement' dialog, the button to decline.">
+    Decline
+  </string>
 
-  <!-- About -->
-  <string name="about">About</string>
-  <string name="about_team">Team:</string>
-  <string name="about_version">Version:</string>
-  <string name="about_support">Support:</string>
-  <string name="about_privacy">Privacy:</string>
+  <!-- About My Tracks page -->
+  <string name="about_team"
+    translation_description="In the 'About My Tracks' page, label for the team members. E.g.,
+      'Team: Sandor Dornbush, Rodrigo Damazio'.">
+    Team:
+  </string>
+  <string name="about_version"
+    translation_description="In the 'About My Tracks' page, label for the version number. E.g.,
+      'Version: 1.1.10'.">
+    Version:
+  </string>
+  <string name="about_support"
+    translation_description="In the 'About My Tracks' page, label for the support link. E.g.,
+      'Support: mytracks.appspot.com'.">
+    Support:
+  </string>
+  <string name="about_privacy"
+    translation_description="In the 'About My Tracks' page, label for the privacy link. E.g.,
+      'Privacy: m.google.com/privacy'.">
+    Privacy:
+  </string>
 
   <!-- Send to Google -->
   <string name="sendtogoogle_title">Send to...</string>

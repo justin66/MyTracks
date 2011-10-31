@@ -462,10 +462,10 @@ public class StringUtils implements DescriptionGenerator {
         + "%s: %d %s (%d %s)\n"
         + "%s: %d %s\n"
         + "%s: %d %s\n",
-        context.getString(R.string.distance_label),
+        context.getString(R.string.total_distance_label),
             distanceInKm, context.getString(R.string.kilometer),
             distanceInMiles, context.getString(R.string.mile),
-        context.getString(R.string.time_label),
+        context.getString(R.string.total_time_label),
             StringUtils.formatTime(stats.getTotalTime()),
         context.getString(R.string.moving_time_label),
             StringUtils.formatTime(stats.getMovingTime()),
