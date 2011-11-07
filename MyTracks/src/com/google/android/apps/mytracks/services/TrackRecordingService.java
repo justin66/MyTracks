@@ -582,6 +582,7 @@ public class TrackRecordingService extends Service {
     track.setId(recordingTrackId);
     track.setName(new DefaultTrackNameFactory(this).newTrackName(
         recordingTrackId, startTime));
+    track.setCategory(new DefaultCategoryFactory(this).newTrackCategory());
     isRecording = true;
     isMoving = true;
 

@@ -879,7 +879,17 @@ limitations under the License.
       name' checkbox when it is unchecked explaining using a number as the default track name.">
     Use a number as the default track name
   </string>
-      
+  <string name="settings_default_category"
+    translation_description="In the Recording settings, the option to set the default
+      type of the recorded activity.">
+    Default activity type
+  </string>
+  <string name="settings_default_category_summary"
+    translation_description="In the Recording settings, the summary for the 'Default activity type'
+      option explaining that it sets the default type of the recorded activity.">
+    Default type of the recorded activity
+  </string>
+  
   <!-- Sensor settings -->
   <string name="settings_sensor_type"
     translation_description="In the Sensor settings, the dropdown option to choose a sensor type.">

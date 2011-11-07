@@ -151,6 +151,12 @@ limitations under the License.
         android:summaryOn="@string/settings_timestamp_track_name_summary_on"
         android:summaryOff="@string/settings_timestamp_track_name_summary_off"
         android:defaultValue="true" />
+        
+    <EditTextPreference
+        android:key="@string/default_category_key"
+        android:title="@string/settings_default_category"
+        android:summary="@string/settings_default_category_summary"
+        android:defaultValue="" />
 
   </PreferenceScreen>
 
