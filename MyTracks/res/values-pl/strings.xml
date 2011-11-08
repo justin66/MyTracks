@@ -16,20 +16,20 @@ limitations under the License.
 -->
 <resources>
   <!-- Used by the Menu -->
-  <string name="start_recording">Rejestruj trasę</string>
-  <string name="stop_recording">Zakończ rejestrowanie</string>
-  <string name="switch_to_sat">Tryb satelitarny</string>
-  <string name="switch_to_map">Tryb mapy</string>
-  <string name="mylocation">Moja lokalizacja</string>
-  <string name="list_tracks">Trasy</string>
-  <string name="list_markers">Znaczniki</string>
+  <string name="menu_record_track">Rejestruj trasę</string>
+  <string name="menu_stop_recording">Zakończ rejestrowanie</string>
+  <string name="menu_map_view_satellite_mode">Tryb satelitarny</string>
+  <string name="menu_map_view_map_mode">Tryb mapy</string>
+  <string name="menu_map_view_my_location">Moja lokalizacja</string>
+  <string name="menu_tracks">Trasy</string>
+  <string name="menu_markers">Znaczniki</string>
   <string name="delete_all_tracks">Usuń wszystkie trasy</string>
-  <string name="settings">Ustawienia</string>
+  <string name="menu_settings">Ustawienia</string>
   <string name="elevation">Wysokość n.p.m.</string>
   <string name="choose_track_message">Wybierz trasę do podglądu</string>
   <string name="current_track">Obecna trasa</string>
   <string name="current_segment">Ostatni segment</string>
-  <string name="aggregated_stats">Statystyki Grupowe</string>
+  <string name="menu_aggregated_statistics">Statystyki Grupowe</string>
 
   <!-- Error messages -->
   <string name="error_no_location_manager">Brak menedżera lokalizacji na urządzeniu!</string>
@@ -276,7 +276,7 @@ limitations under the License.
   <string name="loading_track">Wczytywanie trasy...</string>
 
   <!-- Chart Settings -->
-  <string name="chart_settings">Ustawienia wykresów</string>
+  <string name="menu_chart_view_chart_settings">Ustawienia wykresów</string>
   <!-- X Axis -->
   <string name="x_axis">Oś X</string>
   <string name="by_distance">Według odległości</string>
@@ -334,7 +334,7 @@ limitations under the License.
 
   <!-- About -->
   <string name="about">O</string>
-  <string name="help">Pomoc</string>
+  <string name="menu_help">Pomoc</string>
   <string name="about_team">Zespół:</string>
   <string name="about_version">Wersja:</string>
   <string name="about_support">Wsparcie:</string>

@@ -16,21 +16,21 @@ limitations under the License.
 -->
 <resources>
   <!-- Used by the Menu -->
-  <string name="start_recording">Enregistra la ruta</string>
-  <string name="stop_recording">Atura l\'enregistrament</string>
-  <string name="switch_to_sat">Mode de satèl·lit</string>
-  <string name="switch_to_map">Mode de mapa</string>
-  <string name="mylocation">La meva ubicació</string>
-  <string name="list_tracks">Rutes</string>
-  <string name="list_markers">Marcadors</string>
+  <string name="menu_record_track">Enregistra la ruta</string>
+  <string name="menu_stop_recording">Atura l\'enregistrament</string>
+  <string name="menu_map_view_satellite_mode">Mode de satèl·lit</string>
+  <string name="menu_map_view_map_mode">Mode de mapa</string>
+  <string name="menu_map_view_my_location">La meva ubicació</string>
+  <string name="menu_tracks">Rutes</string>
+  <string name="menu_markers">Marcadors</string>
   <string name="delete_all_tracks">Elimina totes les rutes</string>
-  <string name="settings">Paràmetres</string>
+  <string name="menu_settings">Paràmetres</string>
   <string name="elevation">Elevació</string>
   <string name="choose_track_message">Seleccioneu la ruta que es visualitzarà</string>
   <string name="current_track">Ruta actual</string>
   <string name="current_segment">Darrer segment</string>
-  <string name="sensor_state">Estat del sensor</string>
-  <string name="aggregated_stats">Estadístiques agregades</string>
+  <string name="menu_sensor_state">Estat del sensor</string>
+  <string name="menu_aggregated_statistics">Estadístiques agregades</string>
 
   <!-- Error messages -->
   <string name="error_no_location_manager">No s\'ha trobat cap gestor d\'ubicacions en aquest dispositiu.</string>
@@ -283,7 +283,7 @@ limitations under the License.
   <string name="loading_track">S\'està carregant la ruta...</string>
 
   <!-- Chart Settings -->
-  <string name="chart_settings">Configuració del gràfic</string>
+  <string name="menu_chart_view_chart_settings">Configuració del gràfic</string>
   <!-- X Axis -->
   <string name="x_axis">Eix X</string>
   <string name="by_distance">Per distància</string>
@@ -334,7 +334,7 @@ limitations under the License.
 
   <!-- About -->
   <string name="about">Quant a</string>
-  <string name="help">Ajuda</string>
+  <string name="menu_help">Ajuda</string>
   <string name="about_team">Equip:</string>
   <string name="about_version">Versió:</string>
   <string name="about_support">Assistència:</string>

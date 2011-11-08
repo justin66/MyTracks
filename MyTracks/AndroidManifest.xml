@@ -109,7 +109,7 @@ limitations under the License.
     </activity>
 
     <activity android:name="com.google.android.apps.mytracks.AggregatedStatsActivity"
-              android:label="@string/aggregated_stats" />
+              android:label="@string/menu_aggregated_statistics" />
 
     <activity android:name="com.google.android.apps.mytracks.StatsActivity"
               android:label="@string/statistics"
@@ -120,7 +120,7 @@ limitations under the License.
     </activity>
 
     <activity android:name="com.google.android.apps.mytracks.SensorStateActivity"
-              android:label="@string/sensor_state" />
+              android:label="@string/menu_sensor_state" />
 
     <activity android:name="com.google.android.apps.mytracks.ChartActivity"
               android:label="@string/elevation_label"

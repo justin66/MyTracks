@@ -26,7 +26,7 @@ limitations under the License.
     <TextView
       android:layout_width="fill_parent"
       android:layout_height="wrap_content"
-      android:text="@string/chart_settings"
+      android:text="@string/menu_chart_view_chart_settings"
       android:textSize="20dip"
       android:textColor="#fff"
       android:layout_marginLeft="10dip"/>

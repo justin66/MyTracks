@@ -17,21 +17,21 @@ limitations under the License.
 <resources>
 
   <!-- Used by the Menu -->
-  <string name="start_recording">Enregistrer parcours</string>
-  <string name="stop_recording">Arrêter enregistrement</string>
-  <string name="switch_to_sat">Mode satellite</string>
-  <string name="switch_to_map">Mode plan</string>
-  <string name="mylocation">Ma position</string>
-  <string name="list_tracks">Parcours</string>
-  <string name="list_markers">Marqueurs</string>
+  <string name="menu_record_track">Enregistrer parcours</string>
+  <string name="menu_stop_recording">Arrêter enregistrement</string>
+  <string name="menu_map_view_satellite_mode">Mode satellite</string>
+  <string name="menu_map_view_map_mode">Mode plan</string>
+  <string name="menu_map_view_my_location">Ma position</string>
+  <string name="menu_tracks">Parcours</string>
+  <string name="menu_markers">Marqueurs</string>
   <string name="delete_all_tracks">Supprimer tous les parcours</string>
-  <string name="settings">Paramètres</string>
+  <string name="menu_settings">Paramètres</string>
   <string name="elevation">Altitude</string>
   <string name="choose_track_message">Sélectionnez le parcours à visualiser</string>
   <string name="current_track">Parcours actuel</string>
   <string name="current_segment">Segment actuel</string>
-  <string name="sensor_state">État du capteur</string>
-  <string name="aggregated_stats">Statistiques consolidées</string>
+  <string name="menu_sensor_state">État du capteur</string>
+  <string name="menu_aggregated_statistics">Statistiques consolidées</string>
   
   <!-- Error messages -->
   <string name="error_no_location_manager">Aucune source de localisation n\'a été trouvée sur ce système !</string>
@@ -269,7 +269,7 @@ limitations under the License.
   <string name="loading_track">Chargement du parcours...</string>
 
   <!-- Chart Settings -->
-  <string name="chart_settings">Paramètres Graphique</string>
+  <string name="menu_chart_view_chart_settings">Paramètres Graphique</string>
   <!-- X Axis -->
   <string name="x_axis">Abscisse (X)</string>
   <string name="by_distance">Par distance</string>
@@ -325,7 +325,7 @@ limitations under the License.
 
   <!-- About -->
   <string name="about">À propos</string>
-  <string name="help">Aide</string>
+  <string name="menu_help">Aide</string>
 
   <string name="about_team">Équipe :</string>
 

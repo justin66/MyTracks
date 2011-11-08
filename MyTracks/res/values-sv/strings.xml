@@ -17,15 +17,15 @@ limitations under the License.
 <resources>
 
   <!-- Used by the Menu -->
-  <string name="start_recording">Spela in spår</string>
-  <string name="stop_recording">Stoppa inspelning</string>
-  <string name="switch_to_sat">Satellitläge</string>
-  <string name="switch_to_map">Kartläge</string>
-  <string name="mylocation">Min plats</string>
-  <string name="list_tracks">Spår</string>
-  <string name="list_markers">Markörer</string>
+  <string name="menu_record_track">Spela in spår</string>
+  <string name="menu_stop_recording">Stoppa inspelning</string>
+  <string name="menu_map_view_satellite_mode">Satellitläge</string>
+  <string name="menu_map_view_map_mode">Kartläge</string>
+  <string name="menu_map_view_my_location">Min plats</string>
+  <string name="menu_tracks">Spår</string>
+  <string name="menu_markers">Markörer</string>
   <string name="delete_all_tracks">Ta bort alla spår</string>
-  <string name="settings">Inställningar</string>
+  <string name="menu_settings">Inställningar</string>
   <string name="elevation">Höjd</string>
   <string name="choose_track_message">Välj ett spår att visa</string>
   <string name="current_track">Nuvarande spår</string>
@@ -251,7 +251,7 @@ limitations under the License.
   <string name="loading_track">Laddar spår...</string>
 
   <!-- Chart Settings -->
-  <string name="chart_settings">Diagraminställningar</string>
+  <string name="menu_chart_view_chart_settings">Diagraminställningar</string>
   <!-- X Axis -->
   <string name="x_axis">X-axel</string>
   <string name="by_distance">Efter distans</string>
@@ -309,7 +309,7 @@ limitations under the License.
 
   <!-- About -->
   <string name="about">Om</string>
-  <string name="help">Hjälp</string>
+  <string name="menu_help">Hjälp</string>
   <string name="about_team">Team:</string>
   <string name="about_version">Version:</string>
   <string name="about_support">Support:</string>

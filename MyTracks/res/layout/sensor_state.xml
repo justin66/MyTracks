@@ -37,7 +37,7 @@ limitations under the License.
         <TableRow>
           <TextView
             android:layout_span="5"
-            android:text="@string/sensor_state" />
+            android:text="@string/menu_sensor_state" />
         </TableRow>
         <TableRow
           android:background="@color/stat_label_background">

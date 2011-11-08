@@ -16,21 +16,21 @@ limitations under the License.
 -->
 <resources>
   <!-- Used by the Menu -->
-  <string name="start_recording">Запись трека</string>
-  <string name="stop_recording">Остановить запись</string>
-  <string name="switch_to_sat">Режим спутника</string>
-  <string name="switch_to_map">Режим карты</string>
-  <string name="mylocation">Мое местоположение</string>
-  <string name="list_tracks">Треки</string>
-  <string name="list_markers">Маркеры</string>
+  <string name="menu_record_track">Запись трека</string>
+  <string name="menu_stop_recording">Остановить запись</string>
+  <string name="menu_map_view_satellite_mode">Режим спутника</string>
+  <string name="menu_map_view_map_mode">Режим карты</string>
+  <string name="menu_map_view_my_location">Мое местоположение</string>
+  <string name="menu_tracks">Треки</string>
+  <string name="menu_markers">Маркеры</string>
   <string name="delete_all_tracks">Удалить все треки</string>
-  <string name="settings">Настройки</string>
+  <string name="menu_settings">Настройки</string>
   <string name="elevation">Высота</string>
   <string name="choose_track_message">Пожалуйста, выберите трек для просмотра</string>
   <string name="current_track">Текущий трек</string>
   <string name="current_segment">Последний сегмент</string>
-  <string name="sensor_state">Состояние датчика</string>
-  <string name="aggregated_stats">Совокупная статистика</string>
+  <string name="menu_sensor_state">Состояние датчика</string>
+  <string name="menu_aggregated_statistics">Совокупная статистика</string>
 
   <!-- Error messages -->
   <string name="error_no_location_manager">На этом устройстве не был обнаружен диспетчер местоположения!</string>
@@ -339,7 +339,7 @@ limitations under the License.
   <string name="loading_track">Загрузка трека...</string>
 
   <!-- Chart Settings -->
-  <string name="chart_settings">Настройки диаграммы</string>
+  <string name="menu_chart_view_chart_settings">Настройки диаграммы</string>
   <!-- X Axis -->
   <string name="x_axis">Ось X</string>
   <string name="by_distance">По расстоянию</string>
@@ -408,7 +408,7 @@ limitations under the License.
 
   <!-- About -->
   <string name="about">О программе</string>
-  <string name="help">Справка</string>
+  <string name="menu_help">Справка</string>
   <string name="about_team">Команда:</string>
   <string name="about_version">Версия:</string>
   <string name="about_support">Поддержка:</string>

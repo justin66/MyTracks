@@ -16,15 +16,15 @@ limitations under the License.
 -->
 <resources>
   <!-- Used by the Menu -->
-  <string name="start_recording">Gravar caminho</string>
-  <string name="stop_recording">Para gravação</string>
-  <string name="switch_to_sat">Modo do satélite</string>
-  <string name="switch_to_map">Modo do mapa</string>
-  <string name="mylocation">Minha Localização</string>
-  <string name="list_tracks">Caminhos</string>
-  <string name="list_markers">Marcadores</string>
+  <string name="menu_record_track">Gravar caminho</string>
+  <string name="menu_stop_recording">Para gravação</string>
+  <string name="menu_map_view_satellite_mode">Modo do satélite</string>
+  <string name="menu_map_view_map_mode">Modo do mapa</string>
+  <string name="menu_map_view_my_location">Minha Localização</string>
+  <string name="menu_tracks">Caminhos</string>
+  <string name="menu_markers">Marcadores</string>
   <string name="delete_all_tracks">Apagar todos os caminhos</string>
-  <string name="settings">Configurações</string>
+  <string name="menu_settings">Configurações</string>
   <string name="elevation">Elevação</string>
   <string name="choose_track_message">Por favor selecione o caminho a ser visto</string>
   <string name="current_track">Caminho atual</string>
@@ -235,7 +235,7 @@ limitations under the License.
   <string name="loading_track">Carregando caminho...</string>
 
   <!-- Chart Settings -->
-  <string name="chart_settings">Configurações do gráfico</string>
+  <string name="menu_chart_view_chart_settings">Configurações do gráfico</string>
   <!-- X Axis -->
   <string name="x_axis">Eixo X</string>
   <string name="by_distance">Por Distância</string>
@@ -285,7 +285,7 @@ limitations under the License.
 
   <!-- About -->
   <string name="about">Sobre</string>
-  <string name="help">Ajuda</string>
+  <string name="menu_help">Ajuda</string>
   <string name="about_team">Equipe:</string>
   <string name="about_version">Versão:</string>
   <string name="about_support">Suporte:</string>

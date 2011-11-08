@@ -16,21 +16,21 @@ limitations under the License.
 -->
 <resources>
   <!-- Used by the Menu -->
-  <string name="start_recording">トラック記録</string>
-  <string name="stop_recording">記録停止</string>
-  <string name="switch_to_sat">衛星モード</string>
-  <string name="switch_to_map">地図モード</string>
-  <string name="mylocation">現在地</string>
-  <string name="list_tracks">トラック</string>
-  <string name="list_markers">マーカー</string>
+  <string name="menu_record_track">トラック記録</string>
+  <string name="menu_stop_recording">記録停止</string>
+  <string name="menu_map_view_satellite_mode">衛星モード</string>
+  <string name="menu_map_view_map_mode">地図モード</string>
+  <string name="menu_map_view_my_location">現在地</string>
+  <string name="menu_tracks">トラック</string>
+  <string name="menu_markers">マーカー</string>
   <string name="delete_all_tracks">全トラック消去</string>
-  <string name="settings">設定</string>
+  <string name="menu_settings">設定</string>
   <string name="elevation">標高</string>
   <string name="choose_track_message">表示するトラックを選択して下さい</string>
   <string name="current_track">現在のトラック</string>
   <string name="current_segment">最終セグメント</string>
-  <string name="sensor_state">センサー情報</string>
-  <string name="aggregated_stats">集計情報</string>
+  <string name="menu_sensor_state">センサー情報</string>
+  <string name="menu_aggregated_statistics">集計情報</string>
 
   <!-- Error messages -->
   <string name="error_no_location_manager">この端末でロケーションマネージャを発見できませんでした．</string>
@@ -331,7 +331,7 @@ limitations under the License.
   <string name="loading_track">トラックの読み込み中...</string>
 
   <!-- Chart Settings -->
-  <string name="chart_settings">チャート設定</string>
+  <string name="menu_chart_view_chart_settings">チャート設定</string>
   <!-- X Axis -->
   <string name="x_axis">X軸</string>
   <string name="by_distance">距離ベース</string>
@@ -385,7 +385,7 @@ limitations under the License.
 
   <!-- About -->
   <string name="about">このアプリケーションについて</string>
-  <string name="help">ヘルプ</string>
+  <string name="menu_help">ヘルプ</string>
   <string name="about_team">チーム:</string>
   <string name="about_version">バージョン:</string>
   <string name="about_support">サポート:</string>

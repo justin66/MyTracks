@@ -16,21 +16,21 @@ limitations under the License.
 -->
 <resources>
   <!-- Used by the Menu -->
-  <string name="start_recording">Track aufzeichnen</string>
-  <string name="stop_recording">Aufzeichnung anhalten</string>
-  <string name="switch_to_sat">Satellitenansicht</string>
-  <string name="switch_to_map">Kartenansicht</string>
-  <string name="mylocation">Mein Aufenthaltsort</string>
-  <!--string name="list_tracks">Tracks</string-->
-  <string name="list_markers">Wegpunkte</string>
+  <string name="menu_record_track">Track aufzeichnen</string>
+  <string name="menu_stop_recording">Aufzeichnung anhalten</string>
+  <string name="menu_map_view_satellite_mode">Satellitenansicht</string>
+  <string name="menu_map_view_map_mode">Kartenansicht</string>
+  <string name="menu_map_view_my_location">Mein Aufenthaltsort</string>
+  <!--string name="menu_tracks">Tracks</string-->
+  <string name="menu_markers">Wegpunkte</string>
   <string name="delete_all_tracks">Alle Tracks löschen</string>
-  <string name="settings">Einstellungen</string>
+  <string name="menu_settings">Einstellungen</string>
   <string name="elevation">Höhe</string>
   <string name="choose_track_message">Bitte wähle einen Track zur Ansicht aus</string>
   <string name="current_track">Aktueller Track</string>
   <string name="current_segment">Letztes Segment</string>
-  <string name="sensor_state">Sensorstatus</string>
-  <string name="aggregated_stats">Aggregierte Statistiken</string>
+  <string name="menu_sensor_state">Sensorstatus</string>
+  <string name="menu_aggregated_statistics">Aggregierte Statistiken</string>
 
   <!-- Error messages -->
   <string name="error_no_location_manager">Es wurde kein Dienst zur Positionsermittlung auf diesem Gerät gefunden.</string>
@@ -293,7 +293,7 @@ limitations under the License.
   <string name="loading_track">Lade Track…</string>
 
   <!-- Chart Settings -->
-  <string name="chart_settings">Diagramm-Einstellungen</string>
+  <string name="menu_chart_view_chart_settings">Diagramm-Einstellungen</string>
   <!-- X Axis -->
   <string name="x_axis">X-Achse</string>
   <string name="by_distance">Nach Entfernung</string>
@@ -363,7 +363,7 @@ limitations under the License.
 
   <!-- About -->
   <string name="about">Über</string>
-  <string name="help">Hilfe</string>
+  <string name="menu_help">Hilfe</string>
   <!--string name="about_team">Team:</string-->
   <!--string name="about_version">Version:</string-->
   <string name="about_support">Unterstützung:</string>

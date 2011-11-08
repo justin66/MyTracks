@@ -441,10 +441,10 @@ public class MapActivity extends com.google.android.maps.MapActivity
   public boolean onCreateOptionsMenu(Menu menu) {
     super.onCreateOptionsMenu(menu);
     myLocation = menu.add(0, Constants.MENU_MY_LOCATION, 0,
-        R.string.mylocation);
+        R.string.menu_map_view_my_location);
     myLocation.setIcon(android.R.drawable.ic_menu_mylocation);
     toggleLayers = menu.add(0, Constants.MENU_TOGGLE_LAYERS, 0,
-        R.string.switch_to_sat);
+        R.string.menu_map_view_satellite_mode);
     toggleLayers.setIcon(android.R.drawable.ic_menu_mapmode);
     return true;
   }
@@ -452,7 +452,7 @@ public class MapActivity extends com.google.android.maps.MapActivity
   @Override
   public boolean onPrepareOptionsMenu(Menu menu) {
     toggleLayers.setTitle(mapView.isSatellite() ?
-        R.string.switch_to_map : R.string.switch_to_sat);
+        R.string.menu_map_view_map_mode : R.string.menu_map_view_satellite_mode);
     return super.onPrepareOptionsMenu(menu);
   }
 
