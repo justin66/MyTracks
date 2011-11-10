@@ -93,7 +93,7 @@ public class SendToDocs {
 
   private void doUpload(long trackId) {
     // TODO
-    statusMessage = activity.getString(R.string.error_sending_to_fusion_tables);
+    statusMessage = activity.getString(R.string.send_google_error_docs);
     success = false;
 
     try {
@@ -117,12 +117,12 @@ public class SendToDocs {
       success = uploadToDocs(track);
       if (success) {
         String format = createdNewSpreadSheet 
-            ? activity.getString(R.string.send_google_docs_new_doc_success) 
-            : activity.getString(R.string.send_google_docs_existing_doc_success);
+            ? activity.getString(R.string.send_google_success_new_doc) 
+            : activity.getString(R.string.send_google_success_existing_doc);
         String url = activity.getString(SendType.DOCS.getServiceUrl());
         statusMessage = String.format(format, url);
       } else {
-        statusMessage = activity.getString(R.string.error_sending_to_docs);
+        statusMessage = activity.getString(R.string.send_google_error_docs);
       }
       Log.d(Constants.TAG, "SendToDocs: Done.");
     } finally {
