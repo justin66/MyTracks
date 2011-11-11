@@ -169,11 +169,11 @@ public class SendToFusionTables implements Runnable {
   }
 
   private void doUpload() {
-    String statusMessage = context.getString(R.string.error_sending_to_fusion_tables);
+    String statusMessage = context.getString(R.string.send_google_error_fusion_tables);
     boolean success = true;
     try {
       progressIndicator.setProgressValue(PROGRESS_INITIALIZATION);
-      progressIndicator.setProgressMessage(R.string.progress_message_reading_track);
+      progressIndicator.setProgressMessage(R.string.send_google_progress_reading_track);
 
       // Get the track meta-data
       Track track = providerUtils.getTrack(trackId);
@@ -186,13 +186,13 @@ public class SendToFusionTables implements Runnable {
 
       // Create a new table:
       progressIndicator.setProgressValue(PROGRESS_FUSION_TABLE_CREATE);
-      progressIndicator.setProgressMessage(R.string.progress_message_creating_fusion_table);
+      progressIndicator.setProgressMessage(R.string.send_google_progress_creating_fusion_table);
       if (!createNewTable(track) || !makeTableUnlisted()) {
         return;
       }
 
       progressIndicator.setProgressValue(PROGRESS_UPLOAD_DATA_MIN);
-      progressIndicator.setProgressMessage(R.string.progress_message_sending_fusion_tables);
+      progressIndicator.setProgressMessage(R.string.send_google_progress_sending_fusion_tables);
 
       // Upload all of the segments of the track plus start/end markers
       if (!uploadAllTrackPoints(track, originalDescription)) {
@@ -206,7 +206,7 @@ public class SendToFusionTables implements Runnable {
         return;
       }
 
-      String format = context.getString(R.string.send_google_fusion_tables_success);
+      String format = context.getString(R.string.send_google_success_fusion_tables);
       String url = context.getString(SendType.FUSION_TABLES.getServiceUrl());
       statusMessage = String.format(format, url);
       Log.d(Constants.TAG, "SendToFusionTables: Done: " + success);
@@ -341,7 +341,7 @@ public class SendToFusionTables implements Runnable {
 
         if (totalLocationsRead == 0) {
           // Put a marker at the first point of the first valid segment:
-          String name = track.getName() + " " + context.getString(R.string.start);
+          String name = track.getName() + " " + context.getString(R.string.marker_label_start);
           createNewPoint(name, "", loc, MARKER_TYPE_START);
         }
 
@@ -387,7 +387,7 @@ public class SendToFusionTables implements Runnable {
         track.setDescription("<p>" + originalDescription + "</p><p>"
             + stringUtils.generateTrackDescription(track, distances, elevations)
             + "</p>");
-        String name = track.getName() + " " + context.getString(R.string.end);
+        String name = track.getName() + " " + context.getString(R.string.marker_label_end);
         return createNewPoint(name, track.getDescription(), lastLocation, MARKER_TYPE_END);
       }
 
@@ -464,7 +464,7 @@ public class SendToFusionTables implements Runnable {
       if (totalSegmentsUploaded > 1) {
         splitTrack.setName(splitTrack.getName() + " "
             + String.format(
-                context.getString(R.string.track_part_format), totalSegmentsUploaded));
+                context.getString(R.string.send_google_track_part_label), totalSegmentsUploaded));
       }
       totalSegmentsUploaded++;
       Log.d(Constants.TAG,

@@ -17,7 +17,8 @@ limitations under the License.
 <resources>
   <!-- DO NOT TRANSLATE ANY STRINGS IN THIS FILE. -->
   <string name="app_name">My Tracks</string>
-
+  <string name="track_recording_service_name">Track Recording Service</string>
+  
   <string name="my_tracks_web_url">mytracks.appspot.com</string>
   
   <!-- About Dialog -->

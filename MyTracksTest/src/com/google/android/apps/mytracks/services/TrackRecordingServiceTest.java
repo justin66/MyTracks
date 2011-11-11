@@ -382,7 +382,7 @@ public class TrackRecordingServiceTest
     Track track = providerUtils.getTrack(id);
     assertNotNull(track);
     assertEquals(id, track.getId());
-    assertEquals(sharedPreferences.getString(context.getString(R.string.default_category_key), ""),
+    assertEquals(sharedPreferences.getString(context.getString(R.string.default_activity_key), ""),
         track.getCategory());
     assertEquals(id, sharedPreferences.getLong(
         context.getString(R.string.recording_track_key), -1));
@@ -493,7 +493,7 @@ public class TrackRecordingServiceTest
     Waypoint wpt = providerUtils.getWaypoint(1);
     assertEquals(getContext().getString(R.string.stats_icon_url),
         wpt.getIcon());
-    assertEquals(getContext().getString(R.string.statistics),
+    assertEquals(getContext().getString(R.string.marker_type_statistics),
         wpt.getName());
     assertEquals(Waypoint.TYPE_STATISTICS, wpt.getType());
     assertEquals(123, wpt.getTrackId());
@@ -529,7 +529,7 @@ public class TrackRecordingServiceTest
     Waypoint wpt = providerUtils.getWaypoint(1);
     assertEquals(getContext().getString(R.string.waypoint_icon_url),
         wpt.getIcon());
-    assertEquals(getContext().getString(R.string.waypoint),
+    assertEquals(getContext().getString(R.string.marker_type_waypoint),
         wpt.getName());
     assertEquals(Waypoint.TYPE_WAYPOINT, wpt.getType());
     assertEquals(123, wpt.getTrackId());

@@ -495,7 +495,7 @@ public class TrackRecordingService extends Service {
           this, 0 /* requestCode */, new Intent(this, MyTracks.class),
           0 /* flags */);
       notification.setLatestEventInfo(this, getString(R.string.app_name),
-          getString(R.string.recording_your_track), contentIntent);
+          getString(R.string.track_record_notification), contentIntent);
       notification.flags += Notification.FLAG_NO_CLEAR;
       apiLevelAdapter.startForeground(this, notificationManager, 1,
           notification);
@@ -562,7 +562,7 @@ public class TrackRecordingService extends Service {
   
   private String getDefaultActivityType(Context context) {
     SharedPreferences prefs = context.getSharedPreferences(Constants.SETTINGS_NAME, 0);
-    return prefs.getString(context.getString(R.string.default_category_key), "");
+    return prefs.getString(context.getString(R.string.default_activity_key), "");
   }
 
   /*
@@ -968,7 +968,7 @@ public class TrackRecordingService extends Service {
       wpt.setIcon(request.getIconUrl());
     }
     if (request.getName() == null) {
-      wpt.setName(getString(R.string.waypoint));
+      wpt.setName(getString(R.string.marker_type_waypoint));
     } else {
       wpt.setName(request.getName());
     }
@@ -996,7 +996,7 @@ public class TrackRecordingService extends Service {
 
     // Set the rest of the waypoint data
     waypoint.setType(Waypoint.TYPE_STATISTICS);
-    waypoint.setName(getString(R.string.statistics));
+    waypoint.setName(getString(R.string.marker_type_statistics));
     waypoint.setStatistics(waypointStatsBuilder.getStatistics());
     waypoint.setDescription(utils.generateWaypointDescription(waypoint));
     waypoint.setIcon(getString(R.string.stats_icon_url));
