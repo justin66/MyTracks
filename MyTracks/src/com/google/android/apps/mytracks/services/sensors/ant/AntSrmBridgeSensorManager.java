@@ -151,6 +151,7 @@ public class AntSrmBridgeSensorManager extends AntSensorManager {
       
       int powerVal = (((msg[INDEX_MESSAGE_POWER] & 0xFF) << 8) |
           (msg[INDEX_MESSAGE_POWER+1] & 0xFF));
+      @SuppressWarnings("unused")
       int speedVal = (((msg[INDEX_MESSAGE_SPEED] & 0xFF) << 8) |
           (msg[INDEX_MESSAGE_SPEED+1] & 0xFF));
       int cadenceVal = (msg[INDEX_MESSAGE_CADENCE] & 0xFF);
@@ -162,12 +163,12 @@ public class AntSrmBridgeSensorManager extends AntSensorManager {
             .setValue(powerVal)
             .setState(Sensor.SensorState.SENDING);
     
-      // Although speed is available from the SRM Bridge, MyTracks doesn't
-      // use the value, and computes speed from the GPS location data.
-//      Sensor.SensorData.Builder speed = 
-//        Sensor.SensorData.newBuilder()
-//            .setValue(speedVal)
-//            .setState(Sensor.SensorState.SENDING);
+      /*
+       * Although speed is available from the SRM Bridge, MyTracks doesn't use the value, and
+       * computes speed from the GPS location data.
+       */
+//    Sensor.SensorData.Builder speed = Sensor.SensorData.newBuilder().setValue(speedVal).setState(
+//        Sensor.SensorState.SENDING);
 
       Sensor.SensorData.Builder cadence = 
         Sensor.SensorData.newBuilder()
