@@ -16,20 +16,24 @@
     android:icon="@drawable/ic_menu_waypoints"
     android:title="@string/menu_markers"/>
 
+  <item android:id="@+id/menu_search"
+    android:icon="@android:drawable/ic_menu_search"
+    android:title="@string/menu_search"/>
+
   <item android:id="@+id/menu_sensor_state"
     android:icon="@drawable/ic_menu_sensorstatus"
     android:orderInCategory="1000"
     android:title="@string/menu_sensor_state"/>
-  
+
   <item android:id="@+id/menu_settings"
     android:icon="@android:drawable/ic_menu_preferences"
     android:orderInCategory="1001"
     android:title="@string/menu_settings"/>
-    
+
   <item android:id="@+id/menu_aggregated_statistics"
     android:orderInCategory="1002"
     android:title="@string/menu_aggregated_statistics"/>
-    
+
   <item android:id="@+id/menu_help"
     android:icon="@android:drawable/ic_menu_info_details"
     android:orderInCategory="1003"

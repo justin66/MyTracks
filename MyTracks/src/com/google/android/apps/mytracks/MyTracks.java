@@ -158,6 +158,9 @@ public class MyTracks extends TabActivity implements OnTouchListener {
     // We don't need a window title bar:
     requestWindowFeature(Window.FEATURE_NO_TITLE);
 
+    // If the user just starts typing (on a device with a keyboard), we start a search.
+    setDefaultKeyMode(DEFAULT_KEYS_SEARCH_LOCAL);
+
     final Resources res = getResources();
     final TabHost tabHost = getTabHost();
     tabHost.addTab(tabHost.newTabSpec("tab1")

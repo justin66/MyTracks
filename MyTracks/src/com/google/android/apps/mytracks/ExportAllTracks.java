@@ -80,12 +80,12 @@ public class ExportAllTracks {
 
     String exportFileFormat = activity.getString(R.string.track_list_export_file);
     String fileTypes[] = activity.getResources().getStringArray(R.array.file_types);
-    
+
     String[] choices = new String[fileTypes.length];
     for (int i = 0; i < fileTypes.length; i++) {
       choices[i] = String.format(exportFileFormat, fileTypes[i]);
     }
-    
+
     AlertDialog.Builder builder = new AlertDialog.Builder(activity);
     builder.setSingleChoiceItems(choices, 0, itemClick);
     builder.setPositiveButton(R.string.generic_ok, positiveClick);
@@ -158,7 +158,7 @@ public class ExportAllTracks {
     try {
       MyTracksProviderUtils providerUtils =
           MyTracksProviderUtils.Factory.get(activity);
-      cursor = providerUtils.getTracksCursor("");
+      cursor = providerUtils.getTracksCursor(null, null);
       if (cursor == null) {
         return;
       }

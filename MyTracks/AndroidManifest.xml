@@ -46,6 +46,10 @@ limitations under the License.
         <category android:name="android.intent.category.BROWSABLE" />
         <data android:mimeType="vnd.android.cursor.item/vnd.google.track" />
       </intent-filter>
+
+      <!-- Enable searches via SearchActivity. -->
+      <meta-data android:name="android.app.default_searchable"
+                 android:value="com.google.android.apps.mytracks.SearchActivity" />
     </activity>
 
     <activity android:name="com.google.android.apps.mytracks.MapActivity"
@@ -53,6 +57,10 @@ limitations under the License.
       <intent-filter>
         <category android:name="android.intent.category.TAB" />
       </intent-filter>
+
+      <!-- Enable searches via SearchActivity. -->
+      <meta-data android:name="android.app.default_searchable"
+                 android:value="com.google.android.apps.mytracks.SearchActivity" />
     </activity>
 
     <activity android:name="com.google.android.apps.mytracks.MyMapsList"
@@ -61,10 +69,20 @@ limitations under the License.
               android:exported="false" />
 
     <!-- TODO: VIEW and PICK for track cursor dir -->
-    <activity android:name="com.google.android.apps.mytracks.TrackList" />
+    <activity android:name="com.google.android.apps.mytracks.TrackList">
+      <!-- Enable searches via SearchActivity. -->
+      <!-- TODO: Provide a UI for devices without a search key. -->
+      <meta-data android:name="android.app.default_searchable"
+                 android:value="com.google.android.apps.mytracks.SearchActivity" />
+    </activity>
 
     <!-- TODO: VIEW and PICK for waypoint cursor dir -->
-    <activity android:name="com.google.android.apps.mytracks.WaypointsList" />
+    <activity android:name="com.google.android.apps.mytracks.WaypointsList">
+      <!-- Enable searches via SearchActivity. -->
+      <!-- TODO: Provide a UI for devices without a search key. -->
+      <meta-data android:name="android.app.default_searchable"
+                 android:value="com.google.android.apps.mytracks.SearchActivity" />
+    </activity>
 
     <activity android:name="com.google.android.apps.mytracks.TrackDetails"
               android:label="@string/track_detail_title">
@@ -112,6 +130,10 @@ limitations under the License.
       <intent-filter>
         <category android:name="android.intent.category.TAB" />
       </intent-filter>
+
+      <!-- Enable searches via SearchActivity. -->
+      <meta-data android:name="android.app.default_searchable"
+                 android:value="com.google.android.apps.mytracks.SearchActivity" />
     </activity>
 
     <activity android:name="com.google.android.apps.mytracks.SensorStateActivity"
@@ -122,6 +144,10 @@ limitations under the License.
       <intent-filter>
         <category android:name="android.intent.category.TAB" />
       </intent-filter>
+
+      <!-- Enable searches via SearchActivity. -->
+      <meta-data android:name="android.app.default_searchable"
+                 android:value="com.google.android.apps.mytracks.SearchActivity" />
     </activity>
 
     <activity android:name="com.google.android.apps.mytracks.io.sendtogoogle.SendActivity"
@@ -161,6 +187,15 @@ limitations under the License.
               android:label="@string/welcome_title"
               android:exported="false" />
 
+    <activity android:name="com.google.android.apps.mytracks.SearchActivity"
+              android:launchMode="singleTop">
+      <intent-filter>
+        <action android:name="android.intent.action.SEARCH" />
+      </intent-filter>
+      <meta-data android:name="android.app.searchable"
+                 android:resource="@xml/search"/>
+    </activity>
+
     <service android:name="com.google.android.apps.mytracks.services.TrackRecordingService"
              android:label="@string/my_tracks_recording_service"
              android:icon="@drawable/arrow_320"
@@ -170,7 +205,7 @@ limitations under the License.
 
     <service android:name="com.google.android.apps.mytracks.services.ControlRecordingService"
              android:exported="false" />
-             
+
     <receiver android:name="com.google.android.apps.mytracks.BootReceiver">
       <intent-filter>
         <action android:name="android.intent.action.BOOT_COMPLETED" />
