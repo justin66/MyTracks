@@ -2,7 +2,7 @@ package com.google.android.apps.mytracks.services.sensors;
 
 import com.google.android.apps.mytracks.Constants;
 import com.google.android.apps.mytracks.services.sensors.ant.AntDirectSensorManager;
-import com.google.android.apps.mytracks.services.sensors.ant.AntSRMSensorManager;
+import com.google.android.apps.mytracks.services.sensors.ant.AntSrmBridgeSensorManager;
 import com.google.android.maps.mytracks.R;
 
 import android.content.SharedPreferences;
@@ -40,7 +40,7 @@ public class SensorManagerFactoryTest extends AndroidTestCase {
 
   @SmallTest
   public void testCreateAntSRM() throws Exception {
-    assertClassForName(AntSRMSensorManager.class, R.string.sensor_type_value_srm_ant_bridge);
+    assertClassForName(AntSrmBridgeSensorManager.class, R.string.sensor_type_value_srm_ant_bridge);
   }
 
   private void assertClassForName(Class<?> c, int i) {
