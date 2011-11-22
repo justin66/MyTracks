@@ -45,6 +45,7 @@ import com.google.api.client.http.InputStreamContent;
 import com.google.api.client.util.Strings;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.location.Location;
@@ -297,7 +298,8 @@ public class SendToFusionTables implements Runnable {
   }
 
   private boolean uploadAllTrackPoints(final Track track, String originalDescription) {
-    SharedPreferences preferences = context.getSharedPreferences(Constants.SETTINGS_NAME, 0);
+    SharedPreferences preferences = context.getSharedPreferences(
+        Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
     boolean metricUnits = true;
     if (preferences != null) {
       metricUnits = preferences.getBoolean(context.getString(R.string.metric_units_key), true);

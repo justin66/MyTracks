@@ -18,6 +18,7 @@ package com.google.android.apps.mytracks.services;
 import com.google.android.apps.mytracks.Constants;
 import com.google.android.maps.mytracks.R;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.util.Log;
@@ -45,7 +46,7 @@ public class PreferenceManager implements OnSharedPreferenceChangeListener {
   public PreferenceManager(TrackRecordingService service) {
     this.service = service;
     this.sharedPreferences = service.getSharedPreferences(
-        Constants.SETTINGS_NAME, 0);
+        Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
     if (sharedPreferences == null) {
       Log.w(Constants.TAG,
           "TrackRecordingService: Couldn't get shared preferences.");

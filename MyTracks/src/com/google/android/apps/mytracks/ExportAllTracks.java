@@ -26,6 +26,7 @@ import com.google.android.maps.mytracks.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -114,8 +115,8 @@ public class ExportAllTracks {
    * current track.
    */
   private void aquireLocksAndExport() {
-    SharedPreferences prefs =
-        activity.getSharedPreferences(Constants.SETTINGS_NAME, 0);
+    SharedPreferences prefs = activity.getSharedPreferences(
+        Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
     long recordingTrackId = -1;
     if (prefs != null) {
       recordingTrackId =

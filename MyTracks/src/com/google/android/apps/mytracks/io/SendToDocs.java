@@ -31,6 +31,7 @@ import com.google.wireless.gdata.docs.SpreadsheetsClient;
 import com.google.wireless.gdata.docs.XmlDocsGDataParserFactory;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
@@ -66,7 +67,7 @@ public class SendToDocs {
     this.progressIndicator = progressIndicator;
 
     SharedPreferences preferences = activity.getSharedPreferences(
-        Constants.SETTINGS_NAME, 0);
+        Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
     if (preferences != null) {
       metricUnits =
           preferences.getBoolean(activity.getString(R.string.metric_units_key),

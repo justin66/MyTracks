@@ -152,7 +152,8 @@ public class StatusAnnouncerTask implements PeriodicTask {
   protected String getAnnouncement(TripStatistics stats) {
     boolean metricUnits = true;
     boolean reportSpeed = true;
-    SharedPreferences preferences = context.getSharedPreferences(Constants.SETTINGS_NAME, 0);
+    SharedPreferences preferences = context.getSharedPreferences(
+        Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
     if (preferences != null) {
       metricUnits = preferences.getBoolean(context.getString(R.string.metric_units_key), true);
       reportSpeed = preferences.getBoolean(context.getString(R.string.report_speed_key), true);

@@ -38,6 +38,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.TabActivity;
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -151,7 +152,7 @@ public class MyTracks extends TabActivity implements OnTouchListener {
     tracker.dispatch();
 
     providerUtils = MyTracksProviderUtils.Factory.get(this);
-    preferences = getSharedPreferences(Constants.SETTINGS_NAME, 0);
+    preferences = getSharedPreferences(Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
     dataHub = ((MyTracksApplication) getApplication()).getTrackDataHub();
     menuManager = new MenuManager(this);
     serviceConnection = new TrackRecordingServiceConnection(this, serviceBindCallback);
@@ -457,7 +458,8 @@ public class MyTracks extends TabActivity implements OnTouchListener {
    */
   void stopRecording() {
     // Save the track id as the shared preference will overwrite the recording track id.
-    SharedPreferences sharedPreferences = getSharedPreferences(Constants.SETTINGS_NAME, 0);
+    SharedPreferences sharedPreferences = getSharedPreferences(
+        Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
     long currentTrackId = sharedPreferences.getLong(getString(R.string.recording_track_key), -1);
 
     ITrackRecordingService trackRecordingService = serviceConnection.getServiceIfBound();

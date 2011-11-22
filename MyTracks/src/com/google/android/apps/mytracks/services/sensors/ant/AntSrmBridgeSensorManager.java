@@ -68,7 +68,7 @@ public class AntSrmBridgeSensorManager extends AntSensorManager {
 
     // First read the the device id that we will be pairing with.
     SharedPreferences prefs = context.getSharedPreferences(
-        Constants.SETTINGS_NAME, 0);
+        Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
     if (prefs != null) {
       deviceNumber =
         (short) prefs.getInt(context.getString(

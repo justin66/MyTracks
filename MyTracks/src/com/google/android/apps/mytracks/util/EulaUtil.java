@@ -15,7 +15,6 @@
  */
 package com.google.android.apps.mytracks.util;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -31,13 +30,13 @@ public class EulaUtil {
 
   public static boolean getEulaValue(Context context) {
     SharedPreferences preferences = context.getSharedPreferences(
-        EULA_PREFERENCE_FILE, Activity.MODE_PRIVATE);
+        EULA_PREFERENCE_FILE, Context.MODE_PRIVATE);
     return preferences.getBoolean(EULA_PREFERENCE_KEY, false);
   }
 
   public static void setEulaValue(Context context) {
     SharedPreferences preferences = context.getSharedPreferences(
-        EULA_PREFERENCE_FILE, Activity.MODE_PRIVATE);
+        EULA_PREFERENCE_FILE, Context.MODE_PRIVATE);
     Editor editor = preferences.edit();
     editor.putBoolean(EULA_PREFERENCE_KEY, true);
     ApiFeatures.getInstance().getApiAdapter().applyPreferenceChanges(editor);

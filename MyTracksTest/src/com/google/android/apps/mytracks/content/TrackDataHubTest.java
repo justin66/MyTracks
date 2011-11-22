@@ -32,6 +32,7 @@ import com.google.android.apps.mytracks.services.TrackRecordingServiceTest.MockC
 import com.google.android.maps.mytracks.R;
 import com.google.android.testing.mocking.AndroidMock;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.database.ContentObserver;
@@ -86,7 +87,7 @@ public class TrackDataHubTest extends AndroidTestCase {
         getContext(), getContext(), "test.");
     context = new MockContext(mockContentResolver, targetContext);
 
-    prefs = context.getSharedPreferences(Constants.SETTINGS_NAME, 0);
+    prefs = context.getSharedPreferences(Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
     providerUtils = AndroidMock.createMock("providerUtils", MyTracksProviderUtils.class);
     dataSources = AndroidMock.createNiceMock("dataSources", DataSourcesWrapper.class);
 

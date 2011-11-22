@@ -236,8 +236,8 @@ public class StringUtils implements DescriptionGenerator {
   public String generateTrackDescription(Track track, Vector<Double> distances,
       Vector<Double> elevations) {
     boolean displaySpeed = true;
-    SharedPreferences preferences =
-        context.getSharedPreferences(Constants.SETTINGS_NAME, 0);
+    SharedPreferences preferences = context.getSharedPreferences(
+        Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
     if (preferences != null) {
       displaySpeed =
           preferences.getBoolean(context.getString(R.string.report_speed_key), true);

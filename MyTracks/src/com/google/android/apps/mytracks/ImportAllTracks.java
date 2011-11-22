@@ -26,6 +26,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -95,7 +96,8 @@ public class ImportAllTracks {
    * track. Acquire a wake lock if there is no current track.
    */
   private void aquireLocksAndImport() {
-    SharedPreferences prefs = activity.getSharedPreferences(Constants.SETTINGS_NAME, 0);
+    SharedPreferences prefs = activity.getSharedPreferences(
+        Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
     long recordingTrackId = -1;
     if (prefs != null) {
       recordingTrackId = prefs.getLong(activity.getString(R.string.recording_track_key), -1);

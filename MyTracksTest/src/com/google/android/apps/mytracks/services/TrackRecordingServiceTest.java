@@ -151,8 +151,7 @@ public class TrackRecordingServiceTest
 
     providerUtils = MyTracksProviderUtils.Factory.get(context);
 
-    sharedPreferences = context.getSharedPreferences(
-        Constants.SETTINGS_NAME, 0);
+    sharedPreferences = context.getSharedPreferences(Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
     // Let's use default values.
     sharedPreferences.edit().clear().commit();
 

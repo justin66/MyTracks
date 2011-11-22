@@ -5,6 +5,7 @@ import com.google.android.apps.mytracks.services.sensors.ant.AntDirectSensorMana
 import com.google.android.apps.mytracks.services.sensors.ant.AntSRMSensorManager;
 import com.google.android.maps.mytracks.R;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
@@ -18,7 +19,7 @@ public class SensorManagerFactoryTest extends AndroidTestCase {
     super.setUp();
     
     sharedPreferences = getContext().getSharedPreferences(
-        Constants.SETTINGS_NAME, 0);
+        Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
     // Let's use default values.
     sharedPreferences.edit().clear().commit();
   }

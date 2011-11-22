@@ -32,6 +32,7 @@ import com.google.android.apps.mytracks.util.UnitConversions;
 import com.google.android.maps.mytracks.R;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.location.Location;
@@ -121,7 +122,7 @@ public class SendToMyMaps implements Runnable {
       boolean isNewMap = mapId.equals(NEW_MAP_ID);
       if (isNewMap) {
         SharedPreferences preferences = context.getSharedPreferences(
-            Constants.SETTINGS_NAME, 0);
+            Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
         boolean mapPublic = true;
         if (preferences != null) {
           mapPublic = preferences.getBoolean(
@@ -194,7 +195,7 @@ public class SendToMyMaps implements Runnable {
   private boolean uploadAllTrackPoints(
       final Track track, String originalDescription) {
     SharedPreferences preferences = context.getSharedPreferences(
-        Constants.SETTINGS_NAME, 0);
+        Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
     boolean metricUnits = true;
     if (preferences != null) {
       metricUnits =

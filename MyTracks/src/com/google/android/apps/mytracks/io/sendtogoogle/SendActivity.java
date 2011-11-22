@@ -152,7 +152,7 @@ public class SendActivity extends Activity implements ProgressIndicator {
     super.onCreate(savedInstanceState);
 
     providerUtils = MyTracksProviderUtils.Factory.get(this);
-    sharedPreferences = getSharedPreferences(Constants.SETTINGS_NAME, 0);
+    sharedPreferences = getSharedPreferences(Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
 
     tracker = GoogleAnalyticsTracker.getInstance();
     // Start the tracker in manual dispatch mode...

@@ -17,13 +17,12 @@ package com.google.android.apps.mytracks.services.sensors.ant;
 
 import static com.google.android.apps.mytracks.Constants.TAG;
 
-import com.google.android.apps.mytracks.Constants;
-import com.google.android.apps.mytracks.content.Sensor;
-import com.google.android.maps.mytracks.R;
-
 import com.dsi.ant.AntDefine;
 import com.dsi.ant.AntMesg;
 import com.dsi.ant.exception.AntInterfaceException;
+import com.google.android.apps.mytracks.Constants;
+import com.google.android.apps.mytracks.content.Sensor;
+import com.google.android.maps.mytracks.R;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -57,7 +56,7 @@ public class AntDirectSensorManager extends AntSensorManager {
 
     // First read the the device id that we will be pairing with.
     SharedPreferences prefs = context.getSharedPreferences(
-        Constants.SETTINGS_NAME, 0);
+        Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
     if (prefs != null) {
       deviceNumberHRM =
         (short) prefs.getInt(context.getString(R.string.ant_heart_rate_sensor_id_key), 0);

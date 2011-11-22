@@ -55,8 +55,8 @@ class DefaultTrackNameFactory {
 
   /** Determines whether the preferences allow a timestamp-based track name */
   protected boolean useTimestampTrackName() {
-    SharedPreferences prefs =
-        context.getSharedPreferences(Constants.SETTINGS_NAME, 0);
+    SharedPreferences prefs = context.getSharedPreferences(
+        Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
     return prefs.getBoolean(
         context.getString(R.string.timestamp_track_name_key), true);
   }

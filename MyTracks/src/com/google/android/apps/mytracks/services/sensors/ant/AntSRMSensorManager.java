@@ -72,7 +72,7 @@ public class AntSRMSensorManager extends AntSensorManager {
 
     // First read the the device id that we will be announcing.
     SharedPreferences prefs = context.getSharedPreferences(
-        Constants.SETTINGS_NAME, 0);
+        Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
     if (prefs != null) {
       deviceId = (byte) prefs.getInt(
           context.getString(R.string.ant_srm_bridge_sensor_id_key),
