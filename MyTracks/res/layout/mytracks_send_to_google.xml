@@ -37,7 +37,7 @@ limitations under the License.
       android:stretchColumns="1">
 
       <!-- Google Maps -->
-      <TableRow>
+      <TableRow android:id="@+id/send_google_maps_row">
         <ImageView
           android:src="@drawable/mymaps_icon"
           style="@style/SendGoogleImageView"/>
@@ -46,9 +46,8 @@ limitations under the License.
           android:text="@string/send_google_my_maps"
           style="@style/SendGoogleCheckBox"/>
       </TableRow>
-      <TableRow>
+      <TableRow android:id="@+id/send_google_maps_option_row">
         <RadioGroup
-          android:id="@+id/send_google_my_maps_group"
           android:layout_column="1"
           android:layout_height="wrap_content"
           android:layout_marginLeft="10dp"
@@ -65,7 +64,7 @@ limitations under the License.
       </TableRow>
 
       <!-- Google Fusion Tables -->
-      <TableRow>
+      <TableRow android:id="@+id/send_google_fusion_tables_row">
         <ImageView
           android:src="@drawable/googledocs_icon"
           style="@style/SendGoogleImageView"/>
@@ -76,7 +75,7 @@ limitations under the License.
       </TableRow>
 
       <!-- Google Docs -->
-      <TableRow android:id="@+id/send_google_docs_table_row">
+      <TableRow android:id="@+id/send_google_docs_row">
         <ImageView
           android:src="@drawable/googledocs_icon"
           style="@style/SendGoogleImageView"/>

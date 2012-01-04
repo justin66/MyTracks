@@ -2308,20 +2308,24 @@ limitations under the License.
       Screenshot: track_list_share_options.png">
     A %1$s file
   </string>
+  <string name="track_list_share_fusion_table"
+    translation_description="In the context menu for a track, under the 'Share with friends...'
+      option, the menu option to save a track to Google Fusion Tables and share the Fusion Table
+      with friends. 'Fusion Table' in this context means a Google Fusion Table.">
+    Fusion Table
+  </string>
+  <string name="track_list_share_map"
+    translation_description="In the context menu for a track, under the 'Share with friends...'
+      option, the menu option to save a track to Google Maps and share the Map with friends. 'Map'
+      in this context means a Google Map.">
+    Map
+  </string>
   <string name="track_list_share_track"
     translation_description="In the context menu for a track, the menu option to share the track
       with friends through other applications.
 
       Screenshot: track_list_context_menu.png">
     Share with friends...
-  </string>
-  <string name="track_list_share_url"
-    translation_description="In the context menu for a track, under the 'Share with friends...'
-      option, the menu option to save a track to Google Maps or Google Fusion Tables and share the
-      URL with friends.
-
-      Screenshot: track_list_share_options.png">
-    Map or Fusion Table URL
   </string>
   <string name="track_list_show_on_map"
     translation_description="In the context menu for a track, the menu option to show the track on
