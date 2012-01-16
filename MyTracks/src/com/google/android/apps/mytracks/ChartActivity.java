@@ -46,7 +46,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.ZoomControls;
 
@@ -116,11 +115,14 @@ public class ChartActivity extends Activity implements TrackDataListener {
     super.onCreate(savedInstanceState);
 
     // The volume we want to control is the Text-To-Speech volume
+    ApiFeatures apiFeatures = ApiFeatures.getInstance();
     int volumeStream =
-        new StatusAnnouncerFactory(ApiFeatures.getInstance()).getVolumeStream();
+        new StatusAnnouncerFactory(apiFeatures).getVolumeStream();
     setVolumeControlStream(volumeStream);
 
-    requestWindowFeature(Window.FEATURE_NO_TITLE);
+    // Show the action bar (or nothing at all).
+    apiFeatures.getApiAdapter().showActionBar(this);
+
     setContentView(R.layout.mytracks_charts);
     ViewGroup layout = (ViewGroup) findViewById(R.id.elevation_chart);
     chartView = new ChartView(this);

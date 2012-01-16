@@ -19,6 +19,7 @@ import com.google.android.apps.mytracks.io.backup.BackupPreferencesListener;
 import com.google.android.apps.mytracks.services.tasks.PeriodicTask;
 import com.google.api.client.http.HttpTransport;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
@@ -26,17 +27,17 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 /**
- * A set of methods that may be implemented differently depending on the Android API level. 
- *  
+ * A set of methods that may be implemented differently depending on the Android API level.
+ *
  * @author Bartlomiej Niechwiej
  */
 public interface ApiLevelAdapter {
-  
+
   /**
    * Puts the specified service into foreground.
-   * 
+   *
    * Due to changes in API level 5.
-   * 
+   *
    * @param service the service to be put in foreground.
    * @param notificationManager the notification manager used to post the given
    *        notification.
@@ -45,15 +46,15 @@ public interface ApiLevelAdapter {
    */
   void startForeground(Service service, NotificationManager notificationManager,
       int id, Notification notification);
-  
+
   /**
    * Puts the given service into background.
-   * 
+   *
    * Due to changes in API level 5.
-   * 
+   *
    * @param service the service to put into background.
    * @param notificationManager the notification manager to user when removing
-   *        notifications. 
+   *        notifications.
    * @param id the ID of the notification to be remove, or -1 if the
    *        notification shouldn't be removed.
    */
@@ -62,52 +63,62 @@ public interface ApiLevelAdapter {
 
   /**
    * Gets a status announcer task.
-   * 
+   *
    * Due to changes in API level 8.
    */
   PeriodicTask getStatusAnnouncerTask(Context context);
-  
+
   /**
    * Gets a {@link BackupPreferencesListener}.
-   * 
+   *
    * Due to changes in API level 8.
    */
   BackupPreferencesListener getBackupPreferencesListener(Context context);
-  
+
   /**
    * Applies all changes done to the given preferences editor.
    * Changes may or may not be applied immediately.
-   * 
+   *
    * Due to changes in API level 9.
    */
   void applyPreferenceChanges(SharedPreferences.Editor editor);
-  
+
+  /**
+   * Shows the action bar, if the current system supports it.
+   * If it's not supported, the title bar will be kept hidden.
+   *
+   * Due to changes in API level 11.
+   *
+   * @param activity the current activity
+   */
+  void showActionBar(Activity activity);
+
   /**
    * Enables strict mode where supported, only if this is a development build.
-   * 
+   *
    * Due to changes in API level 9.
    */
   void enableStrictMode();
-  
+
   /**
    * Copies elements from the input byte array into a new byte array, from
    * indexes start (inclusive) to end (exclusive). The end index must be less
    * than or equal to input.length.
    *
    * Due to changes in API level 9.
-   * 
+   *
    * @param input the input byte array
    * @param start the start index
    * @param end the end index
    * @return a new array containing elements from the input byte array
    */
   byte[] copyByteArray(byte[] input, int start, int end);
-  
-  
+
+
   /**
-   * Gets a {@link HttpTransport}. 
-   * 
+   * Gets a {@link HttpTransport}.
+   *
    * Due to changes in API level 9.
    */
-  HttpTransport getHttpTransport();  
+  HttpTransport getHttpTransport();
 }

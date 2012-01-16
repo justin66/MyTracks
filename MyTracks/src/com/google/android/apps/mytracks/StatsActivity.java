@@ -34,7 +34,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Window;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -105,12 +104,13 @@ public class StatsActivity extends Activity implements TrackDataListener {
     utils = new StatsUtilities(this);
 
     // The volume we want to control is the Text-To-Speech volume
+    ApiFeatures apiFeatures = ApiFeatures.getInstance();
     int volumeStream =
-        new StatusAnnouncerFactory(ApiFeatures.getInstance()).getVolumeStream();
+        new StatusAnnouncerFactory(apiFeatures).getVolumeStream();
     setVolumeControlStream(volumeStream);
 
-    // We don't need a window title bar:
-    requestWindowFeature(Window.FEATURE_NO_TITLE);
+    // Show the action bar (or nothing at all).
+    apiFeatures.getApiAdapter().showActionBar(this);
 
     setContentView(R.layout.stats);
 
@@ -119,7 +119,7 @@ public class StatsActivity extends Activity implements TrackDataListener {
 
     showUnknownLocation();
     updateLabels();
-    
+
     DisplayMetrics metrics = new DisplayMetrics();
     getWindowManager().getDefaultDisplay().getMetrics(metrics);
     if (metrics.heightPixels > 600) {

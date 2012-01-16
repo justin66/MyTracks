@@ -28,6 +28,7 @@ import com.google.android.apps.mytracks.services.ServiceUtils;
 import com.google.android.apps.mytracks.services.TrackRecordingServiceConnection;
 import com.google.android.apps.mytracks.services.tasks.StatusAnnouncerFactory;
 import com.google.android.apps.mytracks.util.ApiFeatures;
+import com.google.android.apps.mytracks.util.ApiLevelAdapter;
 import com.google.android.apps.mytracks.util.EulaUtil;
 import com.google.android.apps.mytracks.util.SystemUtils;
 import com.google.android.apps.mytracks.util.UriUtils;
@@ -53,7 +54,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
-import android.view.Window;
 import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.Toast;
@@ -67,7 +67,7 @@ import android.widget.Toast;
 @SuppressWarnings("deprecation")
 public class MyTracks extends TabActivity implements OnTouchListener {
   private static final int DIALOG_EULA_ID = 0;
-  
+
   private TrackDataHub dataHub;
 
   /**
@@ -140,8 +140,9 @@ public class MyTracks extends TabActivity implements OnTouchListener {
     Log.d(TAG, "MyTracks.onCreate");
     super.onCreate(savedInstanceState);
     ApiFeatures apiFeatures = ApiFeatures.getInstance();
+    ApiLevelAdapter apiAdapter = apiFeatures.getApiAdapter();
     if (!SystemUtils.isRelease(this)) {
-      apiFeatures.getApiAdapter().enableStrictMode();
+      apiAdapter.enableStrictMode();
     }
 
     tracker = GoogleAnalyticsTracker.getInstance();
@@ -162,8 +163,8 @@ public class MyTracks extends TabActivity implements OnTouchListener {
         new StatusAnnouncerFactory(apiFeatures).getVolumeStream();
     setVolumeControlStream(volumeStream);
 
-    // We don't need a window title bar:
-    requestWindowFeature(Window.FEATURE_NO_TITLE);
+    // Show the action bar (or nothing at all).
+    apiAdapter.showActionBar(this);
 
     final Resources res = getResources();
     final TabHost tabHost = getTabHost();
@@ -199,7 +200,7 @@ public class MyTracks extends TabActivity implements OnTouchListener {
       showDialog(DIALOG_EULA_ID);
     }
   }
- 
+
   @Override
   protected void onStart() {
     Log.d(TAG, "MyTracks.onStart");
@@ -293,7 +294,7 @@ public class MyTracks extends TabActivity implements OnTouchListener {
         return null;
     }
   }
-  
+
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     super.onCreateOptionsMenu(menu);

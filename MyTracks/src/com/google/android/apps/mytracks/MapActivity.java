@@ -53,7 +53,6 @@ import android.view.MotionEvent;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.View.OnCreateContextMenuListener;
-import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -134,12 +133,13 @@ public class MapActivity extends com.google.android.maps.MapActivity
     super.onCreate(bundle);
 
     // The volume we want to control is the Text-To-Speech volume
+    ApiFeatures apiFeatures = ApiFeatures.getInstance();
     int volumeStream =
-        new StatusAnnouncerFactory(ApiFeatures.getInstance()).getVolumeStream();
+        new StatusAnnouncerFactory(apiFeatures).getVolumeStream();
     setVolumeControlStream(volumeStream);
 
-    // We don't need a window title bar:
-    requestWindowFeature(Window.FEATURE_NO_TITLE);
+    // Show the action bar (or nothing at all).
+    apiFeatures.getApiAdapter().showActionBar(this);
 
     // Inflate the layout:
     setContentView(R.layout.mytracks_layout);

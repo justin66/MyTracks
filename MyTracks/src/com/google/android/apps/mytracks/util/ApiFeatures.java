@@ -39,7 +39,7 @@ public class ApiFeatures {
   /**
    * The API level adapter for the Android version we are being run under.
    */
-  private ApiLevelAdapter apiLevelAdapter;
+  private final ApiLevelAdapter apiLevelAdapter;
 
   /**
    * Returns the singleton instance of this class.
@@ -65,7 +65,9 @@ public class ApiFeatures {
   protected ApiFeatures() {
     // It is safe to import unsupported classes as long as we only actually
     // load the class when supported.
-    if (getApiLevel() >= 9) {
+    if (getApiLevel() >= 11) {
+      apiLevelAdapter = new ApiLevel11Adapter();
+    } else if (getApiLevel() >= 9) {
       apiLevelAdapter = new ApiLevel9Adapter();
     } else if (getApiLevel() >= 8) {
       apiLevelAdapter = new ApiLevel8Adapter();
@@ -83,7 +85,7 @@ public class ApiFeatures {
   }
 
   // API Level 4 Changes
-  
+
   /**
    * Returns whether text-to-speech is available.
    */
@@ -92,7 +94,7 @@ public class ApiFeatures {
   }
 
   // API Level 5 Changes
-  
+
   /**
    * There's a bug (#1587) in Cupcake and Donut which prevents you from
    * using a SQLiteQueryBuilder twice.  That is, if you call buildQuery
@@ -104,9 +106,9 @@ public class ApiFeatures {
   public boolean canReuseSQLiteQueryBuilder() {
     return getApiLevel() >= 5;
   }
-  
+
   // API Level 10 changes
-  
+
   /**
    * Returns true if BluetoothDevice.createInsecureRfcommSocketToServiceRecord
    * is available.
@@ -114,7 +116,7 @@ public class ApiFeatures {
   public boolean hasBluetoothDeviceCreateInsecureRfcommSocketToServiceRecord() {
     return getApiLevel() >= 10;
   }
-  
+
   // Visible for testing.
   protected int getApiLevel() {
     return ANDROID_API_LEVEL;
