@@ -323,8 +323,8 @@ public abstract class AntSensorManager extends SensorManager {
       // Disable high priority search
       antReceiver.ANTSetChannelSearchTimeout(channelNumber, (byte) 0);
 
-      // Set search timeout to 30 seconds (low priority search))
-      antReceiver.ANTSetLowPriorityChannelSearchTimeout(channelNumber, (byte) 12);
+      // Set search timeout to 10 seconds (low priority search))
+      antReceiver.ANTSetLowPriorityChannelSearchTimeout(channelNumber, (byte) 4);
 
       if (deviceNumber == WILDCARD) {
         // Configure proximity search, if using wild card search
