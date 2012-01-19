@@ -44,7 +44,6 @@ public abstract class Constants {
   public static final int GET_MAP = 1;
   public static final int SHOW_TRACK = 2;
   public static final int AUTHENTICATE_TO_MAPS = 3;
-  public static final int AUTHENTICATE_TO_FUSION_TABLES = 4;
   public static final int AUTHENTICATE_TO_DOCLIST = 5;
   public static final int AUTHENTICATE_TO_TRIX = 6;
   public static final int SHARE_GPX_FILE = 7;
@@ -58,6 +57,7 @@ public abstract class Constants {
   public static final int SHOW_WAYPOINT = 15;
   public static final int WELCOME = 16;
   public static final int CHOOSE_ACCOUNT = 17;
+  public static final int SEND_FUSION_TABLES = 18;
 
   /*
    * Menu ids:
