@@ -26,8 +26,8 @@ import com.google.android.apps.mytracks.content.Track;
 import com.google.android.apps.mytracks.io.AuthManager;
 import com.google.android.apps.mytracks.io.AuthManager.AuthCallback;
 import com.google.android.apps.mytracks.io.AuthManagerFactory;
-import com.google.android.apps.mytracks.io.SendToDocs;
 import com.google.android.apps.mytracks.io.SendToMaps;
+import com.google.android.apps.mytracks.io.docs.SendDocsActivity;
 import com.google.android.apps.mytracks.io.maps.MapsConstants;
 import com.google.android.apps.mytracks.io.maps.MapsFacade;
 import com.google.android.apps.mytracks.util.SystemUtils;
@@ -75,10 +75,8 @@ public class SendActivity extends Activity implements ProgressIndicator {
     PICK_MAP,
     SEND_TO_MAPS,
     SEND_TO_MAPS_DONE,
-    AUTHENTICATE_FUSION_TABLES,
+    SEND_TO_FUSION_TABLES,
     SEND_TO_FUSION_TABLES_DONE,
-    AUTHENTICATE_DOCS,
-    AUTHENTICATE_TRIX,
     SEND_TO_DOCS,
     SEND_TO_DOCS_DONE,
     SHOW_RESULTS,
@@ -238,14 +236,10 @@ public class SendActivity extends Activity implements ProgressIndicator {
         return sendToGoogleMaps();
       case SEND_TO_MAPS_DONE:
         return onSendToGoogleMapsDone();
-      case AUTHENTICATE_FUSION_TABLES:
-        return authenticateToFusionTables();
+      case SEND_TO_FUSION_TABLES:
+        return sendToFusionTables();
       case SEND_TO_FUSION_TABLES_DONE:
         return onSendToFusionTablesDone();
-      case AUTHENTICATE_DOCS:
-        return authenticateToGoogleDocs();
-      case AUTHENTICATE_TRIX:
-        return authenticateToGoogleTrix();
       case SEND_TO_DOCS:
         return sendToGoogleDocs();
       case SEND_TO_DOCS_DONE:
@@ -275,9 +269,9 @@ public class SendActivity extends Activity implements ProgressIndicator {
     if (sendToMaps) {
       return SendState.AUTHENTICATE_MAPS;
     } else if (sendToFusionTables) {
-      return SendState.AUTHENTICATE_FUSION_TABLES;
+      return SendState.SEND_TO_FUSION_TABLES;
     } else if (sendToDocs) {
-      return SendState.AUTHENTICATE_DOCS;
+      return SendState.SEND_TO_DOCS;
     } else {
       Log.w(TAG, "Nowhere to upload to");
       return SendState.FINISH;
@@ -364,15 +358,15 @@ public class SendActivity extends Activity implements ProgressIndicator {
 
   private SendState onSendToGoogleMapsDone() {
     if (sendToFusionTables) {
-      return SendState.AUTHENTICATE_FUSION_TABLES;
+      return SendState.SEND_TO_FUSION_TABLES;
     } else if (sendToDocs) {
-      return SendState.AUTHENTICATE_DOCS;
+      return SendState.SEND_TO_DOCS;
     } else {
       return SendState.SHOW_RESULTS;
     }
   }
 
-  private SendState authenticateToFusionTables() {
+  private SendState sendToFusionTables() {
     tracker.trackPageView("/send/fusion_tables");
     Intent intent = new Intent(this, SendFusionTablesActivity.class)
         .putExtra(SendFusionTablesActivity.ACCOUNT, account)
@@ -383,51 +377,18 @@ public class SendActivity extends Activity implements ProgressIndicator {
 
   private SendState onSendToFusionTablesDone() {
     if (sendToDocs) {
-      return SendState.AUTHENTICATE_DOCS;
+      return SendState.SEND_TO_DOCS;
     } else {
       return SendState.SHOW_RESULTS;
     }
   }
 
-  private SendState authenticateToGoogleDocs() {
-    showDialog(PROGRESS_DIALOG);
-    setProgressValue(0);
-    setProgressMessage(getAuthenticatingProgressMessage(SendType.DOCS));
-    authenticate(Constants.AUTHENTICATE_TO_DOCLIST, SendToDocs.GDATA_SERVICE_NAME_DOCLIST);
-    // AUTHENTICATE_TO_DOCLIST callback calls authenticateToGoogleTrix
-    return SendState.NOT_READY;
-  }
-
-  private SendState authenticateToGoogleTrix() {
-    setProgressValue(30);
-    setProgressMessage(getAuthenticatingProgressMessage(SendType.DOCS));
-    authenticate(Constants.AUTHENTICATE_TO_TRIX, SendToDocs.GDATA_SERVICE_NAME_TRIX);
-    // AUTHENTICATE_TO_TRIX callback calls sendToGoogleDocs
-    return SendState.NOT_READY;
-  }
-
   private SendState sendToGoogleDocs() {
-    Log.d(TAG, "Sending to Docs....");
     tracker.trackPageView("/send/docs");
-
-    setProgressValue(50);
-    String format = getString(R.string.send_google_progress_sending);
-    String serviceName = getString(SendType.DOCS.getServiceName());
-    setProgressMessage(String.format(format, serviceName));
-    final SendToDocs sender = new SendToDocs(this,
-        getAuthManager(SendToDocs.GDATA_SERVICE_NAME_TRIX),
-        getAuthManager(SendToDocs.GDATA_SERVICE_NAME_DOCLIST),
-        this);
-    Runnable onCompletion = new Runnable() {
-      public void run() {
-        setProgressValue(100);
-        sendToDocsSuccess = sender.wasSuccess();
-        executeStateMachine(SendState.SEND_TO_DOCS_DONE);
-      }
-    };
-    sender.setOnCompletion(onCompletion);
-    sender.sendToDocs(sendTrackId);
-
+    Intent intent = new Intent(this, SendDocsActivity.class)
+        .putExtra(SendFusionTablesActivity.ACCOUNT, account)
+        .putExtra(SendFusionTablesActivity.TRACK_ID, sendTrackId);
+    startActivityForResult(intent, Constants.SEND_DOCS);
     return SendState.NOT_READY;
   }
 
@@ -513,6 +474,15 @@ public class SendActivity extends Activity implements ProgressIndicator {
         nextState = SendState.START;
         break;
       }
+      case Constants.SEND_DOCS: {
+        if (resultCode == RESULT_CANCELED) {
+          nextState = SendState.FINISH;
+          break;
+        }
+        sendToDocsSuccess = results.getBooleanExtra(SendDocsActivity.SUCCESS, false);
+        nextState = SendState.SEND_TO_DOCS_DONE;
+        break;
+      }
       case Constants.SEND_FUSION_TABLES: {
         if (resultCode == RESULT_CANCELED) {
           nextState = SendState.FINISH;
@@ -542,15 +512,6 @@ public class SendActivity extends Activity implements ProgressIndicator {
         // Authenticated with Google Maps
         nextState = SendState.PICK_MAP;
         break;
-      case Constants.AUTHENTICATE_TO_DOCLIST:
-        // Authenticated with Google Docs
-        nextState = SendState.AUTHENTICATE_TRIX;
-        break;
-      case Constants.AUTHENTICATE_TO_TRIX:
-        // Authenticated with Trix
-        nextState = SendState.SEND_TO_DOCS;
-        break;
-
       default: {
         Log.e(TAG, "Unrequested login code: " + requestCode);
         return;

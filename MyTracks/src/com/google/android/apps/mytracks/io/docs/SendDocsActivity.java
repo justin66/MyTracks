@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.android.apps.mytracks.io.sendtogoogle;
+package com.google.android.apps.mytracks.io.docs;
 
 import com.google.android.maps.mytracks.R;
 
@@ -26,21 +26,11 @@ import android.content.Intent;
 import android.os.Bundle;
 
 /**
- * An activity to send a track to Google Fusion Tables.
- * <p>
- * The activity gets recreated when the screen rotates. To support the activity
- * displaying a progress dialog, we do the following:
- * <ul>
- * <li>use one instance of an AyncTask to send the track</li>
- * <li>save that instance as the last non configuration instance of the activity
- * </li>
- * <li>when a new activity is created, pass the activity to the AsyncTask so
- * that the AsyncTask can update the progress dialog of the activity</li>
- * </ul>
+ * An activity to send a track to Google Docs.
  *
  * @author jshih@google.com (Jimmy Shih)
  */
-public class SendFusionTablesActivity extends Activity {
+public class SendDocsActivity extends Activity {
 
   // parameters in the input intent
   public static final String ACCOUNT = "account";
@@ -48,11 +38,10 @@ public class SendFusionTablesActivity extends Activity {
 
   // parameters in the output intent
   public static final String SUCCESS = "success";
-  public static final String TABLE_ID = "tableId";
 
   private static final int PROGRESS_DIALOG = 1;
 
-  private SendFusionTablesAsyncTask asyncTask;
+  private SendDocsAsyncTask asyncTask;
   private ProgressDialog progressDialog;
 
   @Override
@@ -60,15 +49,15 @@ public class SendFusionTablesActivity extends Activity {
     super.onCreate(savedInstanceState);
 
     Object retained = getLastNonConfigurationInstance();
-    if (retained instanceof SendFusionTablesAsyncTask) {
-      asyncTask = (SendFusionTablesAsyncTask) retained;
+    if (retained instanceof SendDocsAsyncTask) {
+      asyncTask = (SendDocsAsyncTask) retained;
       asyncTask.setActivity(this);
     } else {
       Intent intent = getIntent();
       Account account = intent.getParcelableExtra(ACCOUNT);
       long trackId = intent.getLongExtra(TRACK_ID, -1L);
-
-      asyncTask = new SendFusionTablesAsyncTask(this, account, trackId);
+      
+      asyncTask = new SendDocsAsyncTask(this, account, trackId);
       asyncTask.execute();
     }
   }
@@ -87,7 +76,7 @@ public class SendFusionTablesActivity extends Activity {
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         progressDialog.setIcon(android.R.drawable.ic_dialog_info);
         progressDialog.setTitle(getString(
-            R.string.send_google_progress_title, getString(R.string.send_google_fusion_tables)));
+            R.string.send_google_progress_title, getString(R.string.send_google_docs)));
         progressDialog.setMax(100);
         progressDialog.setProgress(0);
         progressDialog.setCancelable(true);
@@ -109,10 +98,9 @@ public class SendFusionTablesActivity extends Activity {
    * Invokes when the associated AsyncTask completes.
    *
    * @param success true if success
-   * @param tableId tableId if available
    */
-  public void onAsyncTaskCompleted(boolean success, String tableId) {
-    Intent intent = new Intent().putExtra(SUCCESS, success).putExtra(TABLE_ID, tableId);
+  public void onAsyncTaskCompleted(boolean success) {
+    Intent intent = new Intent().putExtra(SUCCESS, success);
     setResult(RESULT_OK, intent);
     finish();
   }

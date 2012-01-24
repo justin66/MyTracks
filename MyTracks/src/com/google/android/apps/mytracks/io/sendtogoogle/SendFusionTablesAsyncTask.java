@@ -50,7 +50,7 @@ import java.util.Vector;
  */
 public class SendFusionTablesAsyncTask extends AsyncTask<Void, Integer, Boolean> {
 
-  private static final String APP_NAME_PREFIX = "Google-My-Tracks-";
+  private static final String APP_NAME_PREFIX = "Google-MyTracks-";
   private static final String SQL_KEY = "sql=";
   private static final String CONTENT_TYPE = "application/x-www-form-urlencoded";
   private static final String SERVICE_ID = "fusiontables";
@@ -91,9 +91,13 @@ public class SendFusionTablesAsyncTask extends AsyncTask<Void, Integer, Boolean>
    */
   private boolean completed;
 
+  /**
+   * True if the result is success.
+   */
+  private boolean success;
+  
   // The following variables are for per upload states
   private String authToken;
-  private boolean success;
   private String tableId;
   int currentSegment;
 
@@ -110,6 +114,7 @@ public class SendFusionTablesAsyncTask extends AsyncTask<Void, Integer, Boolean>
 
     canRetry = true;
     completed = false;
+    success = false;
   }
 
   /**
@@ -143,6 +148,7 @@ public class SendFusionTablesAsyncTask extends AsyncTask<Void, Integer, Boolean>
 
   @Override
   protected void onPostExecute(Boolean result) {
+    success = result;
     completed = true;
     if (success) {
       Track track = myTracksProviderUtils.getTrack(trackId);
@@ -166,7 +172,6 @@ public class SendFusionTablesAsyncTask extends AsyncTask<Void, Integer, Boolean>
   private boolean doUpload() {
     // Reset the per upload states
     authToken = null;
-    success = false;
     tableId = null;
     currentSegment = 1;
 
@@ -577,8 +582,8 @@ public class SendFusionTablesAsyncTask extends AsyncTask<Void, Integer, Boolean>
       Log.d(TAG, e.getMessage());
       return false;
     }
-    success = response.isSuccessStatusCode();
-    if (success) {
+    boolean isSuccess = response.isSuccessStatusCode();
+    if (isSuccess) {
       InputStream content;
       try {
         content = response.getContent();
