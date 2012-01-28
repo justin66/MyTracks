@@ -15,6 +15,7 @@
  */
 package com.google.android.apps.mytracks.io.maps;
 
+import com.google.android.apps.mytracks.io.gdata.maps.MapsMapMetadata;
 import com.google.android.maps.mytracks.R;
 
 import android.accounts.Account;

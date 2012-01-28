@@ -1,5 +1,6 @@
 // Copyright 2009 Google Inc. All Rights Reserved.
-package com.google.android.apps.mytracks.io.maps;
+package com.google.android.apps.mytracks.io.gdata.maps;
+
 
 /**
  * Metadata about a maps feature.

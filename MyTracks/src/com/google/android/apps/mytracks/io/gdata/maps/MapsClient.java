@@ -1,5 +1,5 @@
 // Copyright 2010 Google Inc. All Rights Reserved.
-package com.google.android.apps.mytracks.io.maps;
+package com.google.android.apps.mytracks.io.gdata.maps;
 
 import com.google.wireless.gdata.client.GDataClient;
 import com.google.wireless.gdata.client.GDataParserFactory;
@@ -10,7 +10,7 @@ import android.util.Log;
 /**
  * Client to talk to Google Maps via GData.
  */
-class MapsClient extends GDataServiceClient {
+public class MapsClient extends GDataServiceClient {
   private static final boolean DEBUG = false;
   public static final boolean LOG_COMMUNICATION = false;
 

@@ -13,9 +13,10 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.android.apps.mytracks.io.sendtogoogle;
+package com.google.android.apps.mytracks.io.fusiontables;
 
 import com.google.android.apps.mytracks.content.Track;
+import com.google.android.apps.mytracks.io.fusiontables.SendFusionTablesUtils;
 import com.google.android.apps.mytracks.stats.TripStatistics;
 
 import android.location.Location;

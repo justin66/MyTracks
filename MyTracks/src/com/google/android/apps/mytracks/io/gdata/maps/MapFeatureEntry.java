@@ -1,5 +1,5 @@
 // Copyright 2010 Google Inc. All Rights Reserved.
-package com.google.android.apps.mytracks.io.maps;
+package com.google.android.apps.mytracks.io.gdata.maps;
 
 import com.google.wireless.gdata.data.Entry;
 
@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * GData entry for a map feature.
  */
-class MapFeatureEntry extends Entry {
+public class MapFeatureEntry extends Entry {
 
   private String mPrivacy = null;
   private Map<String, String> mAttributes = new HashMap<String, String>();

@@ -1,5 +1,5 @@
 // Copyright 2009 Google Inc. All Rights Reserved.
-package com.google.android.apps.mytracks.io.maps;
+package com.google.android.apps.mytracks.io.gdata.maps;
 
 import com.google.wireless.gdata.data.Entry;
 import com.google.wireless.gdata.data.StringUtils;
@@ -17,7 +17,7 @@ import org.xmlpull.v1.XmlSerializer;
 /**
  * Converter from GData objects to Maps objects.
  */
-class MapsGDataConverter {
+public class MapsGDataConverter {
 
   private final XmlSerializer xmlSerializer;
 

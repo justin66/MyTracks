@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.wireless.gdata.docs;
+package com.google.android.apps.mytracks.io.gdata.docs;
 
 import com.google.wireless.gdata.client.GDataParserFactory;
 import com.google.wireless.gdata.data.Entry;

@@ -1,10 +1,10 @@
 // Copyright 2009 Google Inc. All Rights Reserved.
-package com.google.android.apps.mytracks.io.maps;
+package com.google.android.apps.mytracks.io.gdata.maps;
 
 /**
  * Metadata about a Google Maps map.
  */
-class MapsMapMetadata {
+public class MapsMapMetadata {
 
   private String title;
   private String description;

@@ -1,5 +1,5 @@
 // Copyright 2010 Google Inc. All Rights Reserved.
-package com.google.android.apps.mytracks.io.maps;
+package com.google.android.apps.mytracks.io.gdata.maps;
 
 import com.google.wireless.gdata.client.GDataParserFactory;
 import com.google.wireless.gdata.data.Entry;
@@ -21,7 +21,7 @@ import org.xmlpull.v1.XmlPullParserException;
 /**
  * Factory of Xml parsers for gdata maps data.
  */
-class XmlMapsGDataParserFactory implements GDataParserFactory {
+public class XmlMapsGDataParserFactory implements GDataParserFactory {
   private XmlParserFactory xmlFactory;
 
   public XmlMapsGDataParserFactory(XmlParserFactory xmlFactory) {

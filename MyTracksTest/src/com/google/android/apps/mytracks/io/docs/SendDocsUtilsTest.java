@@ -16,10 +16,10 @@
 package com.google.android.apps.mytracks.io.docs;
 
 import com.google.android.apps.mytracks.content.Track;
+import com.google.android.apps.mytracks.io.gdata.docs.SpreadsheetsClient.WorksheetEntry;
 import com.google.android.apps.mytracks.stats.TripStatistics;
 import com.google.android.apps.mytracks.util.StringUtils;
 import com.google.wireless.gdata.data.Entry;
-import com.google.wireless.gdata.docs.SpreadsheetsClient.WorksheetEntry;
 
 import android.test.AndroidTestCase;
 

@@ -1,5 +1,5 @@
 // Copyright 2009 Google Inc. All Rights Reserved.
-package com.google.android.apps.mytracks.io.maps;
+package com.google.android.apps.mytracks.io.gdata.maps;
 
 import com.google.android.maps.GeoPoint;
 
@@ -12,7 +12,7 @@ import java.util.Vector;
  * in a {@link MapsFeatureMetadata} object so that it can be more efficiently
  * transmitted to other activities.
  */
-class MapsFeature {
+public class MapsFeature {
 
   private static final long serialVersionUID = 8439035544430497236L;
 
@@ -73,7 +73,7 @@ class MapsFeature {
    * Generates a new local id for this feature based on the current time and
    * a random number.
    */
-  void generateAndroidId() {
+  public void generateAndroidId() {
     long time = System.currentTimeMillis();
     int rand = random.nextInt(10000);
     androidId = time + "." + rand;
@@ -84,7 +84,7 @@ class MapsFeature {
    *
    * @return The local id for this feature
    */
-  String getAndroidId() {
+  public String getAndroidId() {
     return androidId;
   }
 

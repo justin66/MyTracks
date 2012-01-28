@@ -16,6 +16,7 @@
 package com.google.android.apps.mytracks.io.maps;
 
 import com.google.android.apps.mytracks.content.Track;
+import com.google.android.apps.mytracks.io.gdata.maps.MapsFeature;
 import com.google.android.maps.GeoPoint;
 
 import android.location.Location;

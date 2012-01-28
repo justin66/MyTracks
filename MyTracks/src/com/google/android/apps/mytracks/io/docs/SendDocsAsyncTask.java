@@ -18,13 +18,13 @@ package com.google.android.apps.mytracks.io.docs;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
 import com.google.android.apps.mytracks.content.Track;
 import com.google.android.apps.mytracks.io.gdata.GDataClientFactory;
+import com.google.android.apps.mytracks.io.gdata.docs.DocumentsClient;
+import com.google.android.apps.mytracks.io.gdata.docs.SpreadsheetsClient;
+import com.google.android.apps.mytracks.io.gdata.docs.XmlDocsGDataParserFactory;
 import com.google.android.common.gdata.AndroidXmlParserFactory;
 import com.google.android.maps.mytracks.R;
 import com.google.wireless.gdata.client.GDataClient;
 import com.google.wireless.gdata.client.HttpException;
-import com.google.wireless.gdata.docs.DocumentsClient;
-import com.google.wireless.gdata.docs.SpreadsheetsClient;
-import com.google.wireless.gdata.docs.XmlDocsGDataParserFactory;
 import com.google.wireless.gdata.parser.ParseException;
 import com.google.wireless.gdata2.client.AuthenticationException;
 

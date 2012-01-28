@@ -17,6 +17,10 @@ package com.google.android.apps.mytracks.io.maps;
 
 import com.google.android.apps.mytracks.content.Track;
 import com.google.android.apps.mytracks.content.Waypoint;
+import com.google.android.apps.mytracks.io.gdata.maps.MapsClient;
+import com.google.android.apps.mytracks.io.gdata.maps.MapsFeature;
+import com.google.android.apps.mytracks.io.gdata.maps.MapsGDataConverter;
+import com.google.android.apps.mytracks.io.gdata.maps.MapsMapMetadata;
 import com.google.android.maps.GeoPoint;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.wireless.gdata.client.HttpException;
