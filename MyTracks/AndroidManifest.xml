@@ -48,6 +48,7 @@ limitations under the License.
 
   <!-- Permissions for misc services -->
   <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
   <!-- Exported permissions (for other apps to use our features) -->
   <!-- Permission to get track start/end broadcasts -->
