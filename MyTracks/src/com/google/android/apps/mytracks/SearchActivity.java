@@ -17,6 +17,7 @@ package com.google.android.apps.mytracks;
 
 import static com.google.android.apps.mytracks.Constants.TAG;
 
+import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
 import com.google.android.apps.mytracks.content.SearchEngine;
 import com.google.android.apps.mytracks.content.SearchEngine.ScoredResult;
 import com.google.android.apps.mytracks.content.SearchEngine.SearchQuery;
@@ -25,12 +26,16 @@ import com.google.android.apps.mytracks.content.Track;
 import com.google.android.apps.mytracks.content.TracksColumns;
 import com.google.android.apps.mytracks.content.Waypoint;
 import com.google.android.apps.mytracks.content.WaypointsColumns;
+import com.google.android.apps.mytracks.stats.TripStatistics;
+import com.google.android.apps.mytracks.util.StringUtils;
 import com.google.android.maps.mytracks.R;
 
 import android.app.ListActivity;
 import android.app.SearchManager;
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -59,20 +64,34 @@ public class SearchActivity extends ListActivity {
 
   private static final boolean LOG_SCORES = true;
 
+  private MyTracksProviderUtils providerUtils;
   private SearchEngine engine;
   private LocationManager locationManager;
+  private SharedPreferences preferences;
 
   private SearchRecentSuggestions suggestions;
+
+  private boolean metricUnits;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    engine = new SearchEngine(this);
+    providerUtils = MyTracksProviderUtils.Factory.get(this);
+    engine = new SearchEngine(providerUtils);
     suggestions = SearchEngineProvider.newHelper(this);
     locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+    preferences = getSharedPreferences(Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
 
     handleIntent(getIntent());
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+
+    metricUnits =
+        preferences.getBoolean(getString(R.string.metric_units_key), true);
   }
 
   @Override
@@ -146,23 +165,40 @@ public class SearchActivity extends ListActivity {
   }
 
   private void prepareWaypointForDisplay(Waypoint waypoint, Map<String, Object> resultMap) {
+    // Look up the owner track.
+    // TODO: It may be more appropriate to do this as a join in the retrieval phase of the search.
+    String trackName = null;
+    long trackId = waypoint.getTrackId();
+    if (trackId > 0) {
+      Track track = providerUtils.getTrack(trackId);
+      if (track != null) {
+        trackName = track.getName();
+      }
+    }
+
     // TODO: Yellow pushpin for statistics marker.
     resultMap.put("icon", R.drawable.blue_pushpin);
     resultMap.put("name", waypoint.getName());
     resultMap.put("description", waypoint.getDescription());
     resultMap.put("category", waypoint.getCategory());
-    resultMap.put("time", String.format("%tc", waypoint.getLocation().getTime()));
+    resultMap.put("stats", StringUtils.formatDateTime(this, waypoint.getLocation().getTime()));
     resultMap.put("trackId", waypoint.getTrackId());
     resultMap.put("waypointId", waypoint.getId());
+    resultMap.put("time", getString(R.string.track_list_track_name, trackName));
   }
 
   private void prepareTrackForDisplay(Track track, Map<String, Object> resultMap) {
+    TripStatistics stats = track.getStatistics();
+
     resultMap.put("icon", R.drawable.track);
     resultMap.put("name", track.getName());
     resultMap.put("description", track.getDescription());
     resultMap.put("category", track.getCategory());
-    resultMap.put("time", String.format("%tc", track.getStatistics().getStartTime()));
+    resultMap.put("time", StringUtils.formatDateTime(this, stats.getStartTime()));
     resultMap.put("trackId", track.getId());
+    resultMap.put("stats",
+        StringUtils.formatTimeDistance(this, stats.getTotalDistance(), stats.getTotalTime(),
+            metricUnits));
   }
 
   /**
@@ -180,14 +216,16 @@ public class SearchActivity extends ListActivity {
           "name",
           "description",
           "category",
-          "time"
+          "time",
+          "stats",
         },
         new int[] {
-          R.id.trackdetails_item_icon,
-          R.id.trackdetails_item_name,
-          R.id.trackdetails_item_description,
-          R.id.trackdetails_item_category,
-          R.id.trackdetails_item_time
+          R.id.track_list_item_icon,
+          R.id.track_list_item_name,
+          R.id.track_list_item_description,
+          R.id.track_list_item_category,
+          R.id.track_list_item_time,
+          R.id.track_list_item_stats,
         });
 
     setListAdapter(adapter);
