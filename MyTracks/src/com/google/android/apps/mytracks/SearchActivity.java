@@ -146,8 +146,8 @@ public class SearchActivity extends ListActivity {
   }
 
   private void prepareWaypointForDisplay(Waypoint waypoint, Map<String, Object> resultMap) {
-    // TODO: Yellow pushpin for statistics marker.
-    resultMap.put("icon", R.drawable.blue_pushpin);
+    resultMap.put("icon", waypoint.getType() == Waypoint.TYPE_STATISTICS ? R.drawable.ylw_pushpin
+        : R.drawable.blue_pushpin);
     resultMap.put("name", waypoint.getName());
     resultMap.put("description", waypoint.getDescription());
     resultMap.put("category", waypoint.getCategory());
