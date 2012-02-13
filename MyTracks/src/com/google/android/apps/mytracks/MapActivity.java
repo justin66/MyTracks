@@ -30,11 +30,13 @@ import com.google.android.apps.mytracks.io.sendtogoogle.UploadServiceChooserActi
 import com.google.android.apps.mytracks.stats.TripStatistics;
 import com.google.android.apps.mytracks.util.GeoRect;
 import com.google.android.apps.mytracks.util.LocationUtils;
+import com.google.android.apps.mytracks.util.PlayTrackUtils;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 import com.google.android.maps.mytracks.R;
 
+import android.app.Dialog;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.location.Location;
@@ -69,6 +71,8 @@ import java.util.EnumSet;
 public class MapActivity extends com.google.android.maps.MapActivity
     implements View.OnTouchListener, View.OnClickListener,
         TrackDataListener {
+
+  private static final int DIALOG_INSTALL_EARTH = 0;
 
   // Saved instance state keys:
   // ---------------------------
@@ -229,6 +233,16 @@ public class MapActivity extends com.google.android.maps.MapActivity
     dataHub = null;
 
     super.onPause();
+  }
+
+  @Override
+  protected Dialog onCreateDialog(int id) {
+    switch (id) {
+      case DIALOG_INSTALL_EARTH:
+        return PlayTrackUtils.createInstallEarthDialog(this);
+      default:
+        return null;
+    }
   }
 
   // Utility functions:
@@ -427,6 +441,7 @@ public class MapActivity extends com.google.android.maps.MapActivity
             String shareFileFormat = getString(R.string.track_list_share_file);
             String fileTypes[] = getResources().getStringArray(R.array.file_types);
 
+            menu.add(Menu.NONE, Constants.MENU_PLAY, Menu.NONE, R.string.track_list_play);
             menu.add(Menu.NONE, Constants.MENU_SEND_TO_GOOGLE, Menu.NONE,
                 R.string.track_list_send_google);
             SubMenu share = menu.addSubMenu(
@@ -464,6 +479,18 @@ public class MapActivity extends com.google.android.maps.MapActivity
     Intent intent;
     long trackId = dataHub.getSelectedTrackId();
     switch (item.getItemId()) {
+      case Constants.MENU_EDIT: 
+        intent = new Intent(this, TrackDetail.class).putExtra(TrackDetail.TRACK_ID, trackId);
+        startActivity(intent);
+        return true;
+      case Constants.MENU_PLAY:
+        if (PlayTrackUtils.isEarthInstalled(this)) {
+          PlayTrackUtils.playTrack(this, trackId);
+          return true;
+        } else {
+          showDialog(DIALOG_INSTALL_EARTH);
+          return true;
+        }
       case Constants.MENU_SEND_TO_GOOGLE:
         intent = new Intent(this, UploadServiceChooserActivity.class)
             .putExtra(SendRequest.SEND_REQUEST_KEY, new SendRequest(trackId, true, true, true));
@@ -479,31 +506,24 @@ public class MapActivity extends com.google.android.maps.MapActivity
             .putExtra(SendRequest.SEND_REQUEST_KEY, new SendRequest(trackId, false, true, false));
         startActivity(intent);
         return true;
-      case Constants.MENU_SAVE_GPX_FILE:
-      case Constants.MENU_SAVE_KML_FILE:
-      case Constants.MENU_SAVE_CSV_FILE:
-      case Constants.MENU_SAVE_TCX_FILE:
       case Constants.MENU_SHARE_GPX_FILE:
       case Constants.MENU_SHARE_KML_FILE:
       case Constants.MENU_SHARE_CSV_FILE:
       case Constants.MENU_SHARE_TCX_FILE:
+      case Constants.MENU_SAVE_GPX_FILE:
+      case Constants.MENU_SAVE_KML_FILE:
+      case Constants.MENU_SAVE_CSV_FILE:
+      case Constants.MENU_SAVE_TCX_FILE:
         SaveActivity.handleExportTrackAction(
             this, trackId, Constants.getActionFromMenuId(item.getItemId()));
         return true;
-      case Constants.MENU_EDIT: {
-        intent = new Intent(this, TrackDetail.class);
-        intent.putExtra(TrackDetail.TRACK_ID, trackId);
-        startActivity(intent);
+      case Constants.MENU_CLEAR_MAP:
+        dataHub.unloadCurrentTrack();
         return true;
-      }
-      case Constants.MENU_DELETE: {
+      case Constants.MENU_DELETE:
         Uri uri = ContentUris.withAppendedId(TracksColumns.CONTENT_URI, trackId);
         intent = new Intent(Intent.ACTION_DELETE, uri);
         startActivity(intent);
-        return true;
-      }
-      case Constants.MENU_CLEAR_MAP:
-        dataHub.unloadCurrentTrack();
         return true;
       default:
         return super.onMenuItemSelected(featureId, item);

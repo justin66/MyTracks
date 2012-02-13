@@ -2274,6 +2274,16 @@ limitations under the License.
       Screenshot: track_list.png">
     Pick a track. Press &amp; hold for more options.
   </string>
+  <string name="track_list_play"
+    translation_description="In the context menu for a track, the menu option to play the track.">
+    Play
+  </string>
+  <string name="track_list_play_install_earth_message"
+    translation_description="After pressing the menu option to play a track, the message informing
+      the user that he needs Google Earth to play the track and asking him if he wants to install
+      Google Earth from the Android Market.">
+    You need Google Earth to play the track. Do you want to install from the Market?
+  </string>
   <string name="track_list_save_file"
     translation_description="In the context menu for a track, under the 'Save to SD card...'
       option, the menu option to save the track as a certain file format.

@@ -57,26 +57,26 @@ public abstract class Constants {
   public static final int MENU_CHART_SETTINGS = 3;
 
   /*
-   * Context menu ids:
+   * Context menu ids. Sorted alphabetically.
    */
-
-  public static final int MENU_EDIT = 100;
+  public static final int MENU_CLEAR_MAP = 100;
   public static final int MENU_DELETE = 101;
-  public static final int MENU_SEND_TO_GOOGLE = 102;
-  public static final int MENU_SHARE = 103;
-  public static final int MENU_SHOW = 104;
-  public static final int MENU_SHARE_MAP = 200;
-  public static final int MENU_SHARE_FUSION_TABLE = 201;
-  public static final int MENU_SHARE_GPX_FILE = 202;
-  public static final int MENU_SHARE_KML_FILE = 203;
-  public static final int MENU_SHARE_CSV_FILE = 204;
-  public static final int MENU_SHARE_TCX_FILE = 205;
-  public static final int MENU_WRITE_TO_SD_CARD = 206;
-  public static final int MENU_SAVE_GPX_FILE = 207;
-  public static final int MENU_SAVE_KML_FILE = 208;
-  public static final int MENU_SAVE_CSV_FILE = 209;
-  public static final int MENU_SAVE_TCX_FILE = 210;
-  public static final int MENU_CLEAR_MAP = 211;
+  public static final int MENU_EDIT = 102;
+  public static final int MENU_PLAY = 103;
+  public static final int MENU_SAVE_CSV_FILE = 104;
+  public static final int MENU_SAVE_GPX_FILE = 105;
+  public static final int MENU_SAVE_KML_FILE = 106;
+  public static final int MENU_SAVE_TCX_FILE = 107;
+  public static final int MENU_SEND_TO_GOOGLE = 108;
+  public static final int MENU_SHARE = 109;
+  public static final int MENU_SHARE_CSV_FILE = 110;
+  public static final int MENU_SHARE_FUSION_TABLE = 111;
+  public static final int MENU_SHARE_GPX_FILE = 112;
+  public static final int MENU_SHARE_KML_FILE = 113;
+  public static final int MENU_SHARE_MAP = 114;
+  public static final int MENU_SHARE_TCX_FILE = 115;
+  public static final int MENU_SHOW = 116;
+  public static final int MENU_WRITE_TO_SD_CARD = 117;
 
   /**
    * The number of distance readings to smooth to get a stable signal.
