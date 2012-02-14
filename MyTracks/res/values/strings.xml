@@ -1099,7 +1099,7 @@ limitations under the License.
   <string name="search_global_description"
     translation_description="Description of what is searched in My Tracks, to be displayed in the
       global system search settings.">
-    My Tracks tracks and waypoints
+    Tracks and waypoints
   </string>
   <string name="search_hint"
     translation_description="The hint shown on the search box until the user types a search query.
