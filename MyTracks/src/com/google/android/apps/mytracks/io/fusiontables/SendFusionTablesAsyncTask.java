@@ -3,6 +3,8 @@
 package com.google.android.apps.mytracks.io.fusiontables;
 
 import com.google.android.apps.mytracks.Constants;
+import com.google.android.apps.mytracks.content.DescriptionGenerator;
+import com.google.android.apps.mytracks.content.DescriptionGeneratorImpl;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
 import com.google.android.apps.mytracks.content.Track;
 import com.google.android.apps.mytracks.content.Waypoint;
@@ -12,7 +14,6 @@ import com.google.android.apps.mytracks.stats.DoubleBuffer;
 import com.google.android.apps.mytracks.stats.TripStatisticsBuilder;
 import com.google.android.apps.mytracks.util.ApiAdapterFactory;
 import com.google.android.apps.mytracks.util.LocationUtils;
-import com.google.android.apps.mytracks.util.StringUtils;
 import com.google.android.apps.mytracks.util.SystemUtils;
 import com.google.android.apps.mytracks.util.UnitConversions;
 import com.google.android.maps.mytracks.R;
@@ -275,9 +276,9 @@ public class SendFusionTablesAsyncTask extends AbstractSendAsyncTask {
       if (lastLocation != null) {
         distances.add(tripStatisticsBuilder.getStatistics().getTotalDistance());
         elevations.add(elevationBuffer.getAverage());
-        StringUtils stringUtils = new StringUtils(context);
+        DescriptionGenerator descriptionGenerator = new DescriptionGeneratorImpl(context);
         track.setDescription("<p>" + track.getDescription() + "</p><p>"
-            + stringUtils.generateTrackDescription(track, distances, elevations) + "</p>");
+            + descriptionGenerator.generateTrackDescription(track, distances, elevations) + "</p>");
         String name = context.getString(R.string.marker_label_end, track.getName());
         if (!createNewPoint(name, track.getDescription(), lastLocation, MARKER_TYPE_END)) {
           Log.d(TAG, "Unable to create the end marker");

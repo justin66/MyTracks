@@ -15,10 +15,13 @@
  */
 package com.google.android.apps.mytracks.io.file;
 
+import com.google.android.apps.mytracks.content.DescriptionGenerator;
+import com.google.android.apps.mytracks.content.DescriptionGeneratorImpl;
 import com.google.android.apps.mytracks.content.Track;
 import com.google.android.apps.mytracks.content.Waypoint;
 import com.google.android.apps.mytracks.io.file.TrackWriterFactory.TrackFileFormat;
 import com.google.android.apps.mytracks.util.StringUtils;
+import com.google.common.annotations.VisibleForTesting;
 
 import android.content.Context;
 import android.location.Location;
@@ -37,19 +40,17 @@ public class KmlTrackWriter implements TrackFormatWriter {
 
   private final Vector<Double> distances = new Vector<Double>();
   private final Vector<Double> elevations = new Vector<Double>();
-  private final StringUtils stringUtils;
+  private final DescriptionGenerator descriptionGenerator;
   private PrintWriter pw = null;
   private Track track;
 
   public KmlTrackWriter(Context context) {
-    stringUtils = new StringUtils(context);
+    descriptionGenerator = new DescriptionGeneratorImpl(context);
   }
 
-  /**
-   * Testing constructor.
-   */
-  KmlTrackWriter(StringUtils stringUtils) {
-    this.stringUtils = stringUtils;
+  @VisibleForTesting
+  KmlTrackWriter(DescriptionGenerator descriptionGenerator) {
+    this.descriptionGenerator = descriptionGenerator;
   }
 
   @SuppressWarnings("hiding")
@@ -113,7 +114,7 @@ public class KmlTrackWriter implements TrackFormatWriter {
     if (pw != null) {
       pw.println("</MultiGeometry>");
       pw.println("</Placemark>");
-      String description = stringUtils.generateTrackDescription(
+      String description = descriptionGenerator.generateTrackDescription(
           track, distances, elevations);
       writePlacemark("(End)", description, "#sh_red-circle", lastPoint);
     }

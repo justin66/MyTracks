@@ -40,7 +40,7 @@ limitations under the License.
   <string name="my_tracks_support_url">
     groups.google.com/a/googleproductforums.com/forum/#!categories/maps/mytracks
   </string>
-  <string name="my_tracks_web_url">mytracks.appspot.com</string>
+  <string name="my_tracks_web_url">www.google.com/mobile/mytracks</string>
   <string name="permission_notification_value">
     com.google.android.apps.mytracks.MYTRACKS_NOTIFICATIONS
   </string>

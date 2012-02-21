@@ -17,6 +17,7 @@ package com.google.android.apps.mytracks;
 
 import static com.google.android.apps.mytracks.Constants.TAG;
 
+import com.google.android.apps.mytracks.content.DescriptionGeneratorImpl;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
 import com.google.android.apps.mytracks.content.Waypoint;
 import com.google.android.apps.mytracks.content.WaypointCreationRequest;
@@ -319,7 +320,7 @@ public class WaypointsList extends ListActivity
           public void onClick(DialogInterface dialogInterface, int i) {
             dialogInterface.dismiss();
             providerUtils.deleteWaypoint(waypointId,
-                new StringUtils(WaypointsList.this));
+                new DescriptionGeneratorImpl(WaypointsList.this));
           }
         });
     builder.setNegativeButton(getString(R.string.generic_no),

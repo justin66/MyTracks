@@ -1,17 +1,17 @@
 // Copyright 2010 Google Inc. All Rights Reserved.
 package com.google.android.apps.mytracks.io.file;
 
+import com.google.android.apps.mytracks.content.DescriptionGenerator;
 import com.google.android.apps.mytracks.content.Track;
-import com.google.android.apps.mytracks.io.file.KmlTrackWriter;
-import com.google.android.apps.mytracks.util.StringUtils;
+import com.google.android.apps.mytracks.content.Waypoint;
 
 import android.location.Location;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import java.util.List;
 import java.util.Vector;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Tests for the KML track exporter.
@@ -22,26 +22,27 @@ public class KmlTrackWriterTest extends TrackFormatWriterTest {
   private static final String FULL_TRACK_DESCRIPTION = "full track description";
 
   /**
-   * A fake version of {@link StringUtils} which returns a fixed track
+   * A fake version of {@link DescriptionGenerator} which returns a fixed track
    * description, thus not depending on the context.
    */
-  private class FakeStringUtils extends StringUtils {
-    public FakeStringUtils() {
-      super(null);
-    }
-
+  private class MockDescriptionGenerator implements DescriptionGenerator {
     @Override
-    public String generateTrackDescription(Track trackToDescribe,
-        Vector<Double> distances, Vector<Double> elevations) {
+    public String generateTrackDescription(
+        Track trackToDescribe, Vector<Double> distances, Vector<Double> elevations) {
       assertSame(KmlTrackWriterTest.super.track, trackToDescribe);
       assertTrue(distances.isEmpty());
       assertTrue(elevations.isEmpty());
       return FULL_TRACK_DESCRIPTION;
     }
+
+    @Override
+    public String generateWaypointDescription(Waypoint waypoint) {
+      return null;
+    }
   }
 
   public void testXmlOutput() throws Exception {
-    KmlTrackWriter writer = new KmlTrackWriter(new FakeStringUtils());
+    KmlTrackWriter writer = new KmlTrackWriter(new MockDescriptionGenerator());
     String result = writeTrack(writer);
     Document doc = parseXmlDocument(result);
 

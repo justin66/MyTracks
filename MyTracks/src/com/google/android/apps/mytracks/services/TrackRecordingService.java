@@ -20,6 +20,8 @@ import static com.google.android.apps.mytracks.Constants.TAG;
 
 import com.google.android.apps.mytracks.Constants;
 import com.google.android.apps.mytracks.MyTracks;
+import com.google.android.apps.mytracks.content.DescriptionGenerator;
+import com.google.android.apps.mytracks.content.DescriptionGeneratorImpl;
 import com.google.android.apps.mytracks.content.MyTracksLocation;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
 import com.google.android.apps.mytracks.content.Sensor;
@@ -37,7 +39,6 @@ import com.google.android.apps.mytracks.services.tasks.StatusAnnouncerFactory;
 import com.google.android.apps.mytracks.stats.TripStatistics;
 import com.google.android.apps.mytracks.stats.TripStatisticsBuilder;
 import com.google.android.apps.mytracks.util.LocationUtils;
-import com.google.android.apps.mytracks.util.StringUtils;
 import com.google.android.maps.mytracks.R;
 import com.google.common.annotations.VisibleForTesting;
 
@@ -982,7 +983,7 @@ public class TrackRecordingService extends Service {
    * @param waypoint The waypoint which will be populated with stats data.
    */
   private void buildStatisticsMarker(Waypoint waypoint) {
-    StringUtils utils = new StringUtils(TrackRecordingService.this);
+    DescriptionGenerator descriptionGenerator = new DescriptionGeneratorImpl(this);
 
     // Set stop and total time in the stats data
     final long time = System.currentTimeMillis();
@@ -996,7 +997,7 @@ public class TrackRecordingService extends Service {
     waypoint.setType(Waypoint.TYPE_STATISTICS);
     waypoint.setName(getString(R.string.marker_type_statistics));
     waypoint.setStatistics(waypointStatsBuilder.getStatistics());
-    waypoint.setDescription(utils.generateWaypointDescription(waypoint));
+    waypoint.setDescription(descriptionGenerator.generateWaypointDescription(waypoint));
     waypoint.setIcon(getString(R.string.marker_statistics_icon_url));
 
     waypoint.setStartId(providerUtils.getLastLocationId(recordingTrackId));

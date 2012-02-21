@@ -16,6 +16,8 @@
 package com.google.android.apps.mytracks.io.maps;
 
 import com.google.android.apps.mytracks.Constants;
+import com.google.android.apps.mytracks.content.DescriptionGenerator;
+import com.google.android.apps.mytracks.content.DescriptionGeneratorImpl;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
 import com.google.android.apps.mytracks.content.Track;
 import com.google.android.apps.mytracks.content.Waypoint;
@@ -29,7 +31,6 @@ import com.google.android.apps.mytracks.io.sendtogoogle.SendToGoogleUtils;
 import com.google.android.apps.mytracks.stats.DoubleBuffer;
 import com.google.android.apps.mytracks.stats.TripStatisticsBuilder;
 import com.google.android.apps.mytracks.util.LocationUtils;
-import com.google.android.apps.mytracks.util.StringUtils;
 import com.google.android.apps.mytracks.util.UnitConversions;
 import com.google.android.common.gdata.AndroidXmlParserFactory;
 import com.google.android.maps.mytracks.R;
@@ -215,7 +216,7 @@ public class SendMapsAsyncTask extends AbstractSendAsyncTask {
           context.getString(R.string.default_map_public_key), true);
       try {
         String description = track.getCategory() + "\n" + track.getDescription() + "\n"
-            + StringUtils.getCreatedByMyTracks(context, false);
+            + context.getString(R.string.send_google_by_my_tracks, "", "");
         mapId = SendMapsUtils.createNewMap(
             track.getName(), description, mapPublic, mapsClient, authToken);
       } catch (ParseException e) {
@@ -312,9 +313,9 @@ public class SendMapsAsyncTask extends AbstractSendAsyncTask {
       if (lastLocation != null) {
         distances.add(tripStatisticsBuilder.getStatistics().getTotalDistance());
         elevations.add(elevationBuffer.getAverage());
-        StringUtils stringUtils = new StringUtils(context);
+        DescriptionGenerator descriptionGenerator = new DescriptionGeneratorImpl(context);
         track.setDescription("<p>" + track.getDescription() + "</p><p>"
-            + stringUtils.generateTrackDescription(track, distances, elevations) + "</p>");
+            + descriptionGenerator.generateTrackDescription(track, distances, elevations) + "</p>");
         if (!uploadMarker(context.getString(R.string.marker_label_end, track.getName()),
             track.getDescription(), END_ICON_URL, lastLocation)) {
           Log.d(TAG, "Unable to create an end marker");

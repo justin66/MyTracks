@@ -15,15 +15,9 @@
  */
 package com.google.android.apps.mytracks.util;
 
-import com.google.android.apps.mytracks.Constants;
-import com.google.android.apps.mytracks.content.DescriptionGenerator;
-import com.google.android.apps.mytracks.content.Track;
-import com.google.android.apps.mytracks.content.Waypoint;
-import com.google.android.apps.mytracks.stats.TripStatistics;
 import com.google.android.maps.mytracks.R;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.text.format.DateUtils;
 
 import java.text.DateFormat;
@@ -32,7 +26,6 @@ import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.SimpleTimeZone;
-import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,9 +35,9 @@ import java.util.regex.Pattern;
  * @author Sandor Dornbush
  * @author Rodrigo Damazio
  */
-public class StringUtils implements DescriptionGenerator {
+public class StringUtils {
 
-  private final Context context;
+  private StringUtils() {}
 
   /**
    * Formats the date and time based on user's phone date/time preferences.
@@ -235,269 +228,5 @@ public class StringUtils implements DescriptionGenerator {
     parts[2] = tmp / 60;
 
     return parts;
-  }
-
-  public StringUtils(Context context) {
-    this.context = context;
-  }
-
-  /**
-   * Generates a description for a track (with information about the
-   * statistics).
-   *
-   * @param track the track
-   * @return a track description
-   */
-  public String generateTrackDescription(Track track, Vector<Double> distances,
-      Vector<Double> elevations) {
-    boolean displaySpeed = true;
-    SharedPreferences preferences = context.getSharedPreferences(
-        Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
-    if (preferences != null) {
-      displaySpeed =
-          preferences.getBoolean(context.getString(R.string.report_speed_key), true);
-    }
-
-    TripStatistics trackStats = track.getStatistics();
-    final double distanceInKm = trackStats.getTotalDistance() * UnitConversions.M_TO_KM;
-    final double distanceInMiles = distanceInKm * UnitConversions.KM_TO_MI;
-    final long minElevationInMeters = Math.round(trackStats.getMinElevation());
-    final long minElevationInFeet =
-        Math.round(trackStats.getMinElevation() * UnitConversions.M_TO_FT);
-    final long maxElevationInMeters = Math.round(trackStats.getMaxElevation());
-    final long maxElevationInFeet =
-        Math.round(trackStats.getMaxElevation() * UnitConversions.M_TO_FT);
-    final long elevationGainInMeters =
-        Math.round(trackStats.getTotalElevationGain());
-    final long elevationGainInFeet = Math.round(
-        trackStats.getTotalElevationGain() * UnitConversions.M_TO_FT);
-
-    long minGrade = 0;
-    long maxGrade = 0;
-    double trackMaxGrade = trackStats.getMaxGrade();
-    double trackMinGrade = trackStats.getMinGrade();
-    if (!Double.isNaN(trackMaxGrade)
-        && !Double.isInfinite(trackMaxGrade)) {
-      maxGrade = Math.round(trackMaxGrade * 100);
-    }
-    if (!Double.isNaN(trackMinGrade) && !Double.isInfinite(trackMinGrade)) {
-      minGrade = Math.round(trackMinGrade * 100);
-    }
-
-    String category = context.getString(R.string.value_unknown);
-    String trackCategory = track.getCategory();
-    if (trackCategory != null && trackCategory.length() > 0) {
-      category = trackCategory;
-    }
-
-    String averageSpeed =
-        getSpeedString(trackStats.getAverageSpeed(),
-            R.string.stat_average_speed,
-            R.string.stat_average_pace,
-            displaySpeed);
-
-    String averageMovingSpeed =
-        getSpeedString(trackStats.getAverageMovingSpeed(),
-            R.string.stat_average_moving_speed,
-            R.string.stat_average_moving_pace,
-            displaySpeed);
-
-    String maxSpeed =
-        getSpeedString(trackStats.getMaxSpeed(),
-            R.string.stat_max_speed,
-            R.string.stat_min_pace,
-            displaySpeed);
-
-    return String.format("%s<p>"
-        + "%s: %.2f %s (%.1f %s)<br>"
-        + "%s: %s<br>"
-        + "%s: %s<br>"
-        + "%s %s %s"
-        + "%s: %d %s (%d %s)<br>"
-        + "%s: %d %s (%d %s)<br>"
-        + "%s: %d %s (%d %s)<br>"
-        + "%s: %d %%<br>"
-        + "%s: %d %%<br>"
-        + "%s: %s<br>"
-        + "%s: %s<br>"
-        + "<img border=\"0\" src=\"%s\"/>",
-
-        // Line 1
-        getCreatedByMyTracks(context, true),
-
-        // Line 2
-        context.getString(R.string.stat_total_distance),
-        distanceInKm, context.getString(R.string.unit_kilometer),
-        distanceInMiles, context.getString(R.string.unit_mile),
-
-        // Line 3
-        context.getString(R.string.stat_total_time),
-        StringUtils.formatElapsedTime(trackStats.getTotalTime()),
-
-        // Line 4
-        context.getString(R.string.stat_moving_time),
-        StringUtils.formatElapsedTime(trackStats.getMovingTime()),
-
-        // Line 5
-        averageSpeed, averageMovingSpeed, maxSpeed,
-
-        // Line 6
-        context.getString(R.string.stat_min_elevation),
-        minElevationInMeters, context.getString(R.string.unit_meter),
-        minElevationInFeet, context.getString(R.string.unit_feet),
-
-        // Line 7
-        context.getString(R.string.stat_max_elevation),
-        maxElevationInMeters, context.getString(R.string.unit_meter),
-        maxElevationInFeet, context.getString(R.string.unit_feet),
-
-        // Line 8
-        context.getString(R.string.stat_elevation_gain),
-        elevationGainInMeters, context.getString(R.string.unit_meter),
-        elevationGainInFeet, context.getString(R.string.unit_feet),
-
-        // Line 9
-        context.getString(R.string.stat_max_grade), maxGrade,
-
-        // Line 10
-        context.getString(R.string.stat_min_grade), minGrade,
-
-        // Line 11
-        context.getString(R.string.send_google_recorded),
-        StringUtils.formatDateTime(context, trackStats.getStartTime()),
-
-        // Line 12
-        context.getString(R.string.track_detail_activity_type_hint), category,
-
-        // Line 13
-        ChartURLGenerator.getChartUrl(distances, elevations, track, context));
-  }
-
-  /**
-   * Returns the 'Created by My Tracks on Android' string.
-   *
-   * @param context the context
-   * @param addLink true to add a link to the My Tracks web site
-   */
-  public static String getCreatedByMyTracks(Context context, boolean addLink) {
-    String format = context.getString(R.string.send_google_by_my_tracks);
-    if (addLink) {
-      String url = context.getString(R.string.my_tracks_web_url);
-      return String.format(format, "<a href='http://" + url + "'>", "</a>");
-    } else {
-      return String.format(format, "", "");
-    }
-  }
-
-  private String getSpeedString(double speed, int speedLabel, int paceLabel,
-      boolean displaySpeed) {
-    double speedInKph = speed * UnitConversions.MS_TO_KMH;
-    double speedInMph = speedInKph * UnitConversions.KM_TO_MI;
-    if (displaySpeed) {
-      return String.format("%s: %.2f %s (%.1f %s)<br>",
-          context.getString(speedLabel),
-          speedInKph, context.getString(R.string.unit_kilometer_per_hour),
-          speedInMph, context.getString(R.string.unit_mile_per_hour));
-    } else {
-      double paceInKm;
-      double paceInMi;
-      if (speed == 0) {
-        paceInKm = 0.0;
-        paceInMi = 0.0;
-      } else {
-        paceInKm = 60.0 / speedInKph;
-        paceInMi = 60.0 / speedInMph;
-      }
-      return String.format("%s: %.2f %s (%.1f %s)<br>",
-          context.getString(paceLabel),
-          paceInKm, context.getString(R.string.unit_minute_per_kilometer),
-          paceInMi, context.getString(R.string.unit_minute_per_mile));
-    }
-  }
-
-  /**
-   * Generates a description for a waypoint (with information about the
-   * statistics).
-   *
-   * @return a track description
-   */
-  public String generateWaypointDescription(Waypoint waypoint) {
-    TripStatistics stats = waypoint.getStatistics();
-
-    final double distanceInKm = stats.getTotalDistance() * UnitConversions.M_TO_KM;
-    final double distanceInMiles = distanceInKm * UnitConversions.KM_TO_MI;
-    final double averageSpeedInKmh = stats.getAverageSpeed() * UnitConversions.MS_TO_KMH;
-    final double averageSpeedInMph =
-        averageSpeedInKmh * UnitConversions.KM_TO_MI;
-    final double movingSpeedInKmh = stats.getAverageMovingSpeed() * UnitConversions.MS_TO_KMH;
-    final double movingSpeedInMph =
-        movingSpeedInKmh * UnitConversions.KM_TO_MI;
-    final double maxSpeedInKmh = stats.getMaxSpeed() * UnitConversions.MS_TO_KMH;
-    final double maxSpeedInMph = maxSpeedInKmh * UnitConversions.KM_TO_MI;
-    final long minElevationInMeters = Math.round(stats.getMinElevation());
-    final long minElevationInFeet =
-        Math.round(stats.getMinElevation() * UnitConversions.M_TO_FT);
-    final long maxElevationInMeters = Math.round(stats.getMaxElevation());
-    final long maxElevationInFeet =
-        Math.round(stats.getMaxElevation() * UnitConversions.M_TO_FT);
-    final long elevationGainInMeters =
-        Math.round(stats.getTotalElevationGain());
-    final long elevationGainInFeet = Math.round(
-        stats.getTotalElevationGain() * UnitConversions.M_TO_FT);
-    long theMinGrade = 0;
-    long theMaxGrade = 0;
-    double maxGrade = stats.getMaxGrade();
-    double minGrade = stats.getMinGrade();
-    if (!Double.isNaN(maxGrade) &&
-        !Double.isInfinite(maxGrade)) {
-      theMaxGrade = Math.round(maxGrade * 100);
-    }
-    if (!Double.isNaN(minGrade) &&
-        !Double.isInfinite(minGrade)) {
-      theMinGrade = Math.round(minGrade * 100);
-    }
-    final String percent = "%";
-
-    return String.format(
-        "%s: %.2f %s (%.1f %s)\n"
-        + "%s: %s\n"
-        + "%s: %s\n"
-        + "%s: %.2f %s (%.1f %s)\n"
-        + "%s: %.2f %s (%.1f %s)\n"
-        + "%s: %.2f %s (%.1f %s)\n"
-        + "%s: %d %s (%d %s)\n"
-        + "%s: %d %s (%d %s)\n"
-        + "%s: %d %s (%d %s)\n"
-        + "%s: %d %s\n"
-        + "%s: %d %s\n",
-        context.getString(R.string.stat_total_distance),
-            distanceInKm, context.getString(R.string.unit_kilometer),
-            distanceInMiles, context.getString(R.string.unit_mile),
-        context.getString(R.string.stat_total_time),
-            StringUtils.formatElapsedTime(stats.getTotalTime()),
-        context.getString(R.string.stat_moving_time),
-            StringUtils.formatElapsedTime(stats.getMovingTime()),
-        context.getString(R.string.stat_average_speed),
-            averageSpeedInKmh, context.getString(R.string.unit_kilometer_per_hour),
-            averageSpeedInMph, context.getString(R.string.unit_mile_per_hour),
-        context.getString(R.string.stat_average_moving_speed),
-            movingSpeedInKmh, context.getString(R.string.unit_kilometer_per_hour),
-            movingSpeedInMph, context.getString(R.string.unit_mile_per_hour),
-        context.getString(R.string.stat_max_speed),
-            maxSpeedInKmh, context.getString(R.string.unit_kilometer_per_hour),
-            maxSpeedInMph, context.getString(R.string.unit_mile_per_hour),
-        context.getString(R.string.stat_min_elevation),
-            minElevationInMeters, context.getString(R.string.unit_meter),
-            minElevationInFeet, context.getString(R.string.unit_feet),
-        context.getString(R.string.stat_max_elevation),
-            maxElevationInMeters, context.getString(R.string.unit_meter),
-            maxElevationInFeet, context.getString(R.string.unit_feet),
-        context.getString(R.string.stat_elevation_gain),
-            elevationGainInMeters, context.getString(R.string.unit_meter),
-            elevationGainInFeet, context.getString(R.string.unit_feet),
-        context.getString(R.string.stat_max_grade),
-            theMaxGrade, percent,
-        context.getString(R.string.stat_min_grade),
-            theMinGrade, percent);
   }
 }
