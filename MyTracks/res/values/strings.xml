@@ -507,6 +507,34 @@ limitations under the License.
       %2$d elevation in feet">
     Elevation gain: %1$d m (%2$d ft)
   </string>
+  <string name="description_location_accuracy"
+    translation_description="Label for location accuracy in meters.">
+    Accuracy (m)
+  </string>
+  <string name="description_location_altitude"
+    translation_description="Label for location altitude in degrees.">
+    Altitude (m)
+  </string>
+  <string name="description_location_bearing"
+    translation_description="Label for location bearing in degrees.">
+    Bearing (deg)
+  </string>
+  <string name="description_location_latitude"
+    translation_description="Label for location latitude in degrees.">
+    Latitude (deg)
+  </string>
+  <string name="description_location_longitude"
+    translation_description="Label for location longitude in degrees.">
+    Longitude (deg)
+  </string>
+  <string name="description_location_speed"
+    translation_description="Label for location speed in meters per second.">
+    Speed (m/s)
+  </string>
+  <string name="description_location_time"
+    translation_description="Label for location time.">
+    Time
+  </string>
   <string name="description_max_elevation"
     translation_description="Max elevation description.
     
@@ -575,6 +603,14 @@ limitations under the License.
     translation_description="Label for power with its unit watt (W).">
     Power (W)
   </string>
+  <string name="description_track_point"
+    translation_description="Label for a track point">
+    Point
+  </string>
+  <string name="description_track_segment"
+    translation_description="Label for a track segment">
+    Segment
+  </string>
   <string name="description_total_distance"
     translation_description="Total distance description.
       
@@ -588,7 +624,7 @@ limitations under the License.
       %1$s time. E.g., '1:08:59'">
     Total time: %1$s
   </string>
-     
+
   <!-- EULA -->
   <string name="eula_accept"
     translation_description="In the 'Terms of service' dialog, the button to accept.
