@@ -43,13 +43,13 @@ public class ChartActivityTest extends ActivityInstrumentationTestCase2<ChartAct
   private View zoomOut;
   private int currentZoomLevel;
 
-  private final String LOCATION_PROVIDER = "gps";
-  private final double INITIAL_LONGTITUDE = 22;
-  private final double INITIAL_LATITUDE = 22;
-  private final double INITIAL_ALTITUDE = 22;
-  private final float INITIAL_ACCURACY = 5;
-  private final float INITIAL_SPEED = 10;
-  private final float INITIAL_BEARING = 3.0f;
+  private static final String LOCATION_PROVIDER = "gps";
+  private static final double INITIAL_LONGTITUDE = 22;
+  private static final double INITIAL_LATITUDE = 22;
+  private static final double INITIAL_ALTITUDE = 22;
+  private static final float INITIAL_ACCURACY = 5;
+  private static final float INITIAL_SPEED = 10;
+  private static final float INITIAL_BEARING = 3.0f;
   // 10 is same with the default value in ChartView
   private final int MAX_ZOOM_LEVEL = 10;
   private final int MIN_ZOOM_LEVEL = 1;
@@ -214,7 +214,7 @@ public class ChartActivityTest extends ActivityInstrumentationTestCase2<ChartAct
 
     // The third location is a new location, and use metric.
     MyTracksLocation myTracksLocation3 = getMyTracksLocation();
-    myTracksLocation3.setLatitude(23);
+    myTracksLocation3.setLatitude(INITIAL_LONGTITUDE + 1 );
     point = fillDataPointTestHelper(myTracksLocation3, false);
     // Computes the distance between Latitude 22 and 23.
     float[] results = new float[4];
@@ -225,7 +225,7 @@ public class ChartActivityTest extends ActivityInstrumentationTestCase2<ChartAct
 
     // The fourth location is a new location, and use metric.
     MyTracksLocation myTracksLocation4 = getMyTracksLocation();
-    myTracksLocation4.setLatitude(24);
+    myTracksLocation4.setLatitude(INITIAL_LONGTITUDE + 2 );
     point = fillDataPointTestHelper(myTracksLocation4, false);
     // Computes the distance between Latitude 23 and 24.
 
@@ -250,7 +250,7 @@ public class ChartActivityTest extends ActivityInstrumentationTestCase2<ChartAct
 
     // The second location is a new location, and use imperial.
     MyTracksLocation myTracksLocation2 = getMyTracksLocation();
-    myTracksLocation2.setLatitude(23);
+    myTracksLocation2.setLatitude(INITIAL_LONGTITUDE + 1 );
     point = fillDataPointTestHelper(myTracksLocation2, false);
     /*
      * Computes the distance between Latitude 22 and 23. And for we set using
@@ -264,7 +264,7 @@ public class ChartActivityTest extends ActivityInstrumentationTestCase2<ChartAct
 
     // The third location is a new location, and use imperial.
     MyTracksLocation myTracksLocation3 = getMyTracksLocation();
-    myTracksLocation3.setLatitude(24);
+    myTracksLocation3.setLatitude(INITIAL_LONGTITUDE + 2 );
     point = fillDataPointTestHelper(myTracksLocation3, false);
     /*
      * Computes the distance between Latitude 23 and 24. And for we set using
@@ -274,7 +274,7 @@ public class ChartActivityTest extends ActivityInstrumentationTestCase2<ChartAct
     Location.distanceBetween(myTracksLocation2.getLatitude(), myTracksLocation2.getLongitude(),
         myTracksLocation3.getLatitude(), myTracksLocation3.getLongitude(), results);
     double distance2 = results[0] * UnitConversions.KM_TO_MI;
-    assertEquals((distance1 + distance2) / KILOMETER_TO_METER, point[0]);
+    assertEquals(distance1 / KILOMETER_TO_METER + distance2 / KILOMETER_TO_METER , point[0]);
   }
 
   /**
@@ -390,7 +390,7 @@ public class ChartActivityTest extends ActivityInstrumentationTestCase2<ChartAct
    * 
    * @return a simulated location.
    */
-  private MyTracksLocation getMyTracksLocation() {
+  public static MyTracksLocation getMyTracksLocation() {
     // Initial Location
     Location loc = new Location(LOCATION_PROVIDER);
     loc.setLongitude(INITIAL_LONGTITUDE);
