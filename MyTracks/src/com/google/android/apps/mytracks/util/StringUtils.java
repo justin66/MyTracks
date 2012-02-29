@@ -18,6 +18,7 @@ package com.google.android.apps.mytracks.util;
 import com.google.android.maps.mytracks.R;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.text.format.DateUtils;
 
 import java.text.DateFormat;
@@ -68,6 +69,16 @@ public class StringUtils {
    */
   public static String formatElapsedTime(long time) {
     return DateUtils.formatElapsedTime(time / 1000);
+  }
+  
+  /**
+   * Formats the elapsed time in the form "H:MM:SS".
+   * 
+   * @param time the time in milliseconds
+   */
+  public static String formatElapsedTimeWithHour(long time) {
+    String value = formatElapsedTime(time);
+    return TextUtils.split(value, ":").length == 2 ? "0:" + value : value;
   }
 
   /**

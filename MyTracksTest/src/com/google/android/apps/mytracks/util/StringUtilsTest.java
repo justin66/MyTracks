@@ -79,4 +79,44 @@ public class StringUtilsTest extends TestCase {
     calendar.set(GregorianCalendar.MILLISECOND, millis);
     assertEquals(calendar.getTimeInMillis(), timestamp);
   }
+
+  /**
+   * Tests {@link StringUtils#formatElapsedTime(long)}.
+   */
+  public void testformatElapsedTime() {
+    // 1 second
+    assertEquals("00:01", StringUtils.formatElapsedTime(1000));
+    // 10 seconds
+    assertEquals("00:10", StringUtils.formatElapsedTime(10000));
+    // 1 minute
+    assertEquals("01:00", StringUtils.formatElapsedTime(60000));
+    // 10 minutes
+    assertEquals("10:00", StringUtils.formatElapsedTime(600000));
+    // 1 hour
+    assertEquals("1:00:00", StringUtils.formatElapsedTime(3600000));
+    // 10 hours
+    assertEquals("10:00:00", StringUtils.formatElapsedTime(36000000));
+    // 100 hours
+    assertEquals("100:00:00", StringUtils.formatElapsedTime(360000000));
+  }
+
+  /**
+   * Tests {@link StringUtils#formatElapsedTimeWithHour(long)}.
+   */
+  public void testformatElapsedTimeWithHour() {
+    // 1 second
+    assertEquals("0:00:01", StringUtils.formatElapsedTimeWithHour(1000));
+    // 10 seconds
+    assertEquals("0:00:10", StringUtils.formatElapsedTimeWithHour(10000));
+    // 1 minute
+    assertEquals("0:01:00", StringUtils.formatElapsedTimeWithHour(60000));
+    // 10 minutes
+    assertEquals("0:10:00", StringUtils.formatElapsedTimeWithHour(600000));
+    // 1 hour
+    assertEquals("1:00:00", StringUtils.formatElapsedTimeWithHour(3600000));
+    // 10 hours
+    assertEquals("10:00:00", StringUtils.formatElapsedTimeWithHour(36000000));
+    // 100 hours
+    assertEquals("100:00:00", StringUtils.formatElapsedTimeWithHour(360000000));
+  }
 }
