@@ -43,6 +43,11 @@ import java.util.ArrayList;
  */
 public class KmlTrackWriter implements TrackFormatWriter {
 
+  /**
+   * ID of the KML feature to play a tour.
+   */
+  public static final String TOUR_FEATURE_ID = "tour";
+
   private static final String WAYPOINT_STYLE = "waypoint";
   private static final String STATISTICS_STYLE = "statistics";
   private static final String START_STYLE = "start";
@@ -169,7 +174,7 @@ public class KmlTrackWriter implements TrackFormatWriter {
     if (printWriter != null) {
       String name = context.getString(R.string.marker_label_start, track.getName());
       writePlacemark(name, track.getDescription(), START_STYLE, firstLocation);
-      printWriter.println("<Placemark>");
+      printWriter.println("<Placemark id=\"" + TOUR_FEATURE_ID + "\">");
       printWriter.println(
           "<description>" + StringUtils.stringAsCData(track.getDescription()) + "</description>");
       printWriter.println("<name>" + StringUtils.stringAsCData(track.getName()) + "</name>");
