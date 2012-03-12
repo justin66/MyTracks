@@ -548,6 +548,13 @@ limitations under the License.
       %1$d grade in percentage">
     Max grade: %1$d %%
   </string>
+  <string name="description_max_pace"
+    translation_description="Max pace description.
+
+      %1$.2f pace in minutes per kilometer
+      %2$.1f pace in minutes per mile">
+    Max pace: %1$.2f min/km (%2$.1f min/mi)
+  </string>
   <string name="description_max_speed"
     translation_description="Max speed description.
 
@@ -567,13 +574,6 @@ limitations under the License.
     
       %1$d grade in percentage">
     Min grade: %1$d %%
-  </string>
-  <string name="description_min_pace"
-    translation_description="Min pace description.
-
-      %1$.2f pace in minutes per kilometer
-      %2$.1f pace in minutes per mile">
-    Min pace: %1$.2f min/km (%2$.1f min/mi)
   </string>
   <string name="description_moving_time"
     translation_description="Moving time description.
@@ -2263,6 +2263,10 @@ limitations under the License.
       Screenshot: stat_speed.png">
     Max grade
   </string>
+  <string name="stat_max_pace"
+    translation_description="In the 'Statistics' page, the maximum pace.">
+    Max pace
+  </string>
   <string name="stat_max_speed"
     translation_description="In the 'Statistics' page, the maximum speed.
 
@@ -2280,12 +2284,6 @@ limitations under the License.
 
       Screenshot: stat_speed.png">
     Min grade
-  </string>
-  <string name="stat_min_pace"
-    translation_description="In the 'Statistics' page, the minimum pace.
-
-      Screenshot: stat_pace.png">
-    Min pace
   </string>
   <string name="stat_moving_time"
     translation_description="In the 'Statistics' page, the moving time.
