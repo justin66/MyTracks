@@ -58,6 +58,17 @@ public class KmlTrackWriter implements TrackFormatWriter {
   private static final String POWER = "power";
   private static final String BATTER_LEVEL = "battery_level";
 
+  private static final String WAYPOINT_ICON =
+      "http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png";
+  private static final String STATISTICS_ICON =
+      "http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png";
+  private static final String START_ICON =
+      "http://maps.google.com/mapfiles/kml/paddle/grn-circle.png";
+  private static final String END_ICON =
+      "http://maps.google.com/mapfiles/kml/paddle/red-circle.png";
+  private static final String TRACK_ICON =
+      "http://earth.google.com/images/kml-icons/track-directional/track-0.png";
+
   private final Context context;
   private final DescriptionGenerator descriptionGenerator;
   private Track track;
@@ -117,14 +128,10 @@ public class KmlTrackWriter implements TrackFormatWriter {
           context.getString(R.string.send_google_by_my_tracks, "", ""))
           + "</atom:name></atom:author>");
       writeTrackStyle();
-      writePlacemarkerStyle(
-          START_STYLE, "http://maps.google.com/mapfiles/kml/paddle/grn-circle.png", 32, 1);
-      writePlacemarkerStyle(
-          END_STYLE, "http://maps.google.com/mapfiles/kml/paddle/red-circle.png", 32, 1);
-      writePlacemarkerStyle(
-          STATISTICS_STYLE, "http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png", 20, 2);
-      writePlacemarkerStyle(
-          WAYPOINT_STYLE, "http://maps.google.com/mapfiles/kml/pushpin/blue-pushpin.png", 20, 2);
+      writePlacemarkerStyle(START_STYLE, START_ICON, 32, 1);
+      writePlacemarkerStyle(END_STYLE, END_ICON, 32, 1);
+      writePlacemarkerStyle(STATISTICS_STYLE, STATISTICS_ICON, 20, 2);
+      writePlacemarkerStyle(WAYPOINT_STYLE, WAYPOINT_ICON, 20, 2);
       printWriter.println("<Schema id=\"" + SCHEMA_ID + "\">");
       writeSensorStyle(POWER, context.getString(R.string.description_sensor_power));
       writeSensorStyle(CADENCE, context.getString(R.string.description_sensor_cadence));
@@ -328,9 +335,13 @@ public class KmlTrackWriter implements TrackFormatWriter {
    * Writes the track style.
    */
   private void writeTrackStyle() {
-    printWriter.println("<Style id=\"" + TRACK_STYLE + "\"><LineStyle>");
-    printWriter.println("<color>7f0000ff</color><width>4</width>");
-    printWriter.println("</LineStyle></Style>");
+    printWriter.println("<Style id=\"" + TRACK_STYLE + "\">");
+    printWriter.println("<LineStyle><color>7f0000ff</color><width>4</width></LineStyle>");
+    printWriter.println("<IconStyle>");
+    printWriter.println("<scale>1.3</scale>");
+    printWriter.println("<Icon><href>" + TRACK_ICON + "</href></Icon>");
+    printWriter.println("</IconStyle>");
+    printWriter.println("</Style>");
   }
 
   /**
