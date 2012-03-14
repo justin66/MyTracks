@@ -114,28 +114,27 @@ public class SaveActivity extends Activity {
     controller.setOnCompletionListener(new WriteProgressController.OnCompletionListener() {
       @Override
       public void onComplete() {
-        onWriteComplete();
+        showDialog(RESULT_DIALOG);
       }
     });
     controller.startWrite();
   }
 
-  private void onWriteComplete() {
-    if (shareFile) {
-      shareWrittenFile();
-    } if (playFile) {
-      playWrittenFile();
-    } else {
-      showResultDialog();
+  /**
+   * To be invoked after showing the result dialog.
+   */
+  private void onPostResultDialog() {
+    if (writer.wasSuccess()) {
+      if (shareFile) {
+        shareWrittenFile();
+      } else if (playFile) {
+        playWrittenFile();
+      }
     }
+    finish();
   }
 
   private void shareWrittenFile() {
-    if (!writer.wasSuccess()) {
-      showResultDialog();
-      return;
-    }
-
     // Share the file.
     Intent shareIntent = new Intent(Intent.ACTION_SEND);
     shareIntent.putExtra(Intent.EXTRA_SUBJECT,
@@ -152,11 +151,6 @@ public class SaveActivity extends Activity {
   }
 
   private void playWrittenFile() {
-    if (!writer.wasSuccess()) {
-      showResultDialog();
-      return;
-    }
-
     Uri uri = Uri.fromFile(new File(writer.getAbsolutePath()));
     Intent intent = new Intent()
         .setClassName(PlayTrackUtils.GOOGLE_EARTH_PACKAGE, PlayTrackUtils.GOOGLE_EARTH_CLASS)
@@ -165,11 +159,6 @@ public class SaveActivity extends Activity {
         .setDataAndType(uri, PlayTrackUtils.KML_MIME_TYPE)
         .putExtra(PlayTrackUtils.TOUR_FEATURE_ID, KmlTrackWriter.TOUR_FEATURE_ID);
     startActivity(intent);
-  }
-
-  private void showResultDialog() {
-    removeDialog(RESULT_DIALOG);
-    showDialog(RESULT_DIALOG);
   }
 
   @Override
@@ -196,14 +185,14 @@ public class SaveActivity extends Activity {
       @Override
       public void onClick(DialogInterface dialog, int arg1) {
         dialog.dismiss();
-        finish();
+        onPostResultDialog();
       }
     });
     builder.setOnCancelListener(new OnCancelListener() {
       @Override
       public void onCancel(DialogInterface dialog) {
         dialog.dismiss();
-        finish();
+        onPostResultDialog();
       }
     });
     builder.setIcon(success ? android.R.drawable.ic_dialog_info :
