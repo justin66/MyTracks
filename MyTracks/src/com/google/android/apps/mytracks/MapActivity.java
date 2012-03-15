@@ -25,6 +25,7 @@ import com.google.android.apps.mytracks.content.TrackDataListener;
 import com.google.android.apps.mytracks.content.TracksColumns;
 import com.google.android.apps.mytracks.content.Waypoint;
 import com.google.android.apps.mytracks.io.file.SaveActivity;
+import com.google.android.apps.mytracks.io.file.TrackWriterFactory.TrackFileFormat;
 import com.google.android.apps.mytracks.io.sendtogoogle.SendRequest;
 import com.google.android.apps.mytracks.io.sendtogoogle.UploadServiceChooserActivity;
 import com.google.android.apps.mytracks.stats.TripStatistics;
@@ -42,6 +43,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
@@ -507,16 +509,57 @@ public class MapActivity extends com.google.android.maps.MapActivity
         startActivity(intent);
         return true;
       case Constants.MENU_SHARE_GPX_FILE:
-      case Constants.MENU_SHARE_KML_FILE:
-      case Constants.MENU_SHARE_CSV_FILE:
-      case Constants.MENU_SHARE_TCX_FILE:
-      case Constants.MENU_SAVE_GPX_FILE:
-      case Constants.MENU_SAVE_KML_FILE:
-      case Constants.MENU_SAVE_CSV_FILE:
-      case Constants.MENU_SAVE_TCX_FILE:
-        SaveActivity.handleExportTrackAction(
-            this, trackId, Constants.getActionFromMenuId(item.getItemId()));
+        intent = new Intent(this, SaveActivity.class)
+            .putExtra(SaveActivity.EXTRA_TRACK_ID, trackId)
+            .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.GPX)
+            .putExtra(SaveActivity.EXTRA_SHARE_TRACK, true);
+        startActivity(intent);
         return true;
+      case Constants.MENU_SHARE_KML_FILE:
+        intent = new Intent(this, SaveActivity.class)
+            .putExtra(SaveActivity.EXTRA_TRACK_ID, trackId)
+            .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.KML)
+            .putExtra(SaveActivity.EXTRA_SHARE_TRACK, true);
+        startActivity(intent);
+      return true;
+      case Constants.MENU_SHARE_CSV_FILE:
+        intent = new Intent(this, SaveActivity.class)
+            .putExtra(SaveActivity.EXTRA_TRACK_ID, trackId)
+            .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.CSV)
+            .putExtra(SaveActivity.EXTRA_SHARE_TRACK, true);
+        startActivity(intent);
+        return true;
+      case Constants.MENU_SHARE_TCX_FILE:
+        intent = new Intent(this, SaveActivity.class)
+            .putExtra(SaveActivity.EXTRA_TRACK_ID, trackId)
+            .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.TCX)
+            .putExtra(SaveActivity.EXTRA_SHARE_TRACK, true);
+        startActivity(intent);
+        return true;
+      case Constants.MENU_SAVE_GPX_FILE:
+        intent = new Intent(this, SaveActivity.class)
+            .putExtra(SaveActivity.EXTRA_TRACK_ID, trackId)
+            .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.GPX);
+        startActivity(intent);
+        return true;
+      case Constants.MENU_SAVE_KML_FILE:
+        intent = new Intent(this, SaveActivity.class)
+            .putExtra(SaveActivity.EXTRA_TRACK_ID, trackId)
+            .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.KML);
+        startActivity(intent);
+        return true;
+      case Constants.MENU_SAVE_CSV_FILE:
+        intent = new Intent(this, SaveActivity.class)
+            .putExtra(SaveActivity.EXTRA_TRACK_ID, trackId)
+            .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.CSV);
+        startActivity(intent);
+        return true;        
+      case Constants.MENU_SAVE_TCX_FILE:
+        intent = new Intent(this, SaveActivity.class)
+            .putExtra(SaveActivity.EXTRA_TRACK_ID, trackId)
+            .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.TCX);
+        startActivity(intent);
+        return true;        
       case Constants.MENU_CLEAR_MAP:
         dataHub.unloadCurrentTrack();
         return true;
