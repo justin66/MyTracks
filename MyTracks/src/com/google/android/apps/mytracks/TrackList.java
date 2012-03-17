@@ -17,26 +17,31 @@ package com.google.android.apps.mytracks;
 
 import static com.google.android.apps.mytracks.Constants.TAG;
 
+import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
 import com.google.android.apps.mytracks.content.TracksColumns;
 import com.google.android.apps.mytracks.io.file.SaveActivity;
+import com.google.android.apps.mytracks.io.file.TrackWriterFactory.TrackFileFormat;
 import com.google.android.apps.mytracks.io.sendtogoogle.SendRequest;
 import com.google.android.apps.mytracks.io.sendtogoogle.UploadServiceChooserActivity;
 import com.google.android.apps.mytracks.services.ServiceUtils;
 import com.google.android.apps.mytracks.services.TrackRecordingServiceConnection;
+import com.google.android.apps.mytracks.util.ApiAdapterFactory;
+import com.google.android.apps.mytracks.util.DialogUtils;
 import com.google.android.apps.mytracks.util.PlayTrackUtils;
 import com.google.android.apps.mytracks.util.StringUtils;
 import com.google.android.maps.mytracks.R;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
-import android.content.ContentUris;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -62,7 +67,10 @@ public class TrackList extends ListActivity
     implements SharedPreferences.OnSharedPreferenceChangeListener,
         View.OnClickListener {
 
-  private static final int DIALOG_INSTALL_EARTH = 0;
+  private static final int DIALOG_INSTALL_EARTH_ID = 0;
+  private static final int DIALOG_EXPORT_ALL_ID = 1;
+  private static final int DIALOG_DELETE_ALL_ID = 2;
+  private static final int DIALOG_DELETE_CURRENT_ID = 3;
   
   private int contextPosition = -1;
   private long trackId = -1;
@@ -178,7 +186,7 @@ public class TrackList extends ListActivity
           PlayTrackUtils.playTrack(this, trackId);
           return true;
         } else {
-          showDialog(DIALOG_INSTALL_EARTH);
+          showDialog(DIALOG_INSTALL_EARTH_ID);
           return true;
         }
       case Constants.MENU_SEND_TO_GOOGLE:
@@ -197,21 +205,59 @@ public class TrackList extends ListActivity
         startActivity(intent);
         return true;
       case Constants.MENU_SHARE_GPX_FILE:
-      case Constants.MENU_SHARE_KML_FILE:
-      case Constants.MENU_SHARE_CSV_FILE:
-      case Constants.MENU_SHARE_TCX_FILE:
-      case Constants.MENU_SAVE_GPX_FILE:
-      case Constants.MENU_SAVE_KML_FILE:
-      case Constants.MENU_SAVE_CSV_FILE:
-      case Constants.MENU_SAVE_TCX_FILE:
-        SaveActivity.handleExportTrackAction(
-            this, trackId, Constants.getActionFromMenuId(item.getItemId()));
-        return true;
-      case Constants.MENU_DELETE:
-        Uri uri = ContentUris.withAppendedId(TracksColumns.CONTENT_URI, trackId);
-        intent = new Intent(Intent.ACTION_DELETE)
-            .setDataAndType(uri, TracksColumns.CONTENT_ITEMTYPE);
+        intent = new Intent(this, SaveActivity.class)
+            .putExtra(SaveActivity.EXTRA_TRACK_ID, trackId)
+            .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.GPX)
+            .putExtra(SaveActivity.EXTRA_SHARE_TRACK, true);
         startActivity(intent);
+        return true;
+      case Constants.MENU_SHARE_KML_FILE:
+        intent = new Intent(this, SaveActivity.class)
+            .putExtra(SaveActivity.EXTRA_TRACK_ID, trackId)
+            .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.KML)
+            .putExtra(SaveActivity.EXTRA_SHARE_TRACK, true);
+        startActivity(intent);
+      return true;
+      case Constants.MENU_SHARE_CSV_FILE:
+        intent = new Intent(this, SaveActivity.class)
+            .putExtra(SaveActivity.EXTRA_TRACK_ID, trackId)
+            .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.CSV)
+            .putExtra(SaveActivity.EXTRA_SHARE_TRACK, true);
+        startActivity(intent);
+        return true;
+      case Constants.MENU_SHARE_TCX_FILE:
+        intent = new Intent(this, SaveActivity.class)
+            .putExtra(SaveActivity.EXTRA_TRACK_ID, trackId)
+            .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.TCX)
+            .putExtra(SaveActivity.EXTRA_SHARE_TRACK, true);
+        startActivity(intent);
+        return true;
+      case Constants.MENU_SAVE_GPX_FILE:
+        intent = new Intent(this, SaveActivity.class)
+            .putExtra(SaveActivity.EXTRA_TRACK_ID, trackId)
+            .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.GPX);
+        startActivity(intent);
+        return true;
+      case Constants.MENU_SAVE_KML_FILE:
+        intent = new Intent(this, SaveActivity.class)
+            .putExtra(SaveActivity.EXTRA_TRACK_ID, trackId)
+            .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.KML);
+        startActivity(intent);
+        return true;
+      case Constants.MENU_SAVE_CSV_FILE:
+        intent = new Intent(this, SaveActivity.class)
+            .putExtra(SaveActivity.EXTRA_TRACK_ID, trackId)
+            .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.CSV);
+        startActivity(intent);
+        return true;        
+      case Constants.MENU_SAVE_TCX_FILE:
+        intent = new Intent(this, SaveActivity.class)
+            .putExtra(SaveActivity.EXTRA_TRACK_ID, trackId)
+            .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.TCX);
+        startActivity(intent);
+        return true;        
+      case Constants.MENU_DELETE:
+        showDialog(DIALOG_DELETE_CURRENT_ID);
         return true;
       default:
         Log.w(TAG, "Unknown menu item: " + item.getItemId() + "(" + item.getTitle() + ")");
@@ -223,12 +269,11 @@ public class TrackList extends ListActivity
   public void onClick(View v) {
     switch (v.getId()) {
       case R.id.tracklist_btn_delete_all: {
-        Handler h = new DeleteAllTracks(this, null);
-        h.handleMessage(null);
+        showDialog(DIALOG_DELETE_ALL_ID);
         break;
       }
       case R.id.tracklist_btn_export_all: {
-        new ExportAllTracks(this);
+        showDialog(DIALOG_EXPORT_ALL_ID);
         break;
       }
       case R.id.tracklist_btn_import_all: {
@@ -298,8 +343,60 @@ public class TrackList extends ListActivity
   @Override
   protected Dialog onCreateDialog(int id) {
     switch (id) {
-      case DIALOG_INSTALL_EARTH:
+      case DIALOG_INSTALL_EARTH_ID:
         return PlayTrackUtils.createInstallEarthDialog(this);
+      case DIALOG_EXPORT_ALL_ID:
+        String exportFileFormat = getString(R.string.track_list_export_file);
+        String fileTypes[] = getResources().getStringArray(R.array.file_types);
+        String[] choices = new String[fileTypes.length];
+        for (int i = 0; i < fileTypes.length; i++) {
+          choices[i] = String.format(exportFileFormat, fileTypes[i]);
+        }
+        return new AlertDialog.Builder(this)
+            .setNegativeButton(R.string.generic_cancel, null)
+            .setPositiveButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
+              @Override
+              public void onClick(DialogInterface dialog, int which) {
+                int index = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
+                Intent intent = new Intent(TrackList.this, ExportAllActivity.class);
+                intent.putExtra(ExportAllActivity.EXTRA_TRACK_FILE_FORMAT,
+                    (Parcelable) TrackFileFormat.values()[index]);
+                TrackList.this.startActivity(intent);
+              }
+            })
+            .setSingleChoiceItems(choices, 0, null)
+            .setTitle(R.string.track_list_export_all)
+            .create();
+      case DIALOG_DELETE_ALL_ID:
+        return DialogUtils.createConfirmationDialog(this,
+            R.string.track_list_delete_all_confirm_message, new DialogInterface.OnClickListener() {
+              @Override
+              public void onClick(DialogInterface dialog, int which) {
+                MyTracksProviderUtils.Factory.get(TrackList.this).deleteAllTracks();
+                SharedPreferences sharedPreferences = getSharedPreferences(
+                    Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
+                Editor editor = sharedPreferences.edit();
+                // TODO: Go through data manager
+                editor.putLong(getString(R.string.selected_track_key), -1L);
+                ApiAdapterFactory.getApiAdapter().applyPreferenceChanges(editor);
+              }
+            });
+      case DIALOG_DELETE_CURRENT_ID:
+        return DialogUtils.createConfirmationDialog(this,
+            R.string.track_list_delete_track_confirm_message, new DialogInterface.OnClickListener() {
+              @Override
+              public void onClick(DialogInterface dialog, int which) {
+                MyTracksProviderUtils.Factory.get(TrackList.this).deleteTrack(trackId);
+                // If the deleted track was selected, unselect it.
+                String selectedTrackKey = getString(R.string.selected_track_key);
+                SharedPreferences sharedPreferences = getSharedPreferences(
+                    Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
+                if (sharedPreferences.getLong(selectedTrackKey, -1L) == trackId) {
+                  Editor editor = sharedPreferences.edit().putLong(selectedTrackKey, -1L);
+                  ApiAdapterFactory.getApiAdapter().applyPreferenceChanges(editor);
+                }
+              }
+            });
       default:
         return null;
     }

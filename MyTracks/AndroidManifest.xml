@@ -181,16 +181,6 @@ limitations under the License.
       </intent-filter>
     </activity>
 
-    <activity android:name="com.google.android.apps.mytracks.DeleteTrack"
-              android:theme="@android:style/Theme.Translucent.NoTitleBar"
-              android:noHistory="true">
-      <intent-filter>
-        <action android:name="android.intent.action.DELETE" />
-        <category android:name="android.intent.category.DEFAULT" />
-        <data android:mimeType="vnd.android.cursor.item/vnd.google.track" />
-      </intent-filter>
-    </activity>
-
     <activity android:name="com.google.android.apps.mytracks.WaypointDetails"
               android:label="@string/marker_detail_title">
       <intent-filter>
@@ -283,7 +273,8 @@ limitations under the License.
     <activity android:name="com.google.android.apps.mytracks.io.sendtogoogle.AccountChooserActivity"/>
     <activity android:name="com.google.android.apps.mytracks.io.sendtogoogle.UploadResultActivity"/>
     <activity android:name="com.google.android.apps.mytracks.io.sendtogoogle.UploadServiceChooserActivity"/>
-
+    <activity android:name="com.google.android.apps.mytracks.ExportAllActivity"/>
+    
     <service android:name="com.google.android.apps.mytracks.services.TrackRecordingService"
              android:label="@string/my_tracks_recording_service"
              android:icon="@drawable/arrow_320"
