@@ -64,26 +64,26 @@ public class TrackWriterFactory {
 
     @Override
     public int describeContents() {
-        return 0;
+      return 0;
     }
 
     @Override
     public void writeToParcel(final Parcel dest, final int flags) {
-        dest.writeInt(ordinal());
+      dest.writeInt(ordinal());
     }
 
     public static final Creator<TrackFileFormat> CREATOR = new Creator<TrackFileFormat>() {
-        @Override
-        public TrackFileFormat createFromParcel(final Parcel source) {
-            return TrackFileFormat.values()[source.readInt()];
-        }
+      @Override
+      public TrackFileFormat createFromParcel(final Parcel source) {
+        return TrackFileFormat.values()[source.readInt()];
+      }
 
-        @Override
-        public TrackFileFormat[] newArray(final int size) {
-            return new TrackFileFormat[size];
-        }
+      @Override
+      public TrackFileFormat[] newArray(final int size) {
+        return new TrackFileFormat[size];
+      }
     };
-    
+
     /**
      * Creates and returns a new format writer for each format.
      */
