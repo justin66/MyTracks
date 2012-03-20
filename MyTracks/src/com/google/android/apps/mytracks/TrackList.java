@@ -199,56 +199,28 @@ public class TrackList extends ListActivity
         startActivity(intent);
         return true;
       case Constants.MENU_SHARE_GPX_FILE:
-        intent = new Intent(this, SaveActivity.class)
-            .putExtra(SaveActivity.EXTRA_TRACK_ID, trackId)
-            .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.GPX)
-            .putExtra(SaveActivity.EXTRA_SHARE_TRACK, true);
-        startActivity(intent);
+        startSaveActivity(TrackFileFormat.GPX, true);
         return true;
       case Constants.MENU_SHARE_KML_FILE:
-        intent = new Intent(this, SaveActivity.class)
-            .putExtra(SaveActivity.EXTRA_TRACK_ID, trackId)
-            .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.KML)
-            .putExtra(SaveActivity.EXTRA_SHARE_TRACK, true);
-        startActivity(intent);
+        startSaveActivity(TrackFileFormat.KML, true);
       return true;
       case Constants.MENU_SHARE_CSV_FILE:
-        intent = new Intent(this, SaveActivity.class)
-            .putExtra(SaveActivity.EXTRA_TRACK_ID, trackId)
-            .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.CSV)
-            .putExtra(SaveActivity.EXTRA_SHARE_TRACK, true);
-        startActivity(intent);
+        startSaveActivity(TrackFileFormat.CSV, true);
         return true;
       case Constants.MENU_SHARE_TCX_FILE:
-        intent = new Intent(this, SaveActivity.class)
-            .putExtra(SaveActivity.EXTRA_TRACK_ID, trackId)
-            .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.TCX)
-            .putExtra(SaveActivity.EXTRA_SHARE_TRACK, true);
-        startActivity(intent);
+        startSaveActivity(TrackFileFormat.TCX, true);
         return true;
       case Constants.MENU_SAVE_GPX_FILE:
-        intent = new Intent(this, SaveActivity.class)
-            .putExtra(SaveActivity.EXTRA_TRACK_ID, trackId)
-            .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.GPX);
-        startActivity(intent);
+        startSaveActivity(TrackFileFormat.GPX, false);
         return true;
       case Constants.MENU_SAVE_KML_FILE:
-        intent = new Intent(this, SaveActivity.class)
-            .putExtra(SaveActivity.EXTRA_TRACK_ID, trackId)
-            .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.KML);
-        startActivity(intent);
+        startSaveActivity(TrackFileFormat.KML, false);
         return true;
       case Constants.MENU_SAVE_CSV_FILE:
-        intent = new Intent(this, SaveActivity.class)
-            .putExtra(SaveActivity.EXTRA_TRACK_ID, trackId)
-            .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.CSV);
-        startActivity(intent);
+        startSaveActivity(TrackFileFormat.CSV, false);
         return true;        
       case Constants.MENU_SAVE_TCX_FILE:
-        intent = new Intent(this, SaveActivity.class)
-            .putExtra(SaveActivity.EXTRA_TRACK_ID, trackId)
-            .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.TCX);
-        startActivity(intent);
+        startSaveActivity(TrackFileFormat.TCX, false);
         return true;        
       case Constants.MENU_DELETE:
         Uri uri = ContentUris.withAppendedId(TracksColumns.CONTENT_URI, trackId);
@@ -262,6 +234,20 @@ public class TrackList extends ListActivity
     }
   }
 
+  /**
+   * Starts the {@link SaveActivity} to save trackId.
+   * 
+   * @param trackFileFormat the track file format
+   * @param shareTrack true to share the track after saving
+   */
+  private void startSaveActivity(TrackFileFormat trackFileFormat, boolean shareTrack) {
+    Intent intent = new Intent(this, SaveActivity.class)
+        .putExtra(SaveActivity.EXTRA_TRACK_ID, trackId)
+        .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) trackFileFormat)
+        .putExtra(SaveActivity.EXTRA_SHARE_TRACK, shareTrack);
+    startActivity(intent);
+  }
+  
   @Override
   public void onClick(View v) {
     switch (v.getId()) {
