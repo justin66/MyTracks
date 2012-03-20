@@ -164,7 +164,7 @@ public class MyTracks extends TabActivity implements OnTouchListener {
             android.R.drawable.ic_menu_mapmode))
         .setContent(new Intent(this, MapActivity.class)));
     tabHost.addTab(tabHost.newTabSpec(STATS_TAB_TAG)
-        .setIndicator("Stats", res.getDrawable(R.drawable.menu_stats))
+        .setIndicator("Stats", res.getDrawable(R.drawable.ic_menu_statistics))
         .setContent(new Intent(this, StatsActivity.class)));
     tabHost.addTab(tabHost.newTabSpec(CHART_TAB_TAG)
         .setIndicator("Chart", res.getDrawable(R.drawable.menu_elevation))
