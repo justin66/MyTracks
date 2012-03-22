@@ -18,6 +18,7 @@ package com.google.android.apps.mytracks.services.tasks;
 
 import static com.google.android.apps.mytracks.Constants.TAG;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.media.AudioManager;
 import android.speech.tts.TextToSpeech;
@@ -33,6 +34,7 @@ import java.util.HashMap;
  *
  * @author Sandor Dornbush
  */
+@TargetApi(8)
 public class FroyoStatusAnnouncerTask extends StatusAnnouncerTask {
   private final static HashMap<String, String> SPEECH_PARAMS = new HashMap<String, String>();
   static {

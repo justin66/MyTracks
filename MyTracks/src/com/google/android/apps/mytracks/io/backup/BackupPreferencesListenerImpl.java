@@ -15,6 +15,7 @@
  */
 package com.google.android.apps.mytracks.io.backup;
 
+import android.annotation.TargetApi;
 import android.app.backup.BackupManager;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -25,6 +26,7 @@ import android.content.SharedPreferences;
  *
  * @author Jimmy Shih
  */
+@TargetApi(8)
 public class BackupPreferencesListenerImpl implements BackupPreferencesListener {
 
   private final BackupManager backupManager;

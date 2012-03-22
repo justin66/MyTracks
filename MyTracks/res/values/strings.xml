@@ -689,10 +689,6 @@ limitations under the License.
     translation_description="The title on an alert dialog indicating error.">
     Error
   </string>
-  <string name="generic_no"
-    translation_description="The text on a button to say no.">
-    No
-  </string>
   <string name="generic_ok"
     translation_description="The text on a button to say ok.">
     OK
@@ -712,10 +708,6 @@ limitations under the License.
 
       Screenshot: sd_card_success_write_file.png">
     Success
-  </string>
-  <string name="generic_yes"
-    translation_description="The text on a button to say yes.">
-    Yes
   </string>
 
   <!-- GPS -->
@@ -2510,14 +2502,6 @@ limitations under the License.
   <string name="unit_minute"
     translation_description="Abbreviation for minutes. E.g, '2 min'.">
     min
-  </string>
-  <string name="unit_minute_per_kilometer"
-    translation_description="Abbreviation for minutes per kilometer. E.g, '5 min/km'.">
-    min/km
-  </string>
-  <string name="unit_minute_per_mile"
-    translation_description="Abbreviation for minutes per mile. E.g, '5 min/mi'.">
-    min/mi
   </string>
 
   <!-- Value -->
