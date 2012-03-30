@@ -987,7 +987,7 @@ limitations under the License.
   </string>  
   <string name="menu_export_all"
     translation_description="In the menu, to export all the tracks to the SD card.">
-    Export all
+    Export all...
   </string>
   <string name="menu_export_all_format"
     translation_description="Under the 'Export all' menu option, the option to export all tracks as

@@ -70,7 +70,6 @@ public class TrackListActivity extends FragmentActivity {
   private static final String CHECK_UNITS_DIALOG_TAG = "checkUnitsDialog";
   private static final String DELETE_ALL_DIALOG_TAG = "deleteAllDialog";
   private static final String EULA_DIALOG_TAG = "eulaDialog";
-  private static final String EXPORT_ALL_DIALOG_TAG = "exportAllDialog";
 
   private static final int WELCOME_ACTIVITY_REQUEST_CODE = 0;
 
@@ -172,7 +171,7 @@ public class TrackListActivity extends FragmentActivity {
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Intent intent = new Intent(TrackListActivity.this, TrackDetailActivity.class)
             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK)
-            .putExtra(TrackDetailActivity.TRACK_ID, id);
+            .putExtra(TrackDetailActivity.EXTRA_TRACK_ID, id);
         startActivity(intent);
       }
     });
@@ -281,13 +280,22 @@ public class TrackListActivity extends FragmentActivity {
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     getMenuInflater().inflate(R.menu.track_list, menu);
-
-    recordTrack = menu.findItem(R.id.menu_record_track);
-    stopRecording = menu.findItem(R.id.menu_stop_recording);
-    search = menu.findItem(R.id.menu_search);
-    importAll = menu.findItem(R.id.menu_import_all);
-    exportAll = menu.findItem(R.id.menu_export_all);
-    deleteAll = menu.findItem(R.id.menu_delete_all);
+    String fileTypes[] = getResources().getStringArray(R.array.file_types);
+    menu.findItem(R.id.track_list_export_gpx)
+        .setTitle(getString(R.string.menu_export_all_format, fileTypes[0]));
+    menu.findItem(R.id.track_list_export_kml)
+        .setTitle(getString(R.string.menu_export_all_format, fileTypes[1]));
+    menu.findItem(R.id.track_list_export_csv)
+        .setTitle(getString(R.string.menu_export_all_format, fileTypes[2]));
+    menu.findItem(R.id.track_list_export_tcx)
+        .setTitle(getString(R.string.menu_export_all_format, fileTypes[3]));
+    
+    recordTrack = menu.findItem(R.id.track_list_record_track);
+    stopRecording = menu.findItem(R.id.track_list_stop_recording);
+    search = menu.findItem(R.id.track_list_search);
+    importAll = menu.findItem(R.id.track_list_import_all);
+    exportAll = menu.findItem(R.id.track_list_export_all);
+    deleteAll = menu.findItem(R.id.track_list_delete_all);
 
     ApiAdapterFactory.getApiAdapter().configureSearchWidget(this, search);
     updateMenu();
@@ -328,33 +336,46 @@ public class TrackListActivity extends FragmentActivity {
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
-      case R.id.menu_record_track:
+      case R.id.track_list_record_track:
         updateMenuItems(true);
         startRecording();
         return true;
-      case R.id.menu_stop_recording:
+      case R.id.track_list_stop_recording:
         updateMenuItems(false);
         stopRecording();
         return true;
-      case R.id.menu_search:
+      case R.id.track_list_search:
         return ApiAdapterFactory.getApiAdapter().handleSearchMenuSelection(this);
-      case R.id.menu_import_all:
+      case R.id.track_list_import_all:
         startActivity(
             new Intent(this, ImportActivity.class).putExtra(ImportActivity.EXTRA_IMPORT_ALL, true));
         return true;
-      case R.id.menu_export_all:
-        new ExportAllDialogFragment().show(getSupportFragmentManager(), EXPORT_ALL_DIALOG_TAG);
+      case R.id.track_list_export_gpx:
+        startActivity(new Intent(this, ExportActivity.class).putExtra(
+            ExportActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.GPX));
         return true;
-      case R.id.menu_delete_all:
+      case R.id.track_list_export_kml:
+        startActivity(new Intent(this, ExportActivity.class).putExtra(
+            ExportActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.KML));
+        return true;
+      case R.id.track_list_export_csv:
+        startActivity(new Intent(this, ExportActivity.class).putExtra(
+            ExportActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.CSV));
+        return true;
+      case R.id.track_list_export_tcx:
+        startActivity(new Intent(this, ExportActivity.class).putExtra(
+            ExportActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.TCX));
+        return true;
+      case R.id.track_list_delete_all:
         new DeleteAllDialogFragment().show(getSupportFragmentManager(), DELETE_ALL_DIALOG_TAG);
         return true;
-      case R.id.menu_aggregated_statistics:
+      case R.id.track_list_aggregated_statistics:
         startActivity(new Intent(this, AggregatedStatsActivity.class));
         return true;
-      case R.id.menu_settings:
+      case R.id.track_list_settings:
         startActivity(new Intent(this, SettingsActivity.class));
         return true;
-      case R.id.menu_help:
+      case R.id.track_list_help:
         startActivity(new Intent(this, WelcomeActivity.class));
         return true;
       default:
@@ -396,8 +417,8 @@ public class TrackListActivity extends FragmentActivity {
         service.endCurrentTrack();
         if (recordingTrackId != -1L) {
           Intent intent = new Intent(this, TrackEditActivity.class)
-              .putExtra(TrackEditActivity.SHOW_CANCEL, false)
-              .putExtra(TrackEditActivity.TRACK_ID, recordingTrackId);
+              .putExtra(TrackEditActivity.EXTRA_SHOW_CANCEL, false)
+              .putExtra(TrackEditActivity.EXTRA_TRACK_ID, recordingTrackId);
           startActivity(intent);
         }
         recordingTrackId = -1L;
@@ -498,35 +519,6 @@ public class TrackListActivity extends FragmentActivity {
             }
           })
           .setTitle(R.string.eula_title)
-          .create();
-    }
-  }
-
-  /**
-   * Export All DialogFragment.
-   */
-  public static class ExportAllDialogFragment extends DialogFragment {
-
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-      String fileTypes[] = getResources().getStringArray(R.array.file_types);
-      String[] choices = new String[fileTypes.length];
-      for (int i = 0; i < fileTypes.length; i++) {
-        choices[i] = getString(R.string.menu_export_all_format, fileTypes[i]);
-      }
-      return new AlertDialog.Builder(getActivity()).setNegativeButton(R.string.generic_cancel, null)
-          .setPositiveButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-              int index = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
-              Intent intent = new Intent(getActivity(), ExportActivity.class).putExtra(
-                  ExportActivity.EXTRA_TRACK_FILE_FORMAT,
-                  (Parcelable) TrackFileFormat.values()[index]);
-              getActivity().startActivity(intent);
-            }
-          })
-          .setSingleChoiceItems(choices, 0, null)
-          .setTitle(R.string.menu_export_all)
           .create();
     }
   }
