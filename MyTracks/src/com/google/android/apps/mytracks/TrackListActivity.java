@@ -339,7 +339,7 @@ public class TrackListActivity extends Activity {
       case DIALOG_DELETE_ALL_ID:
         return DialogUtils.createConfirmationDialog(this,
             R.string.track_list_delete_all_confirm_message, new DialogInterface.OnClickListener() {
-                @Override
+              @Override
               public void onClick(DialogInterface dialog, int which) {
                 MyTracksProviderUtils.Factory.get(TrackListActivity.this).deleteAllTracks();
                 /*
