@@ -35,7 +35,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -68,11 +68,11 @@ public class TrackListActivity extends FragmentActivity {
   private static final String TAG = TrackListActivity.class.getSimpleName();
   private static final String CHECK_UNITS_DIALOG_TAG = "checkUnitsDialog";
   private static final String DELETE_ALL_DIALOG_TAG = "deleteAllDialog";
-  private static final String EULA_DIALOG_TAG = "eulaDialog";  
+  private static final String EULA_DIALOG_TAG = "eulaDialog";
   private static final String EXPORT_ALL_DIALOG_TAG = "exportAllDialog";
-  
+
   private static final int WELCOME_ACTIVITY_REQUEST_CODE = 0;
-  
+
   private static final String[] PROJECTION = new String[] {
       TracksColumns._ID,
       TracksColumns.NAME,
@@ -82,18 +82,53 @@ public class TrackListActivity extends FragmentActivity {
       TracksColumns.STARTTIME,
       TracksColumns.DESCRIPTION };
 
-  // Callback when the trackRecordingServiceConnection binding changes
+  // Callback when the trackRecordingServiceConnection binding changes.
   private final Runnable bindChangedCallback = new Runnable() {
     @Override
     public void run() {
-      synchronized (trackRecordingServiceConnection) {
-        if (startNewRecording) {
-          startRecording();
-        } else {
-          updateMenu();
-          adapter.notifyDataSetChanged();
-        }
+      if (!startNewRecording) {
+        return;
       }
+
+      ITrackRecordingService service = trackRecordingServiceConnection.getServiceIfBound();
+      if (service == null) {
+        Log.d(TAG, "service not available to start a new recording");
+        return;
+      }
+      try {
+        recordingTrackId = service.startNewTrack();
+        startNewRecording = false;
+        Toast.makeText(
+            TrackListActivity.this, R.string.track_list_record_success, Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "Started a new recording");
+      } catch (Exception e) {
+        Toast.makeText(TrackListActivity.this, R.string.track_list_record_error, Toast.LENGTH_LONG)
+            .show();
+        Log.e(TAG, "Unable to start a new recording.", e);
+      }
+    }
+  };
+
+  /*
+   * Note that sharedPreferenceChangeListenr cannot be an anonymous inner class.
+   * Anonymous inner class will get garbage collected.
+   */
+  private final OnSharedPreferenceChangeListener sharedPreferenceChangeListener =
+    new OnSharedPreferenceChangeListener() {
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences preferences, String key) {
+      // Note that key can be null
+      if (getString(R.string.metric_units_key).equals(key)) {
+        metricUnits = preferences.getBoolean(getString(R.string.metric_units_key), true);
+      }
+      if (getString(R.string.recording_track_key).equals(key)) {
+        recordingTrackId = sharedPreferences.getLong(getString(R.string.recording_track_key), -1L);
+        if (isRecording()) {
+          trackRecordingServiceConnection.startAndBind();
+        }
+        updateMenu();
+      }
+      adapter.notifyDataSetChanged();
     }
   };
 
@@ -104,7 +139,7 @@ public class TrackListActivity extends FragmentActivity {
   private ListView listView;
   private ResourceCursorAdapter adapter;
 
-  // True to start a new recording
+  // True to start a new recording.
   private boolean startNewRecording = false;
 
   private MenuItem recordTrack;
@@ -120,28 +155,12 @@ public class TrackListActivity extends FragmentActivity {
     setVolumeControlStream(TextToSpeech.Engine.DEFAULT_STREAM);
     setDefaultKeyMode(DEFAULT_KEYS_SEARCH_LOCAL);
     setContentView(R.layout.track_list);
-    
+
     trackRecordingServiceConnection = new TrackRecordingServiceConnection(
         this, bindChangedCallback);
 
     sharedPreferences = getSharedPreferences(Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
-    sharedPreferences.registerOnSharedPreferenceChangeListener(
-        new SharedPreferences.OnSharedPreferenceChangeListener() {
-          @Override
-          public void onSharedPreferenceChanged(SharedPreferences preferences, String key) {
-            if (key == null) {
-              return;
-            }
-            if (key.equals(getString(R.string.metric_units_key))) {
-              metricUnits = preferences.getBoolean(getString(R.string.metric_units_key), true);
-            }
-            if (key.equals(getString(R.string.recording_track_key))) {
-              recordingTrackId = sharedPreferences.getLong(
-                  getString(R.string.recording_track_key), -1L);
-            }
-            adapter.notifyDataSetChanged();
-          }
-        });
+    sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
     metricUnits = sharedPreferences.getBoolean(getString(R.string.metric_units_key), true);
     recordingTrackId = sharedPreferences.getLong(getString(R.string.recording_track_key), -1L);
 
@@ -217,7 +236,7 @@ public class TrackListActivity extends FragmentActivity {
         adapter.swapCursor(null);
       }
     });
-    
+
     if (!EulaUtils.getEulaValue(this)) {
       new EulaDialogFragment().show(getSupportFragmentManager(), EULA_DIALOG_TAG);
     }
@@ -226,18 +245,16 @@ public class TrackListActivity extends FragmentActivity {
   @Override
   protected void onStart() {
     super.onStart();
-    if (ServiceUtils.isRecording(
-        this, trackRecordingServiceConnection.getServiceIfBound(), sharedPreferences)) {
+    if (isRecording()) {
       trackRecordingServiceConnection.startAndBind();
     }
   }
-    
+
   @Override
   protected void onResume() {
     super.onResume();
     trackRecordingServiceConnection.bindIfRunning();
   }
-  
 
   @Override
   protected void onDestroy() {
@@ -251,9 +268,10 @@ public class TrackListActivity extends FragmentActivity {
       if (!CheckUnitsUtils.getCheckUnitsValue(this)) {
         /*
          * See bug http://code.google.com/p/android/issues/detail?id=23761.
-         * Instead of
-         * new CheckUnitsDialogFragment().show(getSupportFragmentManager(), CHECK_UNITS_DIALOG_TAG)
-         * Need to use commitAllowingStateLoss with the support package.
+         * Cannot use
+         * CheckUnitsDialogFragment().show(getSupportFragmentManager(),
+         * CHECK_UNITS_DIALOG_TAG). Need to use commitAllowingStateLoss with the
+         * support package.
          */
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(new CheckUnitsDialogFragment(), CHECK_UNITS_DIALOG_TAG);
@@ -261,7 +279,7 @@ public class TrackListActivity extends FragmentActivity {
       }
     }
   }
-  
+
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     getMenuInflater().inflate(R.menu.track_list, menu);
@@ -282,8 +300,7 @@ public class TrackListActivity extends FragmentActivity {
    * Updates the menu based on whether My Tracks is recording or not.
    */
   private void updateMenu() {
-    boolean isRecording = ServiceUtils.isRecording(
-        this, trackRecordingServiceConnection.getServiceIfBound(), sharedPreferences);
+    boolean isRecording = isRecording();
     updateMenuItems(isRecording);
   }
 
@@ -315,23 +332,11 @@ public class TrackListActivity extends FragmentActivity {
     switch (item.getItemId()) {
       case R.id.menu_record_track:
         updateMenuItems(true);
-        synchronized (trackRecordingServiceConnection) {
-          startNewRecording = true;
-          trackRecordingServiceConnection.startAndBind();
-
-          /*
-           * If the binding has happened, then invoke the callback to start a
-           * new recording. If the binding hasn't happened, then invoking the
-           * callback will have no effect. But when the binding occurs, the
-           * callback will get invoked.
-           */
-          bindChangedCallback.run();
-        }
+        startRecording();
         return true;
       case R.id.menu_stop_recording:
         updateMenuItems(false);
         stopRecording();
-        trackRecordingServiceConnection.stop();
         return true;
       case R.id.menu_search:
         return ApiAdapterFactory.getApiAdapter().handleSearchMenuSelection(this);
@@ -360,26 +365,27 @@ public class TrackListActivity extends FragmentActivity {
   }
 
   /**
+   * Returns true if recording.
+   */
+  private boolean isRecording() {
+    return ServiceUtils.isRecording(
+        this, trackRecordingServiceConnection.getServiceIfBound(), sharedPreferences);
+  }
+
+  /**
    * Starts a new recording.
    */
   private void startRecording() {
-    ITrackRecordingService service = trackRecordingServiceConnection.getServiceIfBound();
-    if (service != null) {
-      try {
-        recordingTrackId = service.startNewTrack();
-        startNewRecording = false;
-        adapter.notifyDataSetChanged();
-        Toast.makeText(TrackListActivity.this, R.string.track_record_success, Toast.LENGTH_SHORT)
-            .show();
-        Log.d(TAG, "Started a new recording");
-      } catch (Exception e) {
-        Toast.makeText(TrackListActivity.this, R.string.track_record_error, Toast.LENGTH_LONG)
-            .show();
-        Log.d(TAG, "Unable to start a new recording.", e);
-      }
-    } else {
-      Log.d(TAG, "service not available to start a new recording");
-    }
+    startNewRecording = true;
+    trackRecordingServiceConnection.startAndBind();
+
+    /*
+     * If the binding has happened, then invoke the callback to start a new
+     * recording. If the binding hasn't happened, then invoking the callback
+     * will have no effect. But when the binding occurs, the callback will get
+     * invoked.
+     */
+    bindChangedCallback.run();
   }
 
   /**
@@ -397,17 +403,27 @@ public class TrackListActivity extends FragmentActivity {
           startActivity(intent);
         }
         recordingTrackId = -1L;
-        adapter.notifyDataSetChanged();
       } catch (Exception e) {
         Log.d(TAG, "Unable to stop recording.", e);
       }
     }
+    trackRecordingServiceConnection.stop();
+  }
+
+  @Override
+  public boolean onKeyUp(int keyCode, KeyEvent event) {
+    if (keyCode == KeyEvent.KEYCODE_SEARCH) {
+      if (ApiAdapterFactory.getApiAdapter().handleSearchKey(search)) {
+        return true;
+      }
+    }
+    return super.onKeyUp(keyCode, event);
   }
 
   /**
    * Check Units DialogFragment.
    */
-  private static class CheckUnitsDialogFragment extends DialogFragment {
+  public static class CheckUnitsDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -439,7 +455,7 @@ public class TrackListActivity extends FragmentActivity {
   /**
    * Delete All DialogFragment.
    */
-  private static class DeleteAllDialogFragment extends DialogFragment {
+  public static class DeleteAllDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -448,16 +464,6 @@ public class TrackListActivity extends FragmentActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
               MyTracksProviderUtils.Factory.get(getActivity()).deleteAllTracks();
-              /*
-               * TODO Verify that selected_track_key is still needed with the
-               * ICS navigation design
-               */
-              SharedPreferences sharedPreferences = getActivity()
-                  .getSharedPreferences(Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
-              Editor editor = sharedPreferences.edit();
-              // TODO: Go through data manager
-              editor.putLong(getString(R.string.selected_track_key), -1L);
-              ApiAdapterFactory.getApiAdapter().applyPreferenceChanges(editor);
             }
           });
     }
@@ -466,14 +472,13 @@ public class TrackListActivity extends FragmentActivity {
   /**
    * Eula DialogFragment.
    */
-  private static class EulaDialogFragment extends DialogFragment {
+  public static class EulaDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
       return new AlertDialog.Builder(getActivity())
           .setCancelable(true)
-          .setMessage(
-              EulaUtils.getEulaMessage(getActivity()))
+          .setMessage(EulaUtils.getEulaMessage(getActivity()))
           .setNegativeButton(R.string.eula_decline, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -502,15 +507,14 @@ public class TrackListActivity extends FragmentActivity {
   /**
    * Export All DialogFragment.
    */
-  private static class ExportAllDialogFragment extends DialogFragment {
+  public static class ExportAllDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-      String exportFileFormat = getString(R.string.track_list_export_file);
       String fileTypes[] = getResources().getStringArray(R.array.file_types);
       String[] choices = new String[fileTypes.length];
       for (int i = 0; i < fileTypes.length; i++) {
-        choices[i] = String.format(exportFileFormat, fileTypes[i]);
+        choices[i] = getString(R.string.menu_export_all_format, fileTypes[i]);
       }
       return new AlertDialog.Builder(getActivity()).setNegativeButton(R.string.generic_cancel, null)
           .setPositiveButton(R.string.generic_ok, new DialogInterface.OnClickListener() {
@@ -527,15 +531,5 @@ public class TrackListActivity extends FragmentActivity {
           .setTitle(R.string.menu_export_all)
           .create();
     }
-  };
-
-  @Override
-  public boolean onKeyUp(int keyCode, KeyEvent event) {
-    if (keyCode == KeyEvent.KEYCODE_SEARCH) {
-      if (ApiAdapterFactory.getApiAdapter().handleSearchKey(search)) {
-        return true;
-      }
-    }
-    return super.onKeyUp(keyCode, event);
   }
 }
