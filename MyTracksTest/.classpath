@@ -10,5 +10,6 @@
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/MyTracks"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
