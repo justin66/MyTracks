@@ -139,14 +139,13 @@ public class TrackDetailActivity extends FragmentActivity {
     setVolumeControlStream(TextToSpeech.Engine.DEFAULT_STREAM);
     ApiAdapterFactory.getApiAdapter().configureActionBarHomeAsUp(this);
     setContentView(R.layout.track_detail);
-
+    
     sharedPreferences = getSharedPreferences(Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
     sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
     trackDataHub = ((MyTracksApplication) getApplication()).getTrackDataHub();
     trackRecordingServiceConnection = new TrackRecordingServiceConnection(this, null);
 
     mapViewContainer = getLayoutInflater().inflate(R.layout.mytracks_layout, null);
-
     tabHost = (TabHost) findViewById(android.R.id.tabhost);
     tabHost.setup();
     tabManager = new TabManager(this, tabHost, R.id.realtabcontent);
@@ -162,7 +161,6 @@ public class TrackDetailActivity extends FragmentActivity {
         getString(R.string.track_detail_stats_tab),
         getResources().getDrawable(R.drawable.ic_menu_statistics));
     tabManager.addTab(statsTabSpec, StatsFragment.class, null);
-
     if (savedInstanceState != null) {
       tabHost.setCurrentTabByTag(savedInstanceState.getString(CURRENT_TAG_KEY));
     }
@@ -174,7 +172,7 @@ public class TrackDetailActivity extends FragmentActivity {
   public void onNewIntent(Intent intent) {
     super.onNewIntent(intent);
     handleIntent(intent);
-  }  
+  } 
   
   @Override
   protected void onStart() {
@@ -505,19 +503,20 @@ public class TrackDetailActivity extends FragmentActivity {
       finish();
     }
     trackDataHub.loadTrack(trackId);
-    
+
     // Get the waypointId
     long waypointId = intent.getLongExtra(EXTRA_WAYPOINT_ID, -1L);
     if (waypointId != -1L) {
-      MapFragment mapFragmet = (MapFragment) getSupportFragmentManager().findFragmentByTag(MAP_TAB_TAG);
+      MapFragment mapFragmet = (MapFragment) getSupportFragmentManager()
+          .findFragmentByTag(MAP_TAB_TAG);
       if (mapFragmet != null) {
         tabHost.setCurrentTab(0);
         mapFragmet.showWaypoint(trackId, waypointId);
       } else {
-         Log.e(TAG, "MapFragment is null");
+        Log.e(TAG, "MapFragment is null");
       }
     }
-  }   
+  }
 
   /**
    * Updates the menu.
