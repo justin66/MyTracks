@@ -30,6 +30,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TextView;
 
 /**
  * API level 11 specific implementation of the {@link ApiAdapter}.
@@ -51,6 +52,7 @@ public class Api11Adapter extends Api10Adapter {
 
   @Override
   public void configureContextualMenu(final Activity activity, ListView listView, final int menuId,
+      final int actionModeTitleId,
       final ContextualActionModeCallback contextualActionModeCallback) {
     listView.setOnItemLongClickListener(new OnItemLongClickListener() {
       ActionMode actionMode;
@@ -58,7 +60,9 @@ public class Api11Adapter extends Api10Adapter {
       @Override
       public boolean onItemLongClick(
           AdapterView<?> parent, View view, int position, final long id) {
-        if (actionMode != null) { return false; }
+        if (actionMode != null) {
+          return false;
+        }
         actionMode = activity.startActionMode(new ActionMode.Callback() {
           @Override
           public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -82,6 +86,10 @@ public class Api11Adapter extends Api10Adapter {
             return contextualActionModeCallback.onClick(item.getItemId(), id);
           }
         });
+        TextView textView = (TextView) view.findViewById(actionModeTitleId);
+        if (textView != null) {
+          actionMode.setTitle(textView.getText());
+        }
         view.setSelected(true);
         return true;
       }

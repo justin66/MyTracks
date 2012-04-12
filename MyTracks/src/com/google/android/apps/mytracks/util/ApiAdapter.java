@@ -133,11 +133,13 @@ public interface ApiAdapter {
    * @param activity the activity
    * @param listView the list view
    * @param menuId the menu resource id
+   * @param actionModeTitleId the id of the list view item TextView to be used
+   *          as the action mode title
    * @param contextualActionModeCallback the callback when an item is selected
    *          in the contextual action mode
    */
   public void configureContextualMenu(Activity activity, ListView listView, int menuId,
-      ContextualActionModeCallback contextualActionModeCallback);
+      int actionModeTitleId, ContextualActionModeCallback contextualActionModeCallback);
 
   /**
    * Configures the search widget.
