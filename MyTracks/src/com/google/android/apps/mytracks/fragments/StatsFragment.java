@@ -23,7 +23,7 @@ import com.google.android.apps.mytracks.content.TrackDataHub;
 import com.google.android.apps.mytracks.content.TrackDataHub.ListenerDataType;
 import com.google.android.apps.mytracks.content.TrackDataListener;
 import com.google.android.apps.mytracks.content.Waypoint;
-import com.google.android.apps.mytracks.services.ServiceUtils;
+import com.google.android.apps.mytracks.util.PreferencesUtils;
 import com.google.android.apps.mytracks.util.UnitConversions;
 import com.google.android.maps.mytracks.R;
 
@@ -72,7 +72,7 @@ public class StatsFragment extends Fragment implements TrackDataListener {
     @Override
     public void run() {
       Log.d(TAG, "UI update thread started");
-      while (ServiceUtils.isRecording(getActivity(), null)) {
+      while (PreferencesUtils.getRecordingTrackId(getActivity()) != -1L) {
         getActivity().runOnUiThread(updateTotalTime);
         try {
           Thread.sleep(1000L);

@@ -33,11 +33,11 @@ import com.google.android.apps.mytracks.io.file.TrackWriterFactory.TrackFileForm
 import com.google.android.apps.mytracks.io.sendtogoogle.SendRequest;
 import com.google.android.apps.mytracks.io.sendtogoogle.UploadServiceChooserActivity;
 import com.google.android.apps.mytracks.services.ITrackRecordingService;
-import com.google.android.apps.mytracks.services.ServiceUtils;
 import com.google.android.apps.mytracks.services.TrackRecordingServiceConnection;
 import com.google.android.apps.mytracks.util.AnalyticsUtils;
 import com.google.android.apps.mytracks.util.ApiAdapterFactory;
 import com.google.android.apps.mytracks.util.PreferencesUtils;
+import com.google.android.apps.mytracks.util.TrackRecordingServiceConnectionUtils;
 import com.google.android.maps.mytracks.R;
 
 import android.content.Context;
@@ -179,7 +179,7 @@ public class TrackDetailActivity extends FragmentActivity {
   @Override
   protected void onResume() {
     super.onResume();
-    trackRecordingServiceConnection.bindIfRunning();
+    TrackRecordingServiceConnectionUtils.resume(this, trackRecordingServiceConnection);
   }
 
   @Override
@@ -261,7 +261,7 @@ public class TrackDetailActivity extends FragmentActivity {
         return true;
       case R.id.track_detail_stop_recording:
         updateMenuItems(false);
-        stopRecording();
+        TrackRecordingServiceConnectionUtils.stop(this, trackRecordingServiceConnection);
         return true;
       case R.id.track_detail_insert_marker:
         // TODO: Add insert marker when updating WaypointList to ICS
@@ -383,7 +383,7 @@ public class TrackDetailActivity extends FragmentActivity {
   @Override
   public boolean onTrackballEvent(MotionEvent event) {
     if (event.getAction() == MotionEvent.ACTION_DOWN) {
-      if (isRecording()) {
+      if (TrackRecordingServiceConnectionUtils.isRecording(this, trackRecordingServiceConnection)) {
         ITrackRecordingService trackRecordingService = trackRecordingServiceConnection
             .getServiceIfBound();
         if (trackRecordingService == null) {
@@ -502,38 +502,6 @@ public class TrackDetailActivity extends FragmentActivity {
         .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) trackFileFormat)
         .putExtra(SaveActivity.EXTRA_SHARE_TRACK, shareTrack);
     startActivity(intent);
-  }
-
-  /**
-   * Returns true if recording.
-   */
-  private boolean isRecording() {
-    return ServiceUtils.isRecording(this, trackRecordingServiceConnection.getServiceIfBound());
-  }
-
-  /**
-   * Stops the recording and the track recording service connection and shows
-   * {@link TrackEditActivity}.
-   */
-  private void stopRecording() {
-    ITrackRecordingService trackRecordingService = trackRecordingServiceConnection
-        .getServiceIfBound();
-    if (trackRecordingService != null) {
-      try {
-        trackRecordingService.endCurrentTrack();
-      } catch (Exception e) {
-        Log.e(TAG, "Unable to stop recording.", e);
-      }
-    }
-    trackRecordingServiceConnection.stop();
-
-    long recordingTrackId = PreferencesUtils.getRecordingTrackId(this);
-    if (recordingTrackId != -1L) {
-      Intent intent = new Intent(this, TrackEditActivity.class)
-          .putExtra(TrackEditActivity.EXTRA_SHOW_CANCEL, false)
-          .putExtra(TrackEditActivity.EXTRA_TRACK_ID, recordingTrackId);
-      startActivity(intent);
-    }
   }
 
   /**

@@ -22,12 +22,12 @@ import com.google.android.apps.mytracks.fragments.DeleteOneTrackDialogFragment;
 import com.google.android.apps.mytracks.fragments.EulaDialogFragment;
 import com.google.android.apps.mytracks.io.file.TrackWriterFactory.TrackFileFormat;
 import com.google.android.apps.mytracks.services.ITrackRecordingService;
-import com.google.android.apps.mytracks.services.ServiceUtils;
 import com.google.android.apps.mytracks.services.TrackRecordingServiceConnection;
 import com.google.android.apps.mytracks.util.ApiAdapterFactory;
 import com.google.android.apps.mytracks.util.EulaUtils;
 import com.google.android.apps.mytracks.util.PreferencesUtils;
 import com.google.android.apps.mytracks.util.StringUtils;
+import com.google.android.apps.mytracks.util.TrackRecordingServiceConnectionUtils;
 import com.google.android.maps.mytracks.R;
 
 import android.content.Context;
@@ -108,25 +108,26 @@ public class TrackListActivity extends FragmentActivity {
    * Note that sharedPreferenceChangeListenr cannot be an anonymous inner class.
    * Anonymous inner class will get garbage collected.
    */
-  private final OnSharedPreferenceChangeListener sharedPreferenceChangeListener =
-    new OnSharedPreferenceChangeListener() {
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences preferences, String key) {
-      // Note that key can be null
-      if (getString(R.string.metric_units_key).equals(key)) {
-        metricUnits = preferences.getBoolean(getString(R.string.metric_units_key), true);
-      }
-      if (PreferencesUtils.getRecordingTrackIdKey(TrackListActivity.this).equals(key)) {
-        recordingTrackId = PreferencesUtils.getRecordingTrackId(TrackListActivity.this);
-        if (isRecording()) {
-          trackRecordingServiceConnection.startAndBind();
+  private final OnSharedPreferenceChangeListener
+      sharedPreferenceChangeListener = new OnSharedPreferenceChangeListener() {
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences preferences, String key) {
+          // Note that key can be null
+          if (getString(R.string.metric_units_key).equals(key)) {
+            metricUnits = preferences.getBoolean(getString(R.string.metric_units_key), true);
+          }
+          if (PreferencesUtils.getRecordingTrackIdKey(TrackListActivity.this).equals(key)) {
+            recordingTrackId = PreferencesUtils.getRecordingTrackId(TrackListActivity.this);
+            if (TrackRecordingServiceConnectionUtils.isRecording(
+                TrackListActivity.this, trackRecordingServiceConnection)) {
+              trackRecordingServiceConnection.startAndBind();
+            }
+            updateMenu();
+          }
+          adapter.notifyDataSetChanged();
         }
-        updateMenu();
-      }
-      adapter.notifyDataSetChanged();
-    }
-  };
-  
+      };
+
   // Callback when an item is selected in the contextual action mode
   private ContextualActionModeCallback contextualActionModeCallback =
     new ContextualActionModeCallback() {
@@ -254,7 +255,7 @@ public class TrackListActivity extends FragmentActivity {
   @Override
   protected void onResume() {
     super.onResume();
-    trackRecordingServiceConnection.bindIfRunning();
+    TrackRecordingServiceConnectionUtils.resume(this, trackRecordingServiceConnection);
   }
 
   @Override
@@ -292,8 +293,8 @@ public class TrackListActivity extends FragmentActivity {
    * Updates the menu based on whether My Tracks is recording or not.
    */
   private void updateMenu() {
-    boolean isRecording = isRecording();
-    updateMenuItems(isRecording);
+    updateMenuItems(
+        TrackRecordingServiceConnectionUtils.isRecording(this, trackRecordingServiceConnection));
   }
 
   /**
@@ -328,7 +329,7 @@ public class TrackListActivity extends FragmentActivity {
         return true;
       case R.id.track_list_stop_recording:
         updateMenuItems(false);
-        stopRecording();
+        TrackRecordingServiceConnectionUtils.stop(this, trackRecordingServiceConnection);
         return true;
       case R.id.track_list_search:
         return ApiAdapterFactory.getApiAdapter().handleSearchMenuSelection(this);
@@ -419,13 +420,6 @@ public class TrackListActivity extends FragmentActivity {
   }
 
   /**
-   * Returns true if recording.
-   */
-  private boolean isRecording() {
-    return ServiceUtils.isRecording(this, trackRecordingServiceConnection.getServiceIfBound());
-  }
-
-  /**
    * Starts a new recording.
    */
   private void startRecording() {
@@ -439,34 +433,6 @@ public class TrackListActivity extends FragmentActivity {
      * invoked.
      */
     bindChangedCallback.run();
-  }
-
-  /**
-   * Stops the current recording.
-   */
-  private void stopRecording() {
-    ITrackRecordingService service = trackRecordingServiceConnection.getServiceIfBound();
-    if (service != null) {
-      try {
-        /*
-         * Remembers the recordingTrackId before endCurrentTrack sets the shared
-         * preferences, R.string.recording_track_key, to -1L, and the
-         * sharedPreferenceChangedListener sets the recordingTrackId variable to
-         * -1L.
-         */
-        long trackId = recordingTrackId;
-        service.endCurrentTrack();
-        if (trackId != -1L) {
-          Intent intent = new Intent(this, TrackEditActivity.class)
-              .putExtra(TrackEditActivity.EXTRA_SHOW_CANCEL, false)
-              .putExtra(TrackEditActivity.EXTRA_TRACK_ID, trackId);
-          startActivity(intent);
-        }
-      } catch (Exception e) {
-        Log.d(TAG, "Unable to stop recording.", e);
-      }
-    }
-    trackRecordingServiceConnection.stop();
   }
 
   @Override
