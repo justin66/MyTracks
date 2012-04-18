@@ -25,6 +25,7 @@ import com.google.android.apps.mytracks.services.ITrackRecordingService;
 import com.google.android.apps.mytracks.services.TrackRecordingServiceConnection;
 import com.google.android.apps.mytracks.util.ApiAdapterFactory;
 import com.google.android.apps.mytracks.util.EulaUtils;
+import com.google.android.apps.mytracks.util.ListItemUtil;
 import com.google.android.apps.mytracks.util.PreferencesUtils;
 import com.google.android.apps.mytracks.util.StringUtils;
 import com.google.android.apps.mytracks.util.TrackRecordingServiceConnectionUtils;
@@ -56,7 +57,6 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -133,7 +133,7 @@ public class TrackListActivity extends FragmentActivity {
   private ContextualActionModeCallback contextualActionModeCallback =
     new ContextualActionModeCallback() {
     @Override
-    public boolean onClick(int itemId, long id) {
+    public boolean onClick(int itemId, int position, long id) {
       return handleContextItem(itemId, id);
     }
   };
@@ -187,8 +187,8 @@ public class TrackListActivity extends FragmentActivity {
         startTrackDetailActivity(id);
       }
     });
-    resourceCursorAdapter = new ResourceCursorAdapter(this, R.layout.track_list_item, null, 0) {
-      @Override
+    resourceCursorAdapter = new ResourceCursorAdapter(this, R.layout.list_item, null, 0) {
+        @Override
       public void bindView(View view, Context context, Cursor cursor) {
         int idIndex = cursor.getColumnIndex(TracksColumns._ID);
         int nameIndex = cursor.getColumnIndex(TracksColumns.NAME);
@@ -199,37 +199,32 @@ public class TrackListActivity extends FragmentActivity {
         int descriptionIndex = cursor.getColumnIndex(TracksColumns.DESCRIPTION);
 
         boolean isRecording = cursor.getLong(idIndex) == recordingTrackId;
-
-        TextView name = (TextView) view.findViewById(R.id.track_list_item_name);
-        name.setText(cursor.getString(nameIndex));
-        name.setCompoundDrawablesWithIntrinsicBounds(
-            isRecording ? R.drawable.menu_record_track : R.drawable.track, 0, 0, 0);
-
-        TextView category = (TextView) view.findViewById(R.id.track_list_item_category);
-        category.setText(cursor.getString(categoryIndex));
-
-        TextView time = (TextView) view.findViewById(R.id.track_list_item_time);
-        time.setText(StringUtils.formatElapsedTime(cursor.getLong(timeIndex)));
-        time.setVisibility(isRecording ? View.GONE : View.VISIBLE);
-
-        TextView distance = (TextView) view.findViewById(R.id.track_list_item_distance);
-        distance.setText(StringUtils.formatDistance(
-            TrackListActivity.this, cursor.getDouble(distanceIndex), metricUnits));
-        distance.setVisibility(isRecording ? View.GONE : View.VISIBLE);
-
-        TextView start = (TextView) view.findViewById(R.id.track_list_item_start);
-        start.setText(
-            StringUtils.formatDateTime(TrackListActivity.this, cursor.getLong(startIndex)));
-        start.setVisibility(start.getText().equals(name.getText()) ? View.GONE : View.VISIBLE);
-
-        TextView description = (TextView) view.findViewById(R.id.track_list_item_description);
-        description.setText(cursor.getString(descriptionIndex));
-        description.setVisibility(description.getText().length() == 0 ? View.GONE : View.VISIBLE);
+        String name = cursor.getString(nameIndex);
+        int iconId = isRecording ? R.drawable.menu_record_track : R.drawable.track;
+        String category = cursor.getString(categoryIndex);
+        String totalTime = isRecording 
+            ? null : StringUtils.formatElapsedTime(cursor.getLong(timeIndex));
+        String totalDistance = isRecording ? null : StringUtils.formatDistance(
+            TrackListActivity.this, cursor.getDouble(distanceIndex), metricUnits);
+        String startTime = 
+            StringUtils.formatDateTime(TrackListActivity.this, cursor.getLong(startIndex));
+        if (startTime.equals(name)) {
+          startTime = null;
+        }
+        String description = cursor.getString(descriptionIndex);
+        ListItemUtil.setListItem(view,
+            name,
+            iconId,
+            category,
+            totalTime,
+            totalDistance,
+            startTime,
+            description);
       }
     };
     listView.setAdapter(resourceCursorAdapter);
     ApiAdapterFactory.getApiAdapter().configureListViewContextualMenu(
-        this, listView, R.menu.track_list_context_menu, R.id.track_list_item_name,
+        this, listView, R.menu.list_context_menu, R.id.list_item_name,
         contextualActionModeCallback);
    
     getSupportLoaderManager().initLoader(0, null, new LoaderCallbacks<Cursor>() {
@@ -386,7 +381,7 @@ public class TrackListActivity extends FragmentActivity {
   @Override
   public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
     super.onCreateContextMenu(menu, v, menuInfo);
-    getMenuInflater().inflate(R.menu.track_list_context_menu, menu);
+    getMenuInflater().inflate(R.menu.list_context_menu, menu);
   }
   
   @Override
@@ -396,21 +391,30 @@ public class TrackListActivity extends FragmentActivity {
     }
     return super.onContextItemSelected(item);
   }
-  
+
   /**
    * Handles a context item selection.
-   *
+   * 
    * @param itemId the menu item id
    * @param trackId the track id
    * @return true if handled.
    */
   private boolean handleContextItem(int itemId, long trackId) {
+    Intent intent;
     switch (itemId) {
-      case R.id.track_list_context_menu_edit:
-        startActivity(new Intent(this, TrackEditActivity.class).putExtra(
-            TrackEditActivity.EXTRA_TRACK_ID, trackId));
+      case R.id.list_context_menu_show_on_map:
+        intent = new Intent(this, TrackDetailActivity.class).addFlags(
+            Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK)
+            .putExtra(TrackDetailActivity.EXTRA_TRACK_ID, trackId);
+        startActivity(intent);
         return true;
-      case R.id.track_list_context_menu_delete:
+      case R.id.list_context_menu_edit:
+        intent = new Intent(this, TrackEditActivity.class).addFlags(
+            Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK)
+            .putExtra(TrackEditActivity.EXTRA_TRACK_ID, trackId);
+        startActivity(intent);
+        return true;
+      case R.id.list_context_menu_delete:
         DeleteOneTrackDialogFragment.newInstance(trackId).show(
             getSupportFragmentManager(), DeleteOneTrackDialogFragment.DELETE_ONE_TRACK_DIALOG_TAG);
         return true;
@@ -418,7 +422,7 @@ public class TrackListActivity extends FragmentActivity {
         return false;
     }
   }
-  
+
   /**
    * Starts {@link TrackDetailActivity}.
    * 

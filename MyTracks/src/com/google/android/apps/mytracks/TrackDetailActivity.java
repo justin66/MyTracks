@@ -165,13 +165,14 @@ public class TrackDetailActivity extends FragmentActivity {
 
     handleIntent(getIntent());
   }
- 
+
   @Override
   public void onNewIntent(Intent intent) {
     super.onNewIntent(intent);
+    setIntent(intent);
     handleIntent(intent);
-  } 
-  
+  }
+
   @Override
   protected void onStart() {
     super.onStart();

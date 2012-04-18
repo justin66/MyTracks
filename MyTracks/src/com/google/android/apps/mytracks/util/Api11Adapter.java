@@ -59,7 +59,7 @@ public class Api11Adapter extends Api10Adapter {
 
       @Override
       public boolean onItemLongClick(
-          AdapterView<?> parent, View view, int position, final long id) {
+          AdapterView<?> parent, View view, final int position, final long id) {
         if (actionMode != null) {
           return false;
         }
@@ -83,7 +83,7 @@ public class Api11Adapter extends Api10Adapter {
 
           @Override
           public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            return contextualActionModeCallback.onClick(item.getItemId(), id);
+            return contextualActionModeCallback.onClick(item.getItemId(), position, id);
           }
         });
         TextView textView = (TextView) view.findViewById(actionModeTitleId);

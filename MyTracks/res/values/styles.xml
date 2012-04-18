@@ -59,8 +59,16 @@ limitations under the License.
     <item name="android:inputType">textAutoCorrect|textCapWords</item>
     <item name="android:drawablePadding">8dp</item>
     <item name="android:gravity">center_vertical</item>
-  </style>  
-  <!-- The style for the list item category -->
+  </style>
+  <!-- The style for the list empty text view -->
+  <style name="ListEmptyTextView" parent="@android:style/TextAppearance.DeviceDefault.Large">
+    <item name="android:gravity">center</item>
+    <item name="android:layout_gravity">center</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:layout_width">wrap_content</item>
+    <item name="android:padding">8dp</item>
+  </style>
+<!-- The style for the list item category -->
   <style name="ListItemCategory" parent="@android:style/TextAppearance.DeviceDefault.Small">
     <item name="android:layout_height">wrap_content</item>
     <item name="android:layout_width">wrap_content</item>

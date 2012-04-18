@@ -26,10 +26,10 @@ limitations under the License.
     android:layout_width="fill_parent"
     android:orientation="horizontal" >
     <TextView
-      android:id="@+id/track_list_item_name"
+      android:id="@+id/list_item_name"
       style="@style/ListItemName" />
     <TextView
-      android:id="@+id/track_list_item_category"
+      android:id="@+id/list_item_category"
       style="@style/ListItemCategory" />
   </LinearLayout>
   <LinearLayout
@@ -37,18 +37,18 @@ limitations under the License.
     android:layout_width="fill_parent"
     android:orientation="horizontal" >
     <TextView
-      android:id="@+id/track_list_item_time"
+      android:id="@+id/list_item_total_time"
+      android:layout_marginRight="8dp"
       style="@style/ListItemStat" />
     <TextView
-      android:id="@+id/track_list_item_distance"
-      android:layout_marginLeft="8dp"
+      android:id="@+id/list_item_total_distance"
+      android:layout_marginRight="8dp"
       style="@style/ListItemStat" />
     <TextView
-      android:id="@+id/track_list_item_start"
-      android:layout_marginLeft="8dp"
+      android:id="@+id/list_item_start_time"
       style="@style/ListItemStat" />
   </LinearLayout>
   <TextView
-    android:id="@+id/track_list_item_description"
+    android:id="@+id/list_item_description"
     style="@style/ListItemDescription" />
 </LinearLayout>

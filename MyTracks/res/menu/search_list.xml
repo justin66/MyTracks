@@ -16,18 +16,9 @@ limitations under the License.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
   <item
-    android:icon="@drawable/menu_show_on_map"
-    android:id="@+id/marker_list_context_menu_show_on_map"
-    android:showAsAction="always"
-    android:title="@string/menu_show_on_map"/>
-  <item
-    android:icon="@drawable/menu_edit"
-    android:id="@+id/marker_list_context_menu_edit"
-    android:showAsAction="always"
-    android:title="@string/menu_edit"/>
-  <item
-    android:icon="@drawable/menu_delete"
-    android:id="@+id/marker_list_context_menu_delete"
-    android:showAsAction="always"
-    android:title="@string/menu_delete"/>
+    android:actionViewClass="android.widget.SearchView"
+    android:icon="@drawable/menu_search"
+    android:id="@+id/search_list_search"
+    android:showAsAction="always|collapseActionView"
+    android:title="@string/menu_search"/>
 </menu>

@@ -21,6 +21,7 @@ import com.google.android.apps.mytracks.content.Waypoint;
 import com.google.android.apps.mytracks.content.WaypointsColumns;
 import com.google.android.apps.mytracks.fragments.DeleteOneMarkerDialogFragment;
 import com.google.android.apps.mytracks.util.ApiAdapterFactory;
+import com.google.android.apps.mytracks.util.ListItemUtil;
 import com.google.android.apps.mytracks.util.PreferencesUtils;
 import com.google.android.apps.mytracks.util.StringUtils;
 import com.google.android.maps.mytracks.R;
@@ -48,7 +49,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.TextView;
 
 /**
  * Activity to show a list of markers in a track.
@@ -72,7 +72,7 @@ public class MarkerListActivity extends FragmentActivity {
   private ContextualActionModeCallback contextualActionModeCallback =
     new ContextualActionModeCallback() {
     @Override
-    public boolean onClick(int itemId, long id) {
+    public boolean onClick(int itemId, int position, long id) {
       return handleContextItem(itemId, id);
     }
   };
@@ -129,7 +129,7 @@ public class MarkerListActivity extends FragmentActivity {
             .putExtra(MarkerDetailActivity.EXTRA_MARKER_ID, id));
       }
     });
-    resourceCursorAdapter = new ResourceCursorAdapter(this, R.layout.marker_list_item, null, 0) {
+    resourceCursorAdapter = new ResourceCursorAdapter(this, R.layout.list_item, null, 0) {
       @Override
       public void bindView(View view, Context context, Cursor cursor) {
         int typeIndex = cursor.getColumnIndex(WaypointsColumns.TYPE);
@@ -139,40 +139,22 @@ public class MarkerListActivity extends FragmentActivity {
         int descriptionIndex = cursor.getColumnIndex(WaypointsColumns.DESCRIPTION);
 
         boolean statistics = cursor.getInt(typeIndex) == Waypoint.TYPE_STATISTICS;
-        TextView name = (TextView) view.findViewById(R.id.marker_list_item_name);
-        name.setText(cursor.getString(nameIndex));
-        name.setCompoundDrawablesWithIntrinsicBounds(statistics ? R.drawable.ylw_pushpin
-            : R.drawable.blue_pushpin, 0, 0, 0);
-
-        TextView category = (TextView) view.findViewById(R.id.marker_list_item_category);
-        if (!statistics) {
-          category.setText(cursor.getString(categoryIndex));
-        }
-        category.setVisibility(statistics || category.getText().length() == 0 ? View.GONE : View.VISIBLE);
-
-        TextView time = (TextView) view.findViewById(R.id.marker_list_item_time);
-        long timeValue = cursor.getLong(timeIndex);
-        if (timeValue == 0) {
-          time.setVisibility(View.GONE);
-        } else {
-          time.setText(StringUtils.formatDateTime(MarkerListActivity.this, timeValue));
-          time.setVisibility(View.VISIBLE);
-        }
-
-        TextView description = (TextView) view.findViewById(R.id.marker_list_item_description);
-        if (!statistics) {
-          description.setText(cursor.getString(descriptionIndex));
-        }
-        description.setVisibility(statistics || description.getText().length() == 0 ? View.GONE : View.VISIBLE);
+        String name = cursor.getString(nameIndex);
+        int iconId = statistics ? R.drawable.ylw_pushpin : R.drawable.blue_pushpin;
+        String category = statistics ? null : cursor.getString(categoryIndex);
+        long time = cursor.getLong(timeIndex);
+        String startTime = time == 0 
+            ? null : StringUtils.formatDateTime(MarkerListActivity.this, time);
+        String description = statistics ? null : cursor.getString(descriptionIndex);
+        ListItemUtil.setListItem(view, name, iconId, category, null, null, startTime, description);
       }
     };
     listView.setAdapter(resourceCursorAdapter);
-    ApiAdapterFactory.getApiAdapter().configureListViewContextualMenu(
-        this, listView, R.menu.marker_list_context_menu, R.id.marker_list_item_name,
-        contextualActionModeCallback);
+    ApiAdapterFactory.getApiAdapter().configureListViewContextualMenu(this, listView,
+        R.menu.list_context_menu, R.id.list_item_name, contextualActionModeCallback);
 
-
-    final long firstWaypointId = MyTracksProviderUtils.Factory.get(this).getFirstWaypointId(trackId);
+    final long firstWaypointId = MyTracksProviderUtils.Factory.get(this)
+        .getFirstWaypointId(trackId);
     getSupportLoaderManager().initLoader(0, null, new LoaderCallbacks<Cursor>() {
       @Override
       public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
@@ -232,7 +214,7 @@ public class MarkerListActivity extends FragmentActivity {
   @Override
   public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
     super.onCreateContextMenu(menu, v, menuInfo);
-    getMenuInflater().inflate(R.menu.marker_list_context_menu, menu);
+    getMenuInflater().inflate(R.menu.list_context_menu, menu);
   }
 
   @Override
@@ -253,17 +235,17 @@ public class MarkerListActivity extends FragmentActivity {
    */
   private boolean handleContextItem(int itemId, long markerId) {
     switch (itemId) {
-      case R.id.marker_list_context_menu_show_on_map:
+      case R.id.list_context_menu_show_on_map:
         startActivity(new Intent(this, TrackDetailActivity.class).addFlags(
             Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK)
             .putExtra(TrackDetailActivity.EXTRA_MARKER_ID, markerId));
         return true;
-      case R.id.marker_list_context_menu_edit:
+      case R.id.list_context_menu_edit:
         startActivity(new Intent(this, MarkerEditActivity.class).addFlags(
             Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK)
             .putExtra(MarkerEditActivity.EXTRA_MARKER_ID, markerId));
         return true;
-      case R.id.marker_list_context_menu_delete:
+      case R.id.list_context_menu_delete:
         DeleteOneMarkerDialogFragment.newInstance(markerId).show(getSupportFragmentManager(),
             DeleteOneMarkerDialogFragment.DELETE_ONE_MARKER_DIALOG_TAG);
         return true;
