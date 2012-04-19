@@ -1288,11 +1288,11 @@ limitations under the License.
     Finished writing to the SD card.
   </string>
 
-  <!-- Search interface -->
+  <!-- Search -->
   <string name="search_global_description"
     translation_description="Description of what is searched in My Tracks, to be displayed in the
       global system search settings.">
-    Tracks and waypoints
+    Tracks and markers
   </string>
   <string name="search_hint"
     translation_description="The hint shown on the search box until the user types a search query.
@@ -1300,14 +1300,13 @@ limitations under the License.
       keeping this consistent with other Android apps.">
     Search My Tracks
   </string>
-  <string name="search_no_results"
-    translation_description="Message shown instead of a list of results to indicate there were no
-      search results.">
-    No tracks or waypoints matched your search.
+  <string name="search_list_empty_message"
+    translation_description="Message when the search result is empty.">
+    No tracks or markers matched your search.
   </string>
-  <string name="search_track_location"
-    translation_description="In the 'Search Result' page, the text field indicating the track that a
-      waypoint belongs to.
+  <string name="search_list_marker_track_location"
+    translation_description="For a marker returned in the search result, the text field indicating
+      the track that the marker belongs to.
 
       %1$s: track name. E.g., 'Grand Canyon trail'">
     In track \'%1$s\'.
@@ -1315,7 +1314,7 @@ limitations under the License.
   <string name="search_voice_prompt"
     translation_description="Prompt shown when the user activates voice search, asking him to speak
       what will be searched for.">
-    Speak the name of a track or waypoint.
+    Speak the name of a track or marker.
   </string>
 
   <!-- Send Google -->

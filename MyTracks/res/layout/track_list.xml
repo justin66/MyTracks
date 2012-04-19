@@ -26,15 +26,10 @@ limitations under the License.
     android:id="@+id/track_list_empty"
     android:layout_height="fill_parent"
     android:layout_width="fill_parent"
-    android:orientation="vertical"
-    android:padding="8dp" >
+    android:orientation="vertical">
     <TextView
-      android:gravity="center"
-      android:layout_height="wrap_content"
-      android:layout_width="wrap_content"
-      android:paddingBottom="8dp"
       android:text="@string/track_list_empty_message"
-      style="@android:style/TextAppearance.DeviceDefault.Large" >
+      style="@style/ListEmptyTextView" >
     </TextView>
     <ImageButton
       android:contentDescription="@string/menu_record_track"

@@ -47,6 +47,7 @@ public class MarkerDetailActivity extends FragmentActivity {
   private static final String TAG = MarkerDetailActivity.class.getSimpleName();
 
   private long markerId;
+  private Waypoint waypoint;
 
   @Override
   protected void onCreate(Bundle bundle) {
@@ -62,7 +63,7 @@ public class MarkerDetailActivity extends FragmentActivity {
       return;
     }
 
-    Waypoint waypoint = MyTracksProviderUtils.Factory.get(this).getWaypoint(markerId);
+    waypoint = MyTracksProviderUtils.Factory.get(this).getWaypoint(markerId);
     if (waypoint == null) {
       Log.d(TAG, "waypoint is null");
       finish();
@@ -143,7 +144,9 @@ public class MarkerDetailActivity extends FragmentActivity {
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
       case android.R.id.home:
-        finish();
+        startActivity(new Intent(this, MarkerListActivity.class).addFlags(
+            Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK)
+            .putExtra(MarkerListActivity.EXTRA_TRACK_ID, waypoint.getTrackId()));
         return true;
       case R.id.marker_detail_show_on_map:
         startActivity(new Intent(this, TrackDetailActivity.class)
