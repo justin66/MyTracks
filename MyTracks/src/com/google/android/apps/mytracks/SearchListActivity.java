@@ -333,7 +333,7 @@ public class SearchListActivity extends FragmentActivity {
         @Override
       public void run() {
         arrayAdapter.clear();
-        arrayAdapter.addAll(displayResults);
+        ApiAdapterFactory.getApiAdapter().addAllToArrayAdapter(arrayAdapter, displayResults);
       }
     });
 
