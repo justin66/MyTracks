@@ -232,7 +232,16 @@ public class TrackDetailActivity extends AbstractMyTracksActivity {
     Intent intent = IntentUtils.newIntent(this, TrackListActivity.class);
     startActivity(intent);
   }
-  
+
+  @Override
+  public boolean onPrepareOptionsMenu(Menu menu) {
+    String sensorTypeValueNone = getString(R.string.sensor_type_value_none);
+    boolean showSensorState = !sensorTypeValueNone.equals(
+        PreferencesUtils.getString(this, R.string.sensor_type_key, sensorTypeValueNone));
+    menu.findItem(R.id.track_detail_sensor_state).setVisible(showSensorState);
+    return super.onPrepareOptionsMenu(menu);
+  }
+
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     Intent intent;
