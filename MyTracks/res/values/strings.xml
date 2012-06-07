@@ -1670,6 +1670,13 @@ limitations under the License.
       Character limit: ~21 (1 line)">
     Date (local)
   </string>
+  <string name="settings_recording_track_name_location_option"
+    translation_description="In the 'Recording' settings, the option in the 'Track name' dropdown
+      list to use the track location as the track name.
+
+      Character limit: ~21 (1 line)">
+    Location
+  </string>
   <string name="settings_recording_track_name_number_option"
     translation_description="In the 'Recording' settings, the option in the 'Track name' dropdown
       list to use a number as the track name.
