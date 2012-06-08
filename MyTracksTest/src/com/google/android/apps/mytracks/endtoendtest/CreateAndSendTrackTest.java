@@ -46,7 +46,6 @@ public class CreateAndSendTrackTest extends ActivityInstrumentationTestCase2<Tra
     super.setUp();
     instrumentation = getInstrumentation();
     activityMyTracks = getActivity();
-    System.out.println(activityMyTracks.getString(R.string.value_unknown));
     EndToEndTestUtils.setupForAllTest(instrumentation, activityMyTracks);
   }
 

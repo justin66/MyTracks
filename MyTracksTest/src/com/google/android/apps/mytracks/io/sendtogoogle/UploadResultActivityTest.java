@@ -18,9 +18,10 @@ package com.google.android.apps.mytracks.io.sendtogoogle;
 
 import com.google.android.maps.mytracks.R;
 
-import android.app.Dialog;
 import android.content.Intent;
 import android.test.ActivityInstrumentationTestCase2;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -31,8 +32,17 @@ import android.widget.TextView;
  */
 public class UploadResultActivityTest
     extends ActivityInstrumentationTestCase2<UploadResultActivity> {
+  
 
   private UploadResultActivity uploadResultActivity;
+  private TextView errorFooter;
+  private TextView successFooter;
+  private LinearLayout mapsResult;
+  private LinearLayout fusionTablesResult;
+  private LinearLayout docsResult;
+  private ImageView mapsResultIcon;
+  private ImageView fusionTablesResultIcon;
+  private ImageView docsResultIcon;
 
   /**
    * This method is necessary for ActivityInstrumentationTestCase2.
@@ -46,10 +56,17 @@ public class UploadResultActivityTest
    */
   public void testAllSuccess() {
     initialActivity(true, true, true, true, true, true);
-    uploadResultActivity.showDialog(UploadResultActivity.DIALOG_RESULT_ID);
-    Dialog dialog = uploadResultActivity.getDialog();
-    TextView textView = (TextView) dialog.findViewById(R.id.upload_result_success_footer);
-    assertTrue(textView.isShown());
+    createDialogAndGetViews();
+    assertEquals(View.VISIBLE, successFooter.getVisibility()); 
+    assertEquals(View.GONE, errorFooter.getVisibility()); 
+    
+    assertEquals(View.VISIBLE, mapsResult.getVisibility()); 
+    assertEquals(View.VISIBLE, fusionTablesResult.getVisibility()); 
+    assertEquals(View.VISIBLE, docsResult.getVisibility()); 
+    
+    assertEquals(uploadResultActivity.getString(R.string.generic_success_title), mapsResultIcon.getContentDescription());
+    assertEquals(uploadResultActivity.getString(R.string.generic_success_title), fusionTablesResultIcon.getContentDescription());
+    assertEquals(uploadResultActivity.getString(R.string.generic_success_title), docsResultIcon.getContentDescription()); 
   }
 
   /**
@@ -58,10 +75,17 @@ public class UploadResultActivityTest
   public void testAllFailed() {
     // Send all kinds but all failed.
     initialActivity(true, true, true, false, false, false);
-    uploadResultActivity.showDialog(UploadResultActivity.DIALOG_RESULT_ID);
-    Dialog dialog = uploadResultActivity.getDialog();
-    TextView textView = (TextView) dialog.findViewById(R.id.upload_result_error_footer);
-    assertTrue(textView.isShown());
+    createDialogAndGetViews();
+    assertEquals(View.GONE, successFooter.getVisibility()); 
+    assertEquals(View.VISIBLE, errorFooter.getVisibility()); 
+    
+    assertEquals(View.VISIBLE, mapsResult.getVisibility()); 
+    assertEquals(View.VISIBLE, fusionTablesResult.getVisibility()); 
+    assertEquals(View.VISIBLE, docsResult.getVisibility()); 
+    
+    assertEquals(uploadResultActivity.getString(R.string.generic_error_title), mapsResultIcon.getContentDescription());
+    assertEquals(uploadResultActivity.getString(R.string.generic_error_title), fusionTablesResultIcon.getContentDescription());
+    assertEquals(uploadResultActivity.getString(R.string.generic_error_title), docsResultIcon.getContentDescription());
   }
 
   /**
@@ -74,21 +98,19 @@ public class UploadResultActivityTest
    */
   public void testPartialSuccess() {
     initialActivity(true, false, true, true, false, false);
-    uploadResultActivity.showDialog(UploadResultActivity.DIALOG_RESULT_ID);
-    Dialog dialog = uploadResultActivity.getDialog();
-    TextView textView = (TextView) dialog.findViewById(R.id.upload_result_error_footer);
-    assertTrue(textView.isShown());
-    LinearLayout mapsResult = (LinearLayout) dialog.findViewById(R.id.upload_result_maps_result);
-    assertTrue(mapsResult.isShown());
-    LinearLayout fusionTablesResult = (LinearLayout) dialog.findViewById(
-        R.id.upload_result_fusion_tables_result);
-    assertFalse(fusionTablesResult.isShown());
-    LinearLayout docsResult = (LinearLayout) dialog.findViewById(R.id.upload_result_docs_result);
-    assertTrue(docsResult.isShown());
+    createDialogAndGetViews();
+    assertEquals(View.VISIBLE, errorFooter.getVisibility()); 
+    
+    assertEquals(View.VISIBLE, mapsResult.getVisibility()); 
+    assertEquals(View.GONE, fusionTablesResult.getVisibility()); 
+    assertEquals(View.VISIBLE, docsResult.getVisibility()); 
+    
+    assertEquals(uploadResultActivity.getString(R.string.generic_success_title), mapsResultIcon.getContentDescription());
+    assertEquals(uploadResultActivity.getString(R.string.generic_error_title), docsResultIcon.getContentDescription());
   }
 
   /**
-   * Initial a {@link SendRequest} and then initials a activity to be tested.
+   * Initials a {@link SendRequest} and then initials a activity to be tested.
    * 
    * @param isSendMaps
    * @param isSendFusionTables
@@ -110,5 +132,25 @@ public class UploadResultActivityTest
     intent.putExtra(SendRequest.SEND_REQUEST_KEY, sendRequest);
     setActivityIntent(intent);
     uploadResultActivity = this.getActivity();
+  }
+  
+  /**
+   * Creates result dialog and gets views in the dialog.
+   */
+  private void createDialogAndGetViews() {
+    uploadResultActivity.onCreateDialog(UploadResultActivity.DIALOG_RESULT_ID);
+    View view = uploadResultActivity.view;
+    errorFooter = (TextView) view.findViewById(R.id.upload_result_error_footer);
+    successFooter = (TextView) view.findViewById(R.id.upload_result_success_footer);
+    
+    mapsResult = (LinearLayout) view.findViewById(R.id.upload_result_maps_result);
+    fusionTablesResult = (LinearLayout) view.findViewById(
+        R.id.upload_result_fusion_tables_result);
+    docsResult = (LinearLayout) view.findViewById(R.id.upload_result_docs_result);
+    
+    mapsResultIcon = (ImageView) view.findViewById(R.id.upload_result_maps_result_icon);
+    fusionTablesResultIcon = (ImageView) view.findViewById(
+        R.id.upload_result_fusion_tables_result_icon);
+    docsResultIcon = (ImageView) view.findViewById(R.id.upload_result_docs_result_icon);
   }
 }
