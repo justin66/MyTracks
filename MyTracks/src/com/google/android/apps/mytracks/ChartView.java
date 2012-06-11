@@ -22,6 +22,7 @@ import com.google.android.apps.mytracks.util.IntentUtils;
 import com.google.android.apps.mytracks.util.StringUtils;
 import com.google.android.apps.mytracks.util.UnitConversions;
 import com.google.android.maps.mytracks.R;
+import com.google.common.annotations.VisibleForTesting;
 
 import android.content.Context;
 import android.content.Intent;
@@ -118,7 +119,8 @@ public class ChartView extends View {
   private int effectiveHeight = 0;
 
   private boolean chartByDistance = true;
-  private boolean metricUnits = true;
+  @VisibleForTesting
+  public boolean metricUnits = true;
   private boolean reportSpeed = true;
   private boolean showPointer = false;
 
