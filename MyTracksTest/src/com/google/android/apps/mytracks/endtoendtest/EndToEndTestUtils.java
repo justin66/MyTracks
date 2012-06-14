@@ -73,6 +73,7 @@ public class EndToEndTestUtils {
   // Check whether the UI has an action bar which is related with the version of
   // Android OS.
   static boolean hasActionBar = false;
+  static boolean isEmulator = true;
   static boolean isCheckedFirstLaunch = false;
 
   private EndToEndTestUtils() {}
@@ -86,6 +87,11 @@ public class EndToEndTestUtils {
     if (number < 1) { 
       return; 
     }
+    // If it's a real device, does not send simulated GPS signal.
+    if (!isEmulator) {
+      return;
+    }
+    
     PrintStream out = null;
     Socket socket = null;
     try {
@@ -111,6 +117,13 @@ public class EndToEndTestUtils {
       }
     }
   }
+  
+  /**
+   * Checks if the test is run under an emulator.
+   */
+  static void isEmulator() {
+    isEmulator = android.os.Build.MODEL.equals("google_sdk");
+  }
 
   /**
    * A setup for all end-to-end tests.
@@ -119,6 +132,7 @@ public class EndToEndTestUtils {
    * @param activityMyTracks the startup activity
    */
   static void setupForAllTest(Instrumentation instrumentation, TrackListActivity activityMyTracks) {
+    isEmulator();
     EndToEndTestUtils.INSTRUMENTATION = instrumentation;
     EndToEndTestUtils.ACTIVITYMYTRACKS = activityMyTracks;
     EndToEndTestUtils.SOLO = new Solo(EndToEndTestUtils.INSTRUMENTATION,
@@ -304,6 +318,10 @@ public class EndToEndTestUtils {
       EndToEndTestUtils.trackName = EndToEndTestUtils.TRACK_NAME_PREFIX
           + System.currentTimeMillis();
       SOLO.enterText(0, trackName);
+      if(!EndToEndTestUtils.isEmulator) {
+        // Close soft keyboard.
+        EndToEndTestUtils.SOLO.goBack();
+      }
       SOLO.clickLongOnText(ACTIVITYMYTRACKS.getString(R.string.generic_save));
     }
   }
@@ -485,4 +503,5 @@ public class EndToEndTestUtils {
     }
     return null;
   }
+
 }
