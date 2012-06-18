@@ -63,15 +63,21 @@ public class AntSensorManager extends SensorManager {
 
   public static final short WILDCARD = 0;
 
-  private static final int CHANNELS = 2;
-  private static final byte HRM_CHANNEL = (byte) 0;
-  private static final byte SDM_CHANNEL = (byte) 1;
+  private static final int CHANNELS = 4;
+  private static final byte HRM_CHANNEL = (byte) 0; // heart rate monitor
+  private static final byte SDM_CHANNEL = (byte) 1; // speed distance monitor
+  private static final byte BCS_CHANNEL = (byte) 2; // bike cadence sensor
+  private static final byte CBS_CHANNEL = (byte) 3; // combined bike speed and cadence sensor
 
   private static final byte HRM_DEVICE_TYPE = 0x78;
   private static final byte SDM_DEVICE_TYPE = 0x7C;
+  private static final byte BCS_DEVICE_TYPE = 0x7A;
+  private static final byte CBS_DEVICE_TYPE = 0x79;
 
   private static final short HRM_PERIOD = 8070;
   private static final short SDM_PERIOD = 8134;
+  private static final short BCS_PERIOD = 8102;
+  private static final short CBS_PERIOD = 8086;
 
   private static final byte DEFAULT_PROXIMITY_SEARCH_BIN = 7;
 
@@ -89,14 +95,21 @@ public class AntSensorManager extends SensorManager {
   private boolean hasClaimedInterface = false;
   private ChannelStates hrmState = ChannelStates.CLOSED;
   private ChannelStates sdmState = ChannelStates.CLOSED;
+  private ChannelStates bcsState = ChannelStates.CLOSED;
+  private ChannelStates cbsState = ChannelStates.CLOSED;
   private short hrmDeviceNumber = WILDCARD;
   private short sdmDeviceNumber = WILDCARD;
+  private short bcsDeviceNumber = WILDCARD;
+  private short cbsDeviceNumber = WILDCARD;
 
   private SensorDataSet sensorDataSet = null;
   private int lastHeartRate = -1;
   private int lastCadence = -1;
   private long lastSensorDataSetTime = 0;
-
+  
+  private CadenceCounter bcsCadenceCounter;
+  private CadenceCounter cbsCadenceCounter;
+  
   private boolean requestedReset = false;
 
   /**
@@ -110,6 +123,8 @@ public class AntSensorManager extends SensorManager {
     channelConfig = new ChannelConfiguration[CHANNELS];
     channelConfig[HRM_CHANNEL] = new ChannelConfiguration();
     channelConfig[SDM_CHANNEL] = new ChannelConfiguration();
+    channelConfig[BCS_CHANNEL] = new ChannelConfiguration();
+    channelConfig[CBS_CHANNEL] = new ChannelConfiguration();
 
     statusIntentFilter = new IntentFilter();
     statusIntentFilter.addAction(AntInterfaceIntent.ANT_ENABLED_ACTION);
@@ -251,25 +266,51 @@ public class AntSensorManager extends SensorManager {
     channelConfig[channel].period = 0;
     channelConfig[channel].freq = ANT_FREQUENCY;
     channelConfig[channel].proxSearch = DEFAULT_PROXIMITY_SEARCH_BIN;
+    short deviceNumber = -1;
+    byte deviceType = 0;
+    short period = 0;
     switch (channel) {
       case HRM_CHANNEL:
-        hrmDeviceNumber = (short) PreferencesUtils.getInt(
+        deviceNumber = (short) PreferencesUtils.getInt(
             context, R.string.ant_heart_rate_monitor_id_key, WILDCARD);
-        channelConfig[channel].deviceNumber = hrmDeviceNumber;
-        channelConfig[channel].deviceType = HRM_DEVICE_TYPE;
-        channelConfig[channel].period = HRM_PERIOD;
+        deviceType = HRM_DEVICE_TYPE;
+        period = HRM_PERIOD;
+        hrmDeviceNumber = deviceNumber;
         hrmState = ChannelStates.PENDING_OPEN;
         break;
       case SDM_CHANNEL:
-        sdmDeviceNumber = (short) PreferencesUtils.getInt(
+        deviceNumber = (short) PreferencesUtils.getInt(
             context, R.string.ant_speed_distance_monitor_id_key, WILDCARD);
-        channelConfig[channel].deviceNumber = sdmDeviceNumber;
-        channelConfig[channel].deviceType = SDM_DEVICE_TYPE;
-        channelConfig[channel].period = SDM_PERIOD;
+        deviceType = SDM_DEVICE_TYPE;
+        period = SDM_PERIOD;
+        sdmDeviceNumber = deviceNumber;
         sdmState = ChannelStates.PENDING_OPEN;
+        break;
+      case BCS_CHANNEL:
+        deviceNumber = (short) PreferencesUtils.getInt(
+            context, R.string.ant_bike_cadence_sensor_id_key, WILDCARD);
+        deviceType = BCS_DEVICE_TYPE;
+        period = BCS_PERIOD;
+        bcsDeviceNumber = deviceNumber;
+        bcsState = ChannelStates.PENDING_OPEN;
+        bcsCadenceCounter = new CadenceCounter();
+        break;
+      case CBS_CHANNEL:
+        deviceNumber = (short) PreferencesUtils.getInt(
+            context, R.string.ant_combined_bike_sensor_id_key, WILDCARD);
+        deviceType = CBS_DEVICE_TYPE;
+        period = CBS_PERIOD;
+        cbsDeviceNumber = deviceNumber;
+        cbsState = ChannelStates.PENDING_OPEN;
+        cbsCadenceCounter = new CadenceCounter();
         break;
       default:
         break;
+    }
+    if (deviceNumber != -1) {
+      channelConfig[channel].deviceNumber = deviceNumber;
+      channelConfig[channel].deviceType = deviceType;
+      channelConfig[channel].period = period;
     }
     setupAntChannel(ANT_NETWORK, channel);
   }
@@ -288,6 +329,12 @@ public class AntSensorManager extends SensorManager {
         break;
       case SDM_CHANNEL:
         sdmState = ChannelStates.CLOSED;
+        break;
+      case BCS_CHANNEL:
+        bcsState = ChannelStates.CLOSED;
+        break;
+      case CBS_CHANNEL:
+        cbsState = ChannelStates.CLOSED;
         break;
       default:
         break;
@@ -308,6 +355,8 @@ public class AntSensorManager extends SensorManager {
   private void clearAllChannels() {
     hrmState = ChannelStates.CLOSED;
     sdmState = ChannelStates.CLOSED;
+    bcsState = ChannelStates.CLOSED;
+    cbsState = ChannelStates.CLOSED;
     setSensorState(SensorState.DISCONNECTED);
   }
 
@@ -393,6 +442,12 @@ public class AntSensorManager extends SensorManager {
               case SDM_CHANNEL:
                 decodeSdmMessage(ANTRxMessage);
                 break;
+              case BCS_CHANNEL:
+                decodeBcsMessage(ANTRxMessage);
+                break;
+              case CBS_CHANNEL:
+                decodeCbsMessage(ANTRxMessage);
+                break;
               default:
                 break;
             }
@@ -403,28 +458,34 @@ public class AntSensorManager extends SensorManager {
           case AntMesg.MESG_CHANNEL_ID_ID:
             short deviceNum = (short) ((ANTRxMessage[AntMesg.MESG_DATA_OFFSET + 1] & 0xFF
                 | ((ANTRxMessage[AntMesg.MESG_DATA_OFFSET + 2] & 0xFF) << 8)) & 0xFFFF);
+            int keyId = -1;
             // Switch on channel number
             switch (ANTRxMessage[AntMesg.MESG_DATA_OFFSET]) {
               case HRM_CHANNEL:
                 hrmDeviceNumber = deviceNum;
-                PreferencesUtils.setInt(
-                    context, R.string.ant_heart_rate_monitor_id_key, hrmDeviceNumber);
-                Toast.makeText(context,
-                    context.getString(R.string.settings_sensor_connected, deviceNum),
-                    Toast.LENGTH_SHORT).show();
-                setSensorState(SensorState.CONNECTED);
+                keyId = R.string.ant_heart_rate_monitor_id_key;
                 break;
               case SDM_CHANNEL:
                 sdmDeviceNumber = deviceNum;
-                PreferencesUtils.setInt(
-                    context, R.string.ant_speed_distance_monitor_id_key, sdmDeviceNumber);
-                Toast.makeText(context,
-                    context.getString(R.string.settings_sensor_connected, deviceNum),
-                    Toast.LENGTH_SHORT).show();
-                setSensorState(SensorState.CONNECTED);
+                keyId = R.string.ant_speed_distance_monitor_id_key;
+                break;
+              case BCS_CHANNEL:
+                bcsDeviceNumber = deviceNum;
+                keyId = R.string.ant_bike_cadence_sensor_id_key;
+                break;
+              case CBS_CHANNEL:
+                cbsDeviceNumber = deviceNum;
+                keyId = R.string.ant_combined_bike_sensor_id_key;
                 break;
               default:
                 break;
+            }
+            if (keyId != -1) {
+              PreferencesUtils.setInt(context, keyId, deviceNum);
+              Toast.makeText(context,
+                  context.getString(R.string.settings_sensor_connected, deviceNum),
+                  Toast.LENGTH_SHORT).show();
+              setSensorState(SensorState.CONNECTED);
             }
             break;
           default:
@@ -449,26 +510,26 @@ public class AntSensorManager extends SensorManager {
         channelConfig[channelNumber].isDeinitializing = false;
         switch (channelNumber) {
           case HRM_CHANNEL:
-            try {
-              hrmState = ChannelStates.OFFLINE;
-              antInterface.ANTUnassignChannel(HRM_CHANNEL);
-              setSensorState(SensorState.DISCONNECTED);
-            } catch (AntInterfaceException e) {
-              handleAntError();
-            }
+            hrmState = ChannelStates.OFFLINE;
             break;
           case SDM_CHANNEL:
-            try {
-              sdmState = ChannelStates.OFFLINE;
-              antInterface.ANTUnassignChannel(SDM_CHANNEL);
-              setSensorState(SensorState.DISCONNECTED);
-            } catch (AntInterfaceException e) {
-              handleAntError();
-            }
+            sdmState = ChannelStates.OFFLINE;
+            break;
+          case BCS_CHANNEL:
+            bcsState = ChannelStates.OFFLINE;
+            break;
+          case CBS_CHANNEL:
+            cbsState = ChannelStates.OFFLINE;
             break;
           default:
             break;
         }
+        try {
+          antInterface.ANTUnassignChannel(channelNumber);
+        } catch (AntInterfaceException e) {
+          handleAntError();
+        }
+        setSensorState(SensorState.DISCONNECTED);
       }
 
       if (channelConfig[channelNumber].isInitializing) {
@@ -554,6 +615,12 @@ public class AntSensorManager extends SensorManager {
                 case SDM_CHANNEL:
                   sdmState = ChannelStates.SEARCHING;
                   break;
+                case BCS_CHANNEL:
+                  bcsState = ChannelStates.SEARCHING;
+                  break;
+                case CBS_CHANNEL:
+                  cbsState = ChannelStates.SEARCHING;
+                  break;
                 default:
                   break;
               }
@@ -623,6 +690,53 @@ public class AntSensorManager extends SensorManager {
         setSenorDataSet();
       }
     }
+
+    /**
+     * Decodes BCS message.
+     * 
+     * @param message the message
+     */
+    private void decodeBcsMessage(byte[] message) {
+      if (bcsState != ChannelStates.CLOSED) {
+        bcsState = ChannelStates.TRACKING_DATA;
+      }
+
+      if (bcsDeviceNumber == WILDCARD) {
+        try {
+          antInterface.ANTRequestMessage(BCS_CHANNEL, AntMesg.MESG_CHANNEL_ID_ID);
+        } catch (AntInterfaceException e) {
+          handleAntError();
+        }
+      }
+      int crankRevs = ((int) message[9] & 0xFF) + ((int) message[10] & 0xFF) * 256;
+      int sensorTime = ((int) message[7] & 0xFF) + ((int) message[8] & 0xFF) * 256;
+      lastCadence = bcsCadenceCounter.getEventsPerMinute(crankRevs, sensorTime);
+      setSenorDataSet();
+    }
+
+    /**
+     * Decodes CBS message.
+     * 
+     * @param message the message
+     */
+    private void decodeCbsMessage(byte[] message) {
+      if (cbsState != ChannelStates.CLOSED) {
+        cbsState = ChannelStates.TRACKING_DATA;
+      }
+
+      if (cbsDeviceNumber == WILDCARD) {
+        try {
+          antInterface.ANTRequestMessage(CBS_CHANNEL, AntMesg.MESG_CHANNEL_ID_ID);
+        } catch (AntInterfaceException e) {
+          handleAntError();
+        }
+      }
+      int crankRevs = ((int) message[5] & 0xFF) + ((int) message[6] & 0xFF) * 256;
+      int sensorTime = ((int) message[3] & 0xFF) + ((int) message[4] & 0xFF) * 256;
+
+      lastCadence = cbsCadenceCounter.getEventsPerMinute(crankRevs, sensorTime);
+      setSenorDataSet();
+    }
   };
 
   /**
@@ -680,11 +794,15 @@ public class AntSensorManager extends SensorManager {
           dataReceiver, new IntentFilter(AntInterfaceIntent.ANT_RX_MESSAGE_ACTION));
       openChannel(HRM_CHANNEL);
       openChannel(SDM_CHANNEL);
+      openChannel(BCS_CHANNEL);
+      openChannel(CBS_CHANNEL);
     } else {
       try {
         context.unregisterReceiver(dataReceiver);
         closeChannel(HRM_CHANNEL);
         closeChannel(SDM_CHANNEL);
+        closeChannel(BCS_CHANNEL);
+        closeChannel(CBS_CHANNEL);
         setSensorState(SensorState.DISCONNECTED);
       } catch (IllegalArgumentException e) {
         // Can safely ignore
