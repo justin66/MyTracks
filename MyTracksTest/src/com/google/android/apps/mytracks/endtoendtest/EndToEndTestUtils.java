@@ -537,4 +537,20 @@ public class EndToEndTestUtils {
     }
     return null;
   }
+  
+  /**
+   * Resets all settings of MyTracks.
+   * 
+   * @param activityMyTracks current activity
+   * @param keepInSettingList whether keep in setting list or not
+   */
+  public static void resetAllSettings(Activity activityMyTracks, boolean keepInSettingList) {
+    EndToEndTestUtils.findMenuItem(activityMyTracks.getString(R.string.menu_settings), true);
+    EndToEndTestUtils.SOLO.clickOnText(activityMyTracks.getString(R.string.settings_reset));
+    EndToEndTestUtils.SOLO.clickOnButton(activityMyTracks.getString(R.string.generic_ok));
+    INSTRUMENTATION.waitForIdleSync();
+    if (!keepInSettingList) {
+      EndToEndTestUtils.SOLO.goBack();
+    }
+  }
 }
