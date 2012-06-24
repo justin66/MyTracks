@@ -141,7 +141,7 @@ public class TrackDetailActivity extends AbstractMyTracksActivity implements Del
     trackDataHub.loadTrack(trackId);
 
     mapViewContainer = getLayoutInflater().inflate(R.layout.map, null);
-    mapViewContainer.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+    ApiAdapterFactory.getApiAdapter().disableHardwareAccelerated(mapViewContainer);
 
     tabHost = (TabHost) findViewById(android.R.id.tabhost);
     tabHost.setup();

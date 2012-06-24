@@ -32,6 +32,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -148,6 +149,11 @@ public class Api7Adapter implements ApiAdapter {
 
   @Override
   public void invalidMenu(Activity activity) {
+    // Do nothing
+  }
+
+  @Override
+  public void disableHardwareAccelerated(View view) {
     // Do nothing
   }
 

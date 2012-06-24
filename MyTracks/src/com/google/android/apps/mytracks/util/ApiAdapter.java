@@ -26,6 +26,7 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -182,6 +183,15 @@ public interface ApiAdapter {
    * Due to changes in API level 11.
    */
   public void invalidMenu(Activity activity);
+
+  /**
+   * Diables hardware-accelerated rendering for a view.
+   * <p>
+   * Due to chagnes in API level 11.
+   * 
+   * @param view the view
+   */
+  public void disableHardwareAccelerated(View view);
 
   /**
    * Handles the search key press. Returns true if handled.
