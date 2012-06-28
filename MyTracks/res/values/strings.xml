@@ -63,6 +63,11 @@ limitations under the License.
       completion suggestion for blimp.">
     blimp
   </string>
+  <string name="activity_type_boat"
+    translation_description="When entering an 'Activity type', in the auto-complete text box, the
+      completion suggestion for boat.">
+    boat
+  </string>
   <string name="activity_type_climbing"
     translation_description="When entering an 'Activity type', in the auto-complete text box, the
       completion suggestion for climbing.">
