@@ -183,6 +183,10 @@ public class CreateAndSendTrackTest extends ActivityInstrumentationTestCase2<Tra
       assertTrue(EndToEndTestUtils.SOLO.searchText(activityMyTracks
           .getString(R.string.icon_recording)));
     }
+    assertTrue(EndToEndTestUtils.findMenuItem(
+        activityMyTracks.getString(R.string.menu_voice_frequency), false));
+    assertTrue(EndToEndTestUtils.findMenuItem(
+        activityMyTracks.getString(R.string.menu_split_frequency), false));
     createWaypoint();
     EndToEndTestUtils.sendGps(2);
     // Back to tracks list.
