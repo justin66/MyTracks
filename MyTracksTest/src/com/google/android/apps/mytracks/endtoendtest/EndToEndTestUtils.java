@@ -45,6 +45,7 @@ import java.util.HashMap;
  * @author Youtao Liu
  */
 public class EndToEndTestUtils {
+  
   private static final String ANDROID_LOCAL_IP = "10.0.2.2";
   // usually 5554.
   private static final int ANDROID_LOCAL_PORT = 5554;
@@ -60,6 +61,7 @@ public class EndToEndTestUtils {
   
   private static final String MOREOPTION_CLASSNAME = "com.android.internal.view.menu.ActionMenuPresenter$OverflowMenuButton";
 
+  static final String DEFAULTACTIVITY = "TestActivity";
   static final String TRACK_NAME_PREFIX = "testTrackName";
   static final String GPX = "gpx";
   static final String KML = "kml";
@@ -74,6 +76,19 @@ public class EndToEndTestUtils {
   private static final HashMap<String, String> VIEW_MODE_ENGLISH_MULTILINGUAL = new HashMap<String, String>(); 
   public static String RELATIVE_STARTTIME_POSTFIX = "";
   public static String VIEW_MODE = "";
+  static {
+    RELATIVE_STARTTIME_POSTFIX_MULTILINGUAL.put("es", "mins ago");
+    RELATIVE_STARTTIME_POSTFIX_MULTILINGUAL.put("de", "Minuten");
+    RELATIVE_STARTTIME_POSTFIX_MULTILINGUAL.put("fr", "minute");
+    RELATIVE_STARTTIME_POSTFIX_MULTILINGUAL.put("ar", "دقيقة");
+    RELATIVE_STARTTIME_POSTFIX_MULTILINGUAL.put("zh", "分钟前");
+    
+    VIEW_MODE_ENGLISH_MULTILINGUAL.put("es", "mode");
+    VIEW_MODE_ENGLISH_MULTILINGUAL.put("de", "modus");
+    VIEW_MODE_ENGLISH_MULTILINGUAL.put("fr", "Mode");
+    VIEW_MODE_ENGLISH_MULTILINGUAL.put("ar", "وضع");
+    VIEW_MODE_ENGLISH_MULTILINGUAL.put("zh", "模式");
+  }
 
   static Solo SOLO;
   static Instrumentation instrumentation;
@@ -86,21 +101,10 @@ public class EndToEndTestUtils {
 
   private EndToEndTestUtils() {}
   
+  /**
+   * Checks the language, then sets the fields with right string.
+   */
   private static void checkLanguage() {
-    RELATIVE_STARTTIME_POSTFIX_MULTILINGUAL.put("es", "mins ago");
-    RELATIVE_STARTTIME_POSTFIX_MULTILINGUAL.put("de", "Minuten");
-    RELATIVE_STARTTIME_POSTFIX_MULTILINGUAL.put("fr", "minute");
-    RELATIVE_STARTTIME_POSTFIX_MULTILINGUAL.put("ar", "دقيقة");
-    RELATIVE_STARTTIME_POSTFIX_MULTILINGUAL.put("zh", "分钟前");
-    
-    VIEW_MODE_ENGLISH_MULTILINGUAL.put("es", "mode");
-    VIEW_MODE_ENGLISH_MULTILINGUAL.put("de", "modus");
-    VIEW_MODE_ENGLISH_MULTILINGUAL.put("fr", "Mode");
-    VIEW_MODE_ENGLISH_MULTILINGUAL.put("ar", "وضع");
-    VIEW_MODE_ENGLISH_MULTILINGUAL.put("zh", "模式");
-    
-    
-    // Check the language, test in Chinese or English.
     String deviceLanguage = instrumentation.getContext().getResources().getConfiguration().locale.getLanguage();
     if (RELATIVE_STARTTIME_POSTFIX_MULTILINGUAL.get(deviceLanguage) != null) {
       RELATIVE_STARTTIME_POSTFIX = RELATIVE_STARTTIME_POSTFIX_MULTILINGUAL.get(deviceLanguage);
@@ -353,7 +357,9 @@ public class EndToEndTestUtils {
       // trusted.
       EndToEndTestUtils.trackName = EndToEndTestUtils.TRACK_NAME_PREFIX
           + System.currentTimeMillis();
+      SOLO.sendKey(KeyEvent.KEYCODE_DEL);
       SOLO.enterText(0, trackName);
+      SOLO.enterText(1, DEFAULTACTIVITY);
       if(!EndToEndTestUtils.isEmulator) {
         // Close soft keyboard.
         EndToEndTestUtils.SOLO.goBack();
@@ -600,4 +606,5 @@ public class EndToEndTestUtils {
       EndToEndTestUtils.SOLO.goBack();
     }
   }
+
 }

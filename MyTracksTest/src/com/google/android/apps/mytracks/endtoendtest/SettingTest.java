@@ -32,9 +32,7 @@ import java.util.ArrayList;
  * @author Youtao Liu
  */
 public class SettingTest extends ActivityInstrumentationTestCase2<TrackListActivity> {
-
-  private final String DEFAULTACTIVITY = "TestActivity";
-
+  
   private Instrumentation instrumentation;
   private TrackListActivity activityMyTracks;
 
@@ -281,7 +279,7 @@ public class SettingTest extends ActivityInstrumentationTestCase2<TrackListActiv
     // Changes the setting of default activity.
     EndToEndTestUtils.SOLO.clickOnText(activityMyTracks
         .getString(R.string.settings_recording_default_activity));
-    EndToEndTestUtils.SOLO.enterText(0, DEFAULTACTIVITY);
+    EndToEndTestUtils.SOLO.enterText(0, EndToEndTestUtils.DEFAULTACTIVITY);
     if(!EndToEndTestUtils.isEmulator) {
       // Close soft keyboard.
       EndToEndTestUtils.SOLO.goBack();
@@ -297,7 +295,7 @@ public class SettingTest extends ActivityInstrumentationTestCase2<TrackListActiv
     instrumentation.waitForIdleSync();
     assertTrue(EndToEndTestUtils.SOLO.searchText(activityMyTracks.getString(
         R.string.track_name_format).split(" ")[0]));
-    assertTrue(EndToEndTestUtils.SOLO.searchText(DEFAULTACTIVITY));
+    assertTrue(EndToEndTestUtils.SOLO.searchText(EndToEndTestUtils.DEFAULTACTIVITY));
     EndToEndTestUtils.SOLO.clickOnText(activityMyTracks.getString(R.string.generic_save));
 
   }
