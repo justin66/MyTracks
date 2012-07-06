@@ -277,6 +277,7 @@ public class EndToEndTestUtils {
       INSTRUMENTATION.waitForIdleSync();
       SOLO.clickOnText(ACTIVITYMYTRACKS.getString(R.string.menu_record_track));
     }
+    INSTRUMENTATION.waitForIdleSync();
   }
   
   /**
