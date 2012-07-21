@@ -26,7 +26,7 @@ import android.content.Intent;
 
 /**
  * MyTracksApplication for keeping global state.
- *
+ * 
  * @author Jimmy Shih
  */
 public class MyTracksApplication extends Application {
@@ -45,13 +45,18 @@ public class MyTracksApplication extends Application {
   }
 
   /**
-   * Gets the application's TrackDataHub.
-   * 
-   * Note: use synchronized to make sure only one instance is created per application.
+   * Gets the application's TrackDataHub. Note: use synchronized to make sure
+   * only one instance is created per application.
    */
   public synchronized TrackDataHub getTrackDataHub() {
     if (trackDataHub == null) {
+      /*
+       * TODO: One TrackDataHub per TrackDetailActivity. Match start/stop
+       * TrackDataHub with TrackDetailActivity lifecycle. Call
+       * TrackDataHub.loadTrack when TrackDetailActivity resumes.
+       */
       trackDataHub = TrackDataHub.newInstance(getApplicationContext());
+      trackDataHub.start();
     }
     return trackDataHub;
   }

@@ -174,7 +174,7 @@ public class TrackDetailActivity extends AbstractMyTracksActivity implements Del
   @Override
   protected void onStart() {
     super.onStart();
-    trackDataHub.start();
+    //trackDataHub.start();
   }
 
   @Override
@@ -193,7 +193,7 @@ public class TrackDetailActivity extends AbstractMyTracksActivity implements Del
   @Override
   protected void onStop() {
     super.onStop();
-    trackDataHub.stop();
+    //trackDataHub.stop();
   }
 
   @Override
