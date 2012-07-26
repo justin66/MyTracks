@@ -45,7 +45,9 @@ public class SingleColorTrackPathPainter implements TrackPathPainter {
 
   @Override
   public void drawTrack(Canvas canvas) {
-    canvas.drawPath(path, selectedTrackPaint);
+    if (path != null) {
+      canvas.drawPath(path, selectedTrackPaint);
+    }
   }
 
   @Override
@@ -71,7 +73,7 @@ public class SingleColorTrackPathPainter implements TrackPathPainter {
       Boolean alwaysVisible, List<CachedLocation> points, Path pathToUpdate) {
     pathToUpdate.incReserve(points.size());
     // Whether to start a new segment on new valid and visible point.
-    boolean newSegment = startLocationIdx <= 0 || !points.get(startLocationIdx - 1).valid;
+    boolean newSegment = startLocationIdx <= 0 || !points.get(startLocationIdx - 1).isValid();
     boolean lastVisible = !newSegment;
     final Point pt = new Point();
     // Loop over track points.
@@ -79,12 +81,12 @@ public class SingleColorTrackPathPainter implements TrackPathPainter {
       CachedLocation loc = points.get(i);
 
       // Check if valid, if not then indicate a new segment.
-      if (!loc.valid) {
+      if (!loc.isValid()) {
         newSegment = true;
         continue;
       }
 
-      final GeoPoint geoPoint = loc.geoPoint;
+      final GeoPoint geoPoint = loc.getGeoPoint();
       // Check if this breaks the existing segment.
       boolean visible = alwaysVisible
           || viewRect.contains(geoPoint.getLongitudeE6(), geoPoint.getLatitudeE6());

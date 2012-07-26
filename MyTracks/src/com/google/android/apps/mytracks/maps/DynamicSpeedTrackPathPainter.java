@@ -69,7 +69,7 @@ public class  DynamicSpeedTrackPathPainter implements TrackPathPainter {
   public void updatePath(Projection projection, Rect viewRect, int startLocationIdx, 
       Boolean alwaysVisible, List<CachedLocation> points) {
     // Whether to start a new segment on new valid and visible point.
-    boolean newSegment = startLocationIdx <= 0 || !points.get(startLocationIdx - 1).valid; 
+    boolean newSegment = startLocationIdx <= 0 || !points.get(startLocationIdx - 1).isValid(); 
     boolean lastVisible = !newSegment;
     final Point pt = new Point();
     
@@ -83,12 +83,12 @@ public class  DynamicSpeedTrackPathPainter implements TrackPathPainter {
       CachedLocation loc = points.get(i);
       
       // Check if valid, if not then indicate a new segment.
-      if (!loc.valid) {
+      if (!loc.isValid()) {
         newSegment = true;
         continue;
       }
       
-      final GeoPoint geoPoint = loc.geoPoint;
+      final GeoPoint geoPoint = loc.getGeoPoint();
       // Check if this breaks the existing segment.
       boolean visible = alwaysVisible || viewRect.contains(
           geoPoint.getLongitudeE6(), geoPoint.getLatitudeE6());
@@ -104,10 +104,10 @@ public class  DynamicSpeedTrackPathPainter implements TrackPathPainter {
         newSegment = false;
       } else {
         ColoredPath coloredPath;
-        if(loc.speed <= slowSpeed) {
+        if(loc.getSpeed() <= slowSpeed) {
           coloredPath = new ColoredPath(selectedTrackPaintSlow);
         }
-        else if(loc.speed <= normalSpeed) {
+        else if(loc.getSpeed() <= normalSpeed) {
           coloredPath = new ColoredPath(selectedTrackPaintMedium);
         } else {
           coloredPath = new ColoredPath(selectedTrackPaintFast);
