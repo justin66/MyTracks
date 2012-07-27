@@ -40,6 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * A unit test for {@link MyTracksProviderUtilsImpl}.
  *
  * @author Bartlomiej Niechwiej
+ * @author Youtao Liu
  */
 public class MyTracksProviderUtilsImplTest extends AndroidTestCase {
   private Context context;

@@ -18,6 +18,7 @@ package com.google.android.apps.mytracks.content;
 
 import com.google.android.apps.mytracks.util.PreferencesUtils;
 import com.google.android.maps.mytracks.R;
+import com.google.common.annotations.VisibleForTesting;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;
@@ -45,13 +46,15 @@ import android.util.Log;
 public class MyTracksProvider extends ContentProvider {
 
   private static final String TAG = MyTracksProvider.class.getSimpleName();
-  private static final String DATABASE_NAME = "mytracks.db";
+  @VisibleForTesting
+  static final String DATABASE_NAME = "mytracks.db";
   private static final int DATABASE_VERSION = 20;
 
   /**
-   * Database helper for creating and upgrading the databasae.
+   * Database helper for creating and upgrading the database.
    */
-  private static class DatabaseHelper extends SQLiteOpenHelper {
+  @VisibleForTesting
+  static class DatabaseHelper extends SQLiteOpenHelper {
   
     public DatabaseHelper(Context context) {
       super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -128,10 +131,19 @@ public class MyTracksProvider extends ContentProvider {
 
   @Override
   public boolean onCreate() {
+    return onCreate(getContext());
+  }
+  
+  /**
+   * Helper method to make onCreate is testable.
+   * @param context context to creates database
+   * @return true means run successfully
+   */
+  public boolean onCreate(Context context) {
     if (!canAccess()) {
       return false;
     }
-    DatabaseHelper databaseHelper = new DatabaseHelper(getContext());
+    DatabaseHelper databaseHelper = new DatabaseHelper(context);
     try {
       db = databaseHelper.getWritableDatabase();
     } catch (SQLiteException e) {
@@ -444,5 +456,15 @@ public class MyTracksProvider extends ContentProvider {
       return uri;
     }
     throw new SQLException("Failed to insert a waypoint " + url);
+  }
+  
+  /**
+   * Gets the db.
+   * 
+   * @return the SQLiteDatabase object
+   */
+  @VisibleForTesting
+  SQLiteDatabase getDb() {
+    return db;
   }
 }
