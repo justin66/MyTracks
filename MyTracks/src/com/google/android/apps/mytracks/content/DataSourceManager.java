@@ -18,6 +18,8 @@ package com.google.android.apps.mytracks.content;
 
 import static com.google.android.apps.mytracks.Constants.TAG;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.database.ContentObserver;
@@ -100,7 +102,8 @@ public class DataSourceManager {
    * 
    * @author Jimmy Shih
    */
-  private class CurrentLocationListener implements LocationListener {
+  @VisibleForTesting
+  class CurrentLocationListener implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
@@ -137,7 +140,8 @@ public class DataSourceManager {
    * 
    * @author Jimmy Shih
    */
-  private class HeadingListener implements SensorEventListener {
+  @VisibleForTesting
+  class HeadingListener implements SensorEventListener {
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {

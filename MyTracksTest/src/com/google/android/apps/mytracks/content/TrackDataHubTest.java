@@ -21,6 +21,9 @@ import static com.google.android.testing.mocking.AndroidMock.expect;
 import static com.google.android.testing.mocking.AndroidMock.isA;
 
 import com.google.android.apps.mytracks.Constants;
+import com.google.android.apps.mytracks.TrackStubUtils;
+import com.google.android.apps.mytracks.content.DataSourceManager.CurrentLocationListener;
+import com.google.android.apps.mytracks.content.DataSourceManager.HeadingListener;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils.LocationFactory;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils.LocationIterator;
 import com.google.android.apps.mytracks.content.TrackDataListener.LocationState;
@@ -780,5 +783,193 @@ public class TrackDataHubTest extends AndroidTestCase {
     public void close() {
       // Do nothing
     }
+  }
+  
+  private void expectStart() {
+    dataSource.registerOnSharedPreferenceChangeListener(capture(preferenceChangeListenerCapture));
+  }
+  
+  /**
+   * Tests the method {@link TrackDataHub#start()}. This method would also cover
+   * some logic of {@link TrackDataHub#loadDataForAll()} and 
+   * {@link TrackDataHub#notifySelectedTrackChanged(Set)}.
+   */
+  public void testStart_notifySelectedTrackChanged() {    
+    expectStart();
+    Track track = TrackStubUtils.createTrack(1);
+    expect(myTracksProviderUtils.getTrack(capture(new Capture<Long>()))).andReturn(track);
+    // Make the recording track id is not euqal with selected track id.
+    PreferencesUtils.setLong(context, R.string.recording_track_id_key, 1L);
+    trackDataListener1.onSelectedTrackChanged(track, false);
+    replay();
+    trackDataHub.start();
+    trackDataHub.registerTrackDataListener(trackDataListener1, EnumSet.of(TrackDataType.SELECTED_TRACK));
+    verifyAndReset();
+  }
+  
+  /**
+   * Tests the method {@link TrackDataHub#start()}. This method would also cover
+   * some logic of {@link TrackDataHub#loadDataForAll()} and 
+   * {@link TrackDataHub#notifyTracksTableUpdate(Set)}.
+   */
+  public void testStart_notifyTracksTableUpdate() {    
+    expectStart();
+    Capture<ContentObserver> observerCapture = new Capture<ContentObserver>();
+    dataSource.registerContentObserver(eq(TracksColumns.CONTENT_URI), capture(observerCapture));
+    Track track = TrackStubUtils.createTrack(1);
+    expect(myTracksProviderUtils.getTrack(capture(new Capture<Long>()))).andReturn(track);
+    // Make the recording track id is not euqal with selected track id.
+    PreferencesUtils.setLong(context, R.string.recording_track_id_key, 1L);
+    trackDataListener1.onTrackUpdated(track);
+    replay();
+    trackDataHub.start();
+    trackDataHub.registerTrackDataListener(trackDataListener1, EnumSet.of(TrackDataType.TRACKS_TABLE));
+    verifyAndReset();
+    trackDataHub.setStartStatus(false);
+  }
+  
+  /**
+   * Tests the method {@link TrackDataHub#start()}. This method would also cover
+   * some logic of {@link TrackDataHub#loadDataForAll()} and 
+   * {@link TrackDataHub#notifyWaypointsTableUpdate(Set)}.
+   */
+  public void testStart_notifyWaypointsTableUpdate() {    
+    expectStart();
+    Capture<ContentObserver> observerCapture = new Capture<ContentObserver>();
+    dataSource.registerContentObserver(eq(WaypointsColumns.CONTENT_URI), capture(observerCapture));    
+    expect(myTracksProviderUtils.getWaypointsCursor(capture(new Capture<Long>()), capture(new Capture<Long>()),
+        capture(new Capture<Integer>()))).andReturn(null);
+    trackDataListener1.clearWaypoints();
+    trackDataListener1.onNewWaypointsDone();
+    replay();
+    trackDataHub.start();
+    trackDataHub.registerTrackDataListener(trackDataListener1, EnumSet.of(TrackDataType.WAYPOINTS_TABLE));
+    verifyAndReset();
+    trackDataHub.setStartStatus(false);
+  }
+  
+  /**
+   * Tests the method {@link TrackDataHub#start()}. This method would also cover
+   * some logic of {@link TrackDataHub#loadDataForAll()} and 
+   * {@link TrackDataHub#notifyLocationStateChanged(Set)}.
+   */
+  public void testStart_notifyLocationStateChanged() {    
+    expectStart();
+    Capture<CurrentLocationListener> currentLocationListener = new Capture<CurrentLocationListener>();
+    dataSource.registerLocationListener(capture(currentLocationListener));    
+    trackDataListener1.onLocationStateChanged(capture(new Capture<LocationState>()));
+    replay();
+    trackDataHub.setLastSeenLocation(null);
+    trackDataHub.start();
+    trackDataHub.registerTrackDataListener(trackDataListener1, EnumSet.of(TrackDataType.LOCATION));
+    verifyAndReset();
+    trackDataHub.setStartStatus(false);
+  }
+  
+  /**
+   * Tests the method {@link TrackDataHub#start()}. This method would also cover
+   * some logic of {@link TrackDataHub#loadDataForAll()} and 
+   * {@link TrackDataHub#notifyLocationChanged(Location, boolean, Set)}.
+   */
+  public void testStart_notifyLocationChanged() {    
+    expectStart();
+    Capture<CurrentLocationListener> currentLocationListener = new Capture<CurrentLocationListener>();
+    dataSource.registerLocationListener(capture(currentLocationListener));   
+    trackDataListener1.onLocationStateChanged(capture(new Capture<LocationState>()));
+    trackDataListener1.onLocationChanged(capture(new Capture<Location>()));
+    replay();
+    trackDataHub.setLastSeenLocation(new Location("gps"));
+    trackDataHub.start();
+    trackDataHub.registerTrackDataListener(trackDataListener1, EnumSet.of(TrackDataType.LOCATION));
+    verifyAndReset();
+    trackDataHub.setStartStatus(false);
+  }
+  
+  /**
+   * Tests the method {@link TrackDataHub#start()}. This method would also cover
+   * some logic of {@link TrackDataHub#loadDataForAllListeners()} and 
+   * {@link TrackDataHub#notifyHeadingChanged(float)}.
+   */
+  public void testStart_HeadingChanged() {    
+    expectStart();
+    Capture<HeadingListener> compassListener = new Capture<HeadingListener>();
+    dataSource.registerHeadingListener(capture(compassListener));    
+    trackDataListener1.onHeadingChanged(capture(new Capture<Float>()));
+    replay();
+    trackDataHub.start();
+    trackDataHub.registerTrackDataListener(trackDataListener1, EnumSet.of(TrackDataType.HEADING));
+    verifyAndReset();
+    trackDataHub.setStartStatus(false);
+  }
+  
+  
+
+  /**
+   * Tests the method {@link TrackDataHub#notifyPreferenceChanged(String)} when
+   * the key is R.string.min_required_accuracy_key.
+   */
+  public void testNotifyPreferenceChanged_minRequiredAccuracy() {
+    int value = 1;
+    PreferencesUtils.setInt(context, R.string.min_required_accuracy_key, value);
+    trackDataHub.notifyPreferenceChanged(PreferencesUtils
+        .getKey(context, R.string.min_required_accuracy_key));
+    assertEquals(value, trackDataHub.getMinRequiredAccuracy());
+    PreferencesUtils.setInt(context, R.string.min_required_accuracy_key, value + 1);
+    trackDataHub.notifyPreferenceChanged(PreferencesUtils
+        .getKey(context, R.string.min_required_accuracy_key));
+    assertEquals(value + 1, trackDataHub.getMinRequiredAccuracy());
+  }
+  
+  /**
+   * Tests the method {@link TrackDataHub#notifyPreferenceChanged(String)} when
+   * the key is R.string.metric_units_key and started status is false.
+   */
+  public void testNotifyPreferenceChanged_metricUnits_noNotify() {
+    boolean value = false;
+    PreferencesUtils.setBoolean(context, R.string.metric_units_key, value);
+    trackDataHub.setStartStatus(false);
+    trackDataHub.notifyPreferenceChanged(PreferencesUtils
+        .getKey(context, R.string.metric_units_key));
+    assertEquals(value, trackDataHub.getMetricUnits());
+    PreferencesUtils.setBoolean(context, R.string.metric_units_key, !value);
+    trackDataHub.notifyPreferenceChanged(PreferencesUtils
+        .getKey(context, R.string.metric_units_key));
+    assertEquals(!value, trackDataHub.getMetricUnits());
+  }
+  
+  
+  /**
+   * Tests the method {@link TrackDataHub#notifyPreferenceChanged(String)} when
+   * the key is R.string.metric_units_key and started status is false.
+   */
+  public void testNotifyPreferenceChanged_reportSpeed_noNotify() {
+    boolean value = false;
+    PreferencesUtils.setBoolean(context, R.string.report_speed_key, value);
+    trackDataHub.setStartStatus(false);
+    trackDataHub.notifyPreferenceChanged(PreferencesUtils
+        .getKey(context, R.string.report_speed_key));
+    assertEquals(value, trackDataHub.getReportSpeed());
+    PreferencesUtils.setBoolean(context, R.string.report_speed_key, !value);
+    trackDataHub.notifyPreferenceChanged(PreferencesUtils
+        .getKey(context, R.string.report_speed_key));
+    assertEquals(!value, trackDataHub.getReportSpeed());
+  }
+  
+  /**
+   * Tests the method {@link TrackDataHub#notifyPreferenceChanged(String)} when
+   * the key is R.string.selected_track_id_key and no listener is registered.
+   */
+  public void testNotifyPreferenceChanged_trackId_noListener() {
+    long value = 1;
+    trackDataHub.setStartStatus(true);
+    PreferencesUtils.setLong(context, R.string.selected_track_id_key, value);
+    trackDataHub.notifyPreferenceChanged(PreferencesUtils
+        .getKey(context, R.string.selected_track_id_key));
+    assertEquals(value, trackDataHub.getSelectedTrackId());
+    PreferencesUtils.setLong(context, R.string.selected_track_id_key, value + 1);
+    trackDataHub.notifyPreferenceChanged(PreferencesUtils
+        .getKey(context, R.string.selected_track_id_key));
+    assertEquals(value + 1, trackDataHub.getSelectedTrackId());
+    trackDataHub.setStartStatus(false);
   }
 }

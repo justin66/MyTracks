@@ -774,4 +774,64 @@ public class TrackDataHub implements DataSourceListener {
     }
     handler.post(runnable);
   }
+  
+  /**
+   * Gets the value selectedTrackId.
+   * 
+   * @return the selectedTrackId
+   */
+  @VisibleForTesting
+  protected long getSelectedTrackId() {
+    return selectedTrackId;
+  }
+  
+  /**
+   * Gets the minRequiredAccuracy.
+   * 
+   * @return the minRequiredAccuracy
+   */
+  @VisibleForTesting
+  protected int getMinRequiredAccuracy() {
+    return minRequiredAccuracy;
+  }
+  
+  /**
+   * Gets the metricUnits.
+   * 
+   * @return the metricUnits
+   */
+  @VisibleForTesting
+  protected boolean getMetricUnits() {
+    return metricUnits;
+  }
+  
+  /**
+   * Gets the reportSpeed.
+   * 
+   * @return the reportSpeed
+   */
+  @VisibleForTesting
+  protected boolean getReportSpeed() {
+    return reportSpeed;
+  }
+  
+  /**
+   * Sets the status of started.
+   * 
+   * @param startStatus status of started
+   */
+  @VisibleForTesting
+  protected void setStartStatus(boolean startStatus) {
+    started = startStatus;
+  }
+  
+  /**
+   * Sets the value of lastSeenLocation.
+   * 
+   * @param value of lastSeenLocation
+   */
+  @VisibleForTesting
+  protected  void setLastSeenLocation(Location lastSeenLocation) {
+    this.lastSeenLocation = lastSeenLocation;
+  }
 }
