@@ -51,7 +51,7 @@ public class EndToEndTestUtils {
   
   private static final String ANDROID_LOCAL_IP = "10.0.2.2";
   // usually 5554.
-  private static final int ANDROID_LOCAL_PORT = 5554;
+  static int ANDROID_LOCAL_PORT = 5554;
 
   private static final int ORIENTATION_PORTRAIT = 1;
   private static final int ORIENTATION_LANDSCAPE = 0;
@@ -127,6 +127,7 @@ public class EndToEndTestUtils {
   static boolean isEmulator = true;
   static boolean hasGpsSingal = true;
   static boolean isCheckedFirstLaunch = false;
+  public static final String LOG_TAG = "MyTracksTest";
 
   private EndToEndTestUtils() {}
   
