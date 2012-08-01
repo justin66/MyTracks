@@ -26,6 +26,7 @@ import com.google.android.apps.mytracks.content.Waypoint;
 import com.google.android.apps.mytracks.fragments.DeleteOneMarkerDialogFragment;
 import com.google.android.apps.mytracks.fragments.DeleteOneTrackDialogFragment;
 import com.google.android.apps.mytracks.fragments.DeleteOneTrackDialogFragment.DeleteOneTrackCaller;
+import com.google.android.apps.mytracks.services.MyTracksLocationManager;
 import com.google.android.apps.mytracks.services.TrackRecordingServiceConnection;
 import com.google.android.apps.mytracks.stats.TripStatistics;
 import com.google.android.apps.mytracks.util.ApiAdapterFactory;
@@ -112,7 +113,7 @@ public class SearchListActivity extends AbstractMyTracksActivity implements Dele
   private MyTracksProviderUtils myTracksProviderUtils;
   private SearchEngine searchEngine;
   private SearchRecentSuggestions searchRecentSuggestions;
-  private LocationManager locationManager;
+  private MyTracksLocationManager myTracksLocationManager;
   private long recordingTrackId;
   private boolean metricUnits;
   private ArrayAdapter<Map<String, Object>> arrayAdapter;
@@ -131,7 +132,7 @@ public class SearchListActivity extends AbstractMyTracksActivity implements Dele
     myTracksProviderUtils = MyTracksProviderUtils.Factory.get(this);
     searchEngine = new SearchEngine(myTracksProviderUtils);
     searchRecentSuggestions = SearchEngineProvider.newHelper(this);
-    locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+    myTracksLocationManager = new MyTracksLocationManager(this);
     getSharedPreferences(Constants.SETTINGS_NAME, Context.MODE_PRIVATE)
         .registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
     recordingTrackId = PreferencesUtils.getLong(this, R.string.recording_track_id_key);
@@ -204,6 +205,7 @@ public class SearchListActivity extends AbstractMyTracksActivity implements Dele
   @Override
   protected void onDestroy() {
     super.onDestroy();
+    myTracksLocationManager.close();
     trackRecordingServiceConnection.unbind();
   }
 
@@ -321,7 +323,7 @@ public class SearchListActivity extends AbstractMyTracksActivity implements Dele
     String textQuery = intent.getStringExtra(SearchManager.QUERY);
     setTitle(textQuery);
 
-    Location currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+    Location currentLocation = myTracksLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
     final SearchQuery query = new SearchQuery(textQuery, currentLocation, -1L, System
         .currentTimeMillis());
     new Thread() {

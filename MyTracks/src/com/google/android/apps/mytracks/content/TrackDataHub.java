@@ -267,6 +267,7 @@ public class TrackDataHub {
 
     started = false;
 
+    dataSources.close();
     dataSources = null;
     dataSourceManager = null;
     listenerHandlerThread = null;

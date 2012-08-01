@@ -662,11 +662,22 @@ limitations under the License.
   </string>
 
   <!-- GPS -->
+  <string name="gps_google_location_settings"
+     translation_description="In Android, the Google location settings to modify location settings
+      for all Google applications. See Settings -> Google -> Location settings.">
+    \'Google location settings\'
+  </string>
+  <string name="gps_location_access"
+    translation_description="In Android, the location access settings to modify location settings
+      for all applications. See Settings -> Location access.">
+    \'Location access\'
+  </string>
   <string name="gps_need_to_enable"
     translation_description="In the main view, the message on the top asking the user to enable
-      GPS.">
-    Tap here to go to \'Location services\' settings &amp; check \'GPS satellites\'. Press the back
-    button to return.
+      GPS.
+
+      %1$s location settings. E.g., 'Google location settings'.">
+    GPS not enabled. Tap here to go to %1$s. Press the back button to return.
   </string>
   <string name="gps_not_found"
     translation_description="On application start, message when there is no GPS on the device.">
@@ -1167,9 +1178,11 @@ limitations under the License.
   </string>
   <string name="my_location_no_location"
     translation_description="When displaying the user's current location, a status message
-      indicating that the current location cannot be determined.">
-    GPS is not available. Current location cannot be determined. Enable more location sources (see
-    \'Location services\' settings) &amp; make sure the sky is visible. Try again later.
+      indicating that the current location cannot be determined.
+
+      %1$s location settings. E.g., 'Google location settings'.">
+    GPS is not available. Current location cannot be determined. Enable more location sources at
+    %1$s &amp; make sure the sky is visible. Try again later.
   </string>
 
   <!-- My Tracks -->

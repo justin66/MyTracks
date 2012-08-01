@@ -85,7 +85,7 @@ public class TrackRecordingService extends Service {
 
   static final int MAX_AUTO_RESUME_TRACK_RETRY_ATTEMPTS = 3;
 
-  private LocationManager locationManager;
+  private MyTracksLocationManager myTracksLocationManager;
   private WakeLock wakeLock;
 
   private int minRecordingDistance = PreferencesUtils.MIN_RECORDING_DISTANCE_DEFAULT;
@@ -155,16 +155,16 @@ public class TrackRecordingService extends Service {
 
     @Override
     public void onLocationChanged(final Location location) {
-      if (executorService.isShutdown() || executorService.isTerminated()) {
+      if (!myTracksLocationManager.isAllowed() || executorService.isShutdown()
+          || executorService.isTerminated()) {
         return;
       }
-      executorService.submit(
-        new Runnable() {
-          @Override
-          public void run() {
-            onLocationChangedAsync(location);
-          }
-        });
+      executorService.submit(new Runnable() {
+        @Override
+        public void run() {
+          onLocationChangedAsync(location);
+        }
+      });
     }
   };
 
@@ -243,7 +243,7 @@ public class TrackRecordingService extends Service {
     super.onCreate();
     Log.d(TAG, "TrackRecordingService.onCreate");
     providerUtils = MyTracksProviderUtils.Factory.get(this);
-    locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+    myTracksLocationManager = new MyTracksLocationManager(this);
 
     setUpTaskExecutors();
     executorService = Executors.newSingleThreadExecutor();
@@ -367,7 +367,8 @@ public class TrackRecordingService extends Service {
     }
 
     // Make sure we have no indirect references to this service.
-    locationManager = null;
+    myTracksLocationManager.close();
+    myTracksLocationManager = null;
     providerUtils = null;
     binder.detachFromService();
     binder = null;
@@ -530,7 +531,7 @@ public class TrackRecordingService extends Service {
   }
 
   private void registerLocationListener() {
-    if (locationManager == null) {
+    if (myTracksLocationManager == null) {
       Log.e(TAG,
           "TrackRecordingService: Do not have any location manager.");
       return;
@@ -539,7 +540,7 @@ public class TrackRecordingService extends Service {
         "Preparing to register location listener w/ TrackRecordingService...");
     try {
       long desiredInterval = locationListenerPolicy.getDesiredPollingInterval();
-      locationManager.requestLocationUpdates(
+      myTracksLocationManager.requestLocationUpdates(
           LocationManager.GPS_PROVIDER, desiredInterval,
           locationListenerPolicy.getMinDistance(),
           // , 0 /* minDistance, get all updates to properly time pauses */
@@ -555,12 +556,12 @@ public class TrackRecordingService extends Service {
   }
 
   private void unregisterLocationListener() {
-    if (locationManager == null) {
+    if (myTracksLocationManager == null) {
       Log.e(TAG,
           "TrackRecordingService: Do not have any location manager.");
       return;
     }
-    locationManager.removeUpdates(locationListener);
+    myTracksLocationManager.removeUpdates(locationListener);
     Log.d(TAG,
         "Location listener now unregistered w/ TrackRecordingService.");
   }

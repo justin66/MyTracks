@@ -29,6 +29,7 @@ import com.google.android.apps.mytracks.content.Waypoint;
 import com.google.android.apps.mytracks.stats.TripStatistics;
 import com.google.android.apps.mytracks.util.ApiAdapterFactory;
 import com.google.android.apps.mytracks.util.GeoRect;
+import com.google.android.apps.mytracks.util.GoogleLocationUtils;
 import com.google.android.apps.mytracks.util.LocationUtils;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapController;
@@ -265,27 +266,33 @@ public class MapFragment extends Fragment
   @Override
   public void onClick(View v) {
     if (v == messageTextView) {
-      Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+      Intent intent = GoogleLocationUtils.isAvailable(getActivity()) ? new Intent(
+          GoogleLocationUtils.ACTION_GOOGLE_LOCATION_SETTINGS)
+          : new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+      intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
       startActivity(intent);
     }
   }
 
   @Override
   public void onProviderStateChange(ProviderState state) {
-    final int messageId;
+    final String message;
     final boolean isGpsDisabled;
     switch (state) {
       case DISABLED:
-        messageId = R.string.gps_need_to_enable;
+        String setting = getString(
+            GoogleLocationUtils.isAvailable(getActivity()) ? R.string.gps_google_location_settings
+                : R.string.gps_location_access);
+        message = getString(R.string.gps_need_to_enable, setting);
         isGpsDisabled = true;
         break;
       case NO_FIX:
       case BAD_FIX:
-        messageId = R.string.gps_wait_for_signal;
+        message = getString(R.string.gps_wait_for_signal);
         isGpsDisabled = false;
         break;
       case GOOD_FIX:
-        messageId = -1;
+        message = null;
         isGpsDisabled = false;
         break;
       default:
@@ -295,8 +302,8 @@ public class MapFragment extends Fragment
     getActivity().runOnUiThread(new Runnable() {
       @Override
       public void run() {
-        if (messageId != -1) {
-          messageTextView.setText(messageId);
+        if (message != null) {
+          messageTextView.setText(message);
           messageTextView.setVisibility(View.VISIBLE);
 
           if (isGpsDisabled) {
