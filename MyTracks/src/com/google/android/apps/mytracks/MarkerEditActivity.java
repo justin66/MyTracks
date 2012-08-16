@@ -146,7 +146,7 @@ public class MarkerEditActivity extends AbstractMyTracksActivity {
   @Override
   protected void onResume() {
     super.onResume();
-    TrackRecordingServiceConnectionUtils.resume(this, trackRecordingServiceConnection);
+    TrackRecordingServiceConnectionUtils.resumeConnection(this, trackRecordingServiceConnection);
   }
 
   @Override

@@ -1073,6 +1073,12 @@ limitations under the License.
       Character limit: ~21 (1 line)">
     Markers
   </string>
+  <string name="menu_pause_track"
+    translation_description="In the menu, to pause a track.
+
+      Character limit: ~21 (1 line)">
+    Pause track
+  </string>
   <string name="menu_play"
     translation_description="In the menu, to play a track.
 
@@ -2226,6 +2232,10 @@ limitations under the License.
   <string name="track_detail_stats_tab"
     translation_description="In the track detail page, the title of the tab showing the stats.">
     Stats
+  </string>
+  <string name="track_detail_title_paused"
+    translation_description="In the track detail page, the title when paused.">
+    Paused
   </string>
   <string name="track_detail_title_recording"
     translation_description="In the track detail page, the title when recording.">

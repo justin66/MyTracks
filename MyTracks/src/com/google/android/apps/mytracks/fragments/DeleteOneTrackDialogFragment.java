@@ -82,7 +82,7 @@ public class DeleteOneTrackDialogFragment extends DialogFragment {
             final long trackId = getArguments().getLong(KEY_TRACK_ID);
             final Context context = getActivity();
             if (trackId == PreferencesUtils.getLong(context, R.string.recording_track_id_key)) {
-              TrackRecordingServiceConnectionUtils.stop(
+              TrackRecordingServiceConnectionUtils.stopRecording(
                   context, caller.getTrackRecordingServiceConnection(), false);
             }
             new Thread(new Runnable() {

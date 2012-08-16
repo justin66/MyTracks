@@ -41,6 +41,7 @@ limitations under the License.
   <string name="min_required_accuracy_key">minRequiredAccuracy</string>
   <string name="pick_existing_map_key">pickExistingMap</string>
   <string name="recording_track_id_key">recordingTrackId</string>
+  <string name="recording_track_paused_key">recordingTrackPaused</string>
   <string name="report_speed_key">reportSpeed</string>
   <string name="selected_track_id_key">selectedTrackId</string>
   <string name="send_to_docs_key">sendToDocs</string>

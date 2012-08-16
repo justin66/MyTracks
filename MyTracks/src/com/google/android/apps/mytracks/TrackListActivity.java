@@ -121,26 +121,34 @@ public class TrackListActivity extends FragmentActivity implements DeleteOneTrac
    */
   private final OnSharedPreferenceChangeListener
       sharedPreferenceChangeListener = new OnSharedPreferenceChangeListener() {
-        @Override
+          @Override
         public void onSharedPreferenceChanged(SharedPreferences preferences, String key) {
           boolean updateList = false;
-          // Note that key can be null
-          if (PreferencesUtils.getKey(TrackListActivity.this, R.string.metric_units_key)
-              .equals(key)) {
+          if (key == null || key.equals(
+              PreferencesUtils.getKey(TrackListActivity.this, R.string.metric_units_key))) {
             metricUnits = PreferencesUtils.getBoolean(TrackListActivity.this,
                 R.string.metric_units_key, PreferencesUtils.METRIC_UNITS_DEFAULT);
-            updateList = true;
+            updateList = key != null;
           }
-          if (PreferencesUtils.getKey(TrackListActivity.this, R.string.recording_track_id_key)
-              .equals(key)) {
+          if (key == null || key.equals(
+              PreferencesUtils.getKey(TrackListActivity.this, R.string.recording_track_id_key))) {
             recordingTrackId = PreferencesUtils.getLong(
                 TrackListActivity.this, R.string.recording_track_id_key);
-            if (TrackRecordingServiceConnectionUtils.isRecording(
-                TrackListActivity.this, trackRecordingServiceConnection)) {
-              trackRecordingServiceConnection.startAndBind();
+            if (key != null) {
+              boolean isRecording = recordingTrackId != PreferencesUtils.RECORDING_TRACK_ID_DEFAULT;
+              if (isRecording) {
+                trackRecordingServiceConnection.startAndBind();
+              }
+              updateMenuItems(isRecording);
+              updateList = true;
             }
-            updateMenu();
-            updateList = true;
+          }
+          if (key == null || key.equals(PreferencesUtils.getKey(
+              TrackListActivity.this, R.string.recording_track_paused_key))) {
+            recordingTrackPaused = PreferencesUtils.getBoolean(TrackListActivity.this,
+                R.string.recording_track_paused_key,
+                PreferencesUtils.RECORDING_TRACK_PAUSED_DEFAULT);
+            updateList = key != null;
           }
           if (updateList) {
             resourceCursorAdapter.notifyDataSetChanged();
@@ -160,6 +168,7 @@ public class TrackListActivity extends FragmentActivity implements DeleteOneTrac
   private TrackRecordingServiceConnection trackRecordingServiceConnection;
   private boolean metricUnits;
   private long recordingTrackId;
+  private boolean recordingTrackPaused;
   private ListView listView;
   private ResourceCursorAdapter resourceCursorAdapter;
 
@@ -167,6 +176,7 @@ public class TrackListActivity extends FragmentActivity implements DeleteOneTrac
   private boolean startNewRecording = false;
 
   private MenuItem recordTrackMenuItem;
+  private MenuItem pauseTrackMenuItem;
   private MenuItem stopRecordingMenuItem;
   private MenuItem searchMenuItem;
   private MenuItem importMenuItem;
@@ -183,12 +193,10 @@ public class TrackListActivity extends FragmentActivity implements DeleteOneTrac
     trackRecordingServiceConnection = new TrackRecordingServiceConnection(
         this, bindChangedCallback);
 
-    getSharedPreferences(Constants.SETTINGS_NAME, Context.MODE_PRIVATE)
-        .registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
-    metricUnits = PreferencesUtils.getBoolean(
-        this, R.string.metric_units_key, PreferencesUtils.METRIC_UNITS_DEFAULT);
-    recordingTrackId = PreferencesUtils.getLong(this, R.string.recording_track_id_key);
-
+    SharedPreferences sharedPreferences = getSharedPreferences(
+        Constants.SETTINGS_NAME, Context.MODE_PRIVATE);
+    sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
+    sharedPreferenceChangeListener.onSharedPreferenceChanged(sharedPreferences, null);
     ImageButton recordImageButton = (ImageButton) findViewById(R.id.track_list_record_button);
     recordImageButton.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -222,8 +230,13 @@ public class TrackListActivity extends FragmentActivity implements DeleteOneTrac
         
         boolean isRecording = cursor.getLong(idIndex) == recordingTrackId;
         String name = cursor.getString(nameIndex);
-        int iconId = isRecording ? R.drawable.menu_record_track
-            : TrackIconUtils.getIconDrawable(cursor.getString(iconIndex));
+        int iconId;
+        if (isRecording) {
+          iconId = recordingTrackPaused ? R.drawable.menu_pause_track
+              : R.drawable.menu_record_track;
+        } else {
+          iconId = TrackIconUtils.getIconDrawable(cursor.getString(iconIndex));
+        }
         String iconContentDescription = getString(isRecording ? R.string.icon_recording
             : R.string.icon_track);
         String category = cursor.getString(categoryIndex);
@@ -317,7 +330,7 @@ public class TrackListActivity extends FragmentActivity implements DeleteOneTrac
   @Override
   protected void onResume() {
     super.onResume();
-    TrackRecordingServiceConnectionUtils.resume(this, trackRecordingServiceConnection);
+    TrackRecordingServiceConnectionUtils.resumeConnection(this, trackRecordingServiceConnection);
   }
 
   @Override
@@ -340,6 +353,7 @@ public class TrackListActivity extends FragmentActivity implements DeleteOneTrac
         .setTitle(getString(R.string.menu_save_format, fileTypes[3]));
     
     recordTrackMenuItem = menu.findItem(R.id.track_list_record_track);
+    pauseTrackMenuItem = menu.findItem(R.id.track_list_pause_track);
     stopRecordingMenuItem = menu.findItem(R.id.track_list_stop_recording);
     searchMenuItem = menu.findItem(R.id.track_list_search);
     importMenuItem = menu.findItem(R.id.track_list_import);
@@ -347,26 +361,23 @@ public class TrackListActivity extends FragmentActivity implements DeleteOneTrac
     deleteAllMenuItem = menu.findItem(R.id.track_list_delete_all);
 
     ApiAdapterFactory.getApiAdapter().configureSearchWidget(this, searchMenuItem);
-    updateMenu();
+    updateMenuItems(recordingTrackId != PreferencesUtils.RECORDING_TRACK_ID_DEFAULT);
     return true;
   }
 
   /**
-   * Updates the menu based on whether My Tracks is recording or not.
-   */
-  private void updateMenu() {
-    updateMenuItems(
-        TrackRecordingServiceConnectionUtils.isRecording(this, trackRecordingServiceConnection));
-  }
-
-  /**
    * Updates the menu items.
-   *
+   * 
    * @param isRecording true if recording
+   *
    */
   private void updateMenuItems(boolean isRecording) {
+    boolean showPause = isRecording && !recordingTrackPaused;
     if (recordTrackMenuItem != null) {
-      recordTrackMenuItem.setVisible(!isRecording);
+      recordTrackMenuItem.setVisible(!showPause);
+    }
+    if (pauseTrackMenuItem != null) {
+      pauseTrackMenuItem.setVisible(showPause);
     }
     if (stopRecordingMenuItem != null) {
       stopRecordingMenuItem.setVisible(isRecording);
@@ -387,13 +398,28 @@ public class TrackListActivity extends FragmentActivity implements DeleteOneTrac
     Intent intent;
     switch (item.getItemId()) {
       case R.id.track_list_record_track:
-        AnalyticsUtils.sendPageViews(this, "/action/record_track");
+        boolean isRecording = recordingTrackId != PreferencesUtils.RECORDING_TRACK_ID_DEFAULT;
+        AnalyticsUtils.sendPageViews(
+            this, isRecording ? "/action/resume_track" : "/action/record_track");
+        recordingTrackPaused = false;
         updateMenuItems(true);
-        startRecording();
+        if (isRecording) {
+          TrackRecordingServiceConnectionUtils.resumeTrack(trackRecordingServiceConnection);
+        } else {
+          startRecording();
+        }
+        return true;
+      case R.id.track_list_pause_track:
+        AnalyticsUtils.sendPageViews(this, "/action/pause_track");
+        recordingTrackPaused = true;
+        updateMenuItems(true);
+        TrackRecordingServiceConnectionUtils.pauseTrack(trackRecordingServiceConnection);
         return true;
       case R.id.track_list_stop_recording:
+        AnalyticsUtils.sendPageViews(this, "/action/stop_recording");
+        recordingTrackPaused = false;
         updateMenuItems(false);
-        TrackRecordingServiceConnectionUtils.stop(this, trackRecordingServiceConnection, true);
+        TrackRecordingServiceConnectionUtils.stopRecording(this, trackRecordingServiceConnection, true);
         return true;
       case R.id.track_list_search:
         return ApiAdapterFactory.getApiAdapter().handleSearchMenuSelection(this);

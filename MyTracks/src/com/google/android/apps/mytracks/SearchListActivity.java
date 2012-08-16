@@ -197,7 +197,7 @@ public class SearchListActivity extends AbstractMyTracksActivity implements Dele
   @Override
   protected void onResume() {
     super.onResume();
-    TrackRecordingServiceConnectionUtils.resume(this, trackRecordingServiceConnection);
+    TrackRecordingServiceConnectionUtils.resumeConnection(this, trackRecordingServiceConnection);
     metricUnits = PreferencesUtils.getBoolean(
         this, R.string.metric_units_key, PreferencesUtils.METRIC_UNITS_DEFAULT);
   }

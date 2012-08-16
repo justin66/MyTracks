@@ -21,6 +21,11 @@ limitations under the License.
     android:showAsAction="ifRoom"
     android:title="@string/menu_record_track"/>
   <item
+    android:icon="@drawable/menu_pause_track"
+    android:id="@+id/track_list_pause_track"
+    android:showAsAction="ifRoom"
+    android:title="@string/menu_pause_track"/>
+  <item
     android:icon="@drawable/menu_stop_recording"
     android:id="@+id/track_list_stop_recording"
     android:showAsAction="ifRoom"
@@ -29,7 +34,7 @@ limitations under the License.
     android:actionViewClass="android.widget.SearchView"
     android:icon="@drawable/menu_search"
     android:id="@+id/track_list_search"
-    android:showAsAction="always|collapseActionView"
+    android:showAsAction="ifRoom|collapseActionView"
     android:title="@string/menu_search"/>
   <item
     android:icon="@drawable/menu_import"

@@ -66,39 +66,47 @@ public class TrackRecordingServiceConnectionUtils {
   }
 
   /**
-   * Returns true if recording. Checks with the track recording service if
-   * available. If not, checks with the shared preferences.
+   * Resumes the recording track.
    * 
-   * @param context the current context
    * @param trackRecordingServiceConnection the track recording service
-   *          connection
    */
-  public static boolean isRecording(
-      Context context, TrackRecordingServiceConnection trackRecordingServiceConnection) {
-    ITrackRecordingService trackRecordingService = trackRecordingServiceConnection
-        .getServiceIfBound();
-    if (trackRecordingService != null) {
-      try {
-        return trackRecordingService.isRecording();
-      } catch (RemoteException e) {
-        Log.e(TAG, "Failed to check if service is recording", e);
-      } catch (IllegalStateException e) {
-        Log.e(TAG, "Failed to check if service is recording", e);
+  public static void resumeTrack(TrackRecordingServiceConnection trackRecordingServiceConnection) {
+    try {
+      ITrackRecordingService service = trackRecordingServiceConnection.getServiceIfBound();
+      if (service != null) {
+        service.resumeCurrentTrack();
       }
+    } catch (RemoteException e) {
+      Log.e(TAG, "Unable to resume track.", e);
     }
-    return PreferencesUtils.getLong(context, R.string.recording_track_id_key)
-        != PreferencesUtils.RECORDING_TRACK_ID_DEFAULT;
   }
 
   /**
-   * Stops the track recording service connection.
+   * Pauses the recording track.
+   * 
+   * @param trackRecordingServiceConnection the track recording service
+   *          connection
+   */
+  public static void pauseTrack(TrackRecordingServiceConnection trackRecordingServiceConnection) {
+    try {
+      ITrackRecordingService service = trackRecordingServiceConnection.getServiceIfBound();
+      if (service != null) {
+        service.resumeCurrentTrack();
+      }
+    } catch (RemoteException e) {
+      Log.e(TAG, "Unable to resume track.", e);
+    }
+  }
+
+  /**
+   * Stops the recording.
    * 
    * @param context the context
    * @param trackRecordingServiceConnection the track recording service
    *          connection
    * @param showEditor true to show the editor
    */
-  public static void stop(Context context,
+  public static void stopRecording(Context context,
       TrackRecordingServiceConnection trackRecordingServiceConnection, boolean showEditor) {
     ITrackRecordingService trackRecordingService = trackRecordingServiceConnection
         .getServiceIfBound();
@@ -127,8 +135,9 @@ public class TrackRecordingServiceConnectionUtils {
     } else {
       PreferencesUtils.setLong(
           context, R.string.recording_track_id_key, PreferencesUtils.RECORDING_TRACK_ID_DEFAULT);
+      PreferencesUtils.setBoolean(context,  R.string.recording_track_paused_key, true);
     }
-    trackRecordingServiceConnection.stop();
+    trackRecordingServiceConnection.unbindAndStop();
   }
 
   /**
@@ -138,12 +147,13 @@ public class TrackRecordingServiceConnectionUtils {
    * @param trackRecordingServiceConnection the track recording service
    *          connection
    */
-  public static void resume(
+  public static void resumeConnection(
       Context context, TrackRecordingServiceConnection trackRecordingServiceConnection) {
-    trackRecordingServiceConnection.bindIfRunning();
+    trackRecordingServiceConnection.bindIfStarted();
     if (!isRecordingServiceRunning(context)) {
       PreferencesUtils.setLong(
           context, R.string.recording_track_id_key, PreferencesUtils.RECORDING_TRACK_ID_DEFAULT);
+      PreferencesUtils.setBoolean(context, R.string.recording_track_paused_key, true);
     }
   }
 

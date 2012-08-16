@@ -13,9 +13,8 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.android.apps.mytracks.services;
 
-import static com.google.android.apps.mytracks.Constants.TAG;
+package com.google.android.apps.mytracks.services;
 
 import com.google.android.apps.mytracks.util.TrackRecordingServiceConnectionUtils;
 import com.google.android.maps.mytracks.BuildConfig;
@@ -30,143 +29,139 @@ import android.os.RemoteException;
 import android.util.Log;
 
 /**
- * Wrapper for the connection to the track recording service.
- * This handles connection/disconnection internally, only returning a real
- * service for use if one is available and connected.
- *
+ * Wrapper for the track recording service. This handles service
+ * start/bind/unbind/stop. The service must be started before it can be bound.
+ * Returns the service if it is started and bound.
+ * 
  * @author Rodrigo Damazio
  */
 public class TrackRecordingServiceConnection {
-  private ITrackRecordingService boundService;
+
+  private static final String TAG = TrackRecordingServiceConnection.class.getSimpleName();
 
   private final DeathRecipient deathRecipient = new DeathRecipient() {
-    @Override
+      @Override
     public void binderDied() {
-      Log.d(TAG, "Service died");
-      setBoundService(null);
+      Log.d(TAG, "Service died.");
+      setTrackRecordingService(null);
     }
   };
 
   private final ServiceConnection serviceConnection = new ServiceConnection() {
-    @Override
+      @Override
     public void onServiceConnected(ComponentName className, IBinder service) {
-      Log.i(TAG, "Connected to service");
+      Log.i(TAG, "Connected to the service.");
       try {
         service.linkToDeath(deathRecipient, 0);
       } catch (RemoteException e) {
-        Log.e(TAG, "Failed to bind a death recipient", e);
+        Log.e(TAG, "Failed to bind a death recipient.", e);
       }
-
-      setBoundService(ITrackRecordingService.Stub.asInterface(service));
+      setTrackRecordingService(ITrackRecordingService.Stub.asInterface(service));
     }
 
-    @Override
+      @Override
     public void onServiceDisconnected(ComponentName className) {
-      Log.i(TAG, "Disconnected from service");
-      setBoundService(null);
+      Log.i(TAG, "Disconnected from the service.");
+      setTrackRecordingService(null);
     }
   };
 
   private final Context context;
-
-  private final Runnable bindChangedCallback;
+  private final Runnable callback;
+  private ITrackRecordingService trackRecordingService;
 
   /**
    * Constructor.
-   *
-   * @param context the current context
-   * @param bindChangedCallback a callback to be executed when the state of the
-   *        service binding changes
+   * 
+   * @param context the context
+   * @param callback the callback to invoke when the service binding changes
    */
-  public TrackRecordingServiceConnection(Context context, Runnable bindChangedCallback) {
+  public TrackRecordingServiceConnection(Context context, Runnable callback) {
     this.context = context;
-    this.bindChangedCallback = bindChangedCallback;
+    this.callback = callback;
   }
 
   /**
-   * Binds to the service, starting it if necessary.
+   * Starts and binds the service.
    */
   public void startAndBind() {
     bindService(true);
   }
 
   /**
-   * Binds to the service, only if it's already running.
+   * Binds the service if it is started.
    */
-  public void bindIfRunning() {
+  public void bindIfStarted() {
     bindService(false);
   }
 
   /**
-   * Unbinds from and stops the service.
+   * Unbinds and stops the service.
    */
-  public void stop() {
+  public void unbindAndStop() {
     unbind();
-
-    Log.d(TAG, "Stopping service");
-    Intent intent = new Intent(context, TrackRecordingService.class);
-    context.stopService(intent);
+    context.stopService(new Intent(context, TrackRecordingService.class));
   }
 
   /**
-   * Unbinds from the service (but leaves it running).
+   * Unbinds the service (but leave it running).
    */
   public void unbind() {
-    Log.d(TAG, "Unbinding from the service");
     try {
       context.unbindService(serviceConnection);
     } catch (IllegalArgumentException e) {
-      // Means we weren't bound, which is ok.
+      // Means not bound to the service. OK to ignore.
     }
-
-    setBoundService(null);
+    setTrackRecordingService(null);
   }
 
   /**
-   * Returns the service if connected to it, or null if not connected.
+   * Gets the track recording service if bound. Returns null otherwise
    */
   public ITrackRecordingService getServiceIfBound() {
-    checkBindingAlive();
-
-    return boundService;
-  }
-
-  private void checkBindingAlive() {
-    if (boundService != null &&
-        !boundService.asBinder().isBinderAlive()) {
-      setBoundService(null);
+    if (trackRecordingService != null && !trackRecordingService.asBinder().isBinderAlive()) {
+      setTrackRecordingService(null);
+      return null;
     }
+    return trackRecordingService;
   }
 
+  /**
+   * Binds the service if it is started.
+   * 
+   * @param startIfNeeded start the service if needed
+   */
   private void bindService(boolean startIfNeeded) {
-    if (boundService != null) {
-      // Already bound.
+    if (trackRecordingService != null) {
+      // Service is already started and bound.
       return;
     }
 
     if (!startIfNeeded
         && !TrackRecordingServiceConnectionUtils.isRecordingServiceRunning(context)) {
-      // Not running, start not requested.
-      Log.d(TAG, "Service not running, not binding to it.");
+      Log.d(TAG, "Service is not started. Not binding it.");
       return;
     }
 
     if (startIfNeeded) {
-      Log.i(TAG, "Starting the service");
-      Intent intent = new Intent(context, TrackRecordingService.class);
-      context.startService(intent);
+      Log.i(TAG, "Starting the service.");
+      context.startService(new Intent(context, TrackRecordingService.class));
     }
 
-    Log.i(TAG, "Binding to the service");
-    Intent intent = new Intent(context, TrackRecordingService.class);
+    Log.i(TAG, "Binding the service.");
     int flags = BuildConfig.DEBUG ? Context.BIND_DEBUG_UNBIND : 0;
-    context.bindService(intent, serviceConnection, flags);
+    context.bindService(new Intent(context, TrackRecordingService.class), serviceConnection, flags);
   }
 
-  private void setBoundService(ITrackRecordingService service) {
-    boundService = service;
-    if (bindChangedCallback != null) {
-      bindChangedCallback.run();
+  /**
+   * Sets the trackRecordingService.
+   * 
+   * @param value the value
+   */
+  private void setTrackRecordingService(ITrackRecordingService value) {
+    trackRecordingService = value;
+    if (callback != null) {
+      callback.run();
     }
   }
 }

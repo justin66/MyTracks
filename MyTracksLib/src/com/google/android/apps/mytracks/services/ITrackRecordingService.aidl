@@ -36,6 +36,11 @@ interface ITrackRecordingService {
   boolean isRecording();
 
   /**
+   * Checks and returns whether the current recording is paused.
+   */
+  boolean isPaused();
+
+  /**
    * Returns the track ID of the track currently being recorded, or -1 if none
    * is being recorded. This ID can then be used to read track data from the
    * content source.
@@ -60,6 +65,16 @@ interface ITrackRecordingService {
    * @param loc the location to insert
    */
   void recordLocation(in Location loc);
+
+  /**
+    * Pauses the current track recording.
+    */
+  void pauseCurrentTrack();
+
+  /**
+    * Resumes the current track recording.
+    */
+  void resumeCurrentTrack();
 
   /**
    * Stops recording the current track.

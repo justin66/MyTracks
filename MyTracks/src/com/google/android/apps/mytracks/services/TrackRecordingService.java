@@ -98,6 +98,7 @@ public class TrackRecordingService extends Service {
   private ExecutorService executorService;
   private SharedPreferences sharedPreferences;
   private long recordingTrackId;
+  private boolean recordingTrackPaused;
   private LocationListenerPolicy locationListenerPolicy;
   private int minRecordingDistance;
   private int maxRecordingDistance;
@@ -141,36 +142,42 @@ public class TrackRecordingService extends Service {
           @Override
         public void onSharedPreferenceChanged(SharedPreferences preferences, String key) {
           if (key == null
-              || PreferencesUtils.getKey(context, R.string.recording_track_id_key).equals(key)) {
-            long id = PreferencesUtils.getLong(context, R.string.recording_track_id_key);
+              || key.equals(PreferencesUtils.getKey(context, R.string.recording_track_id_key))) {
+            long trackId = PreferencesUtils.getLong(context, R.string.recording_track_id_key);
             /*
-             * Only the TrackRecordingService can stop a recording and set the
-             * recordingTrackId to -1L.
+             * Only through the TrackRecordingService can one stop a recording
+             * and set the recordingTrackId to -1L.
              */
-            if (id != PreferencesUtils.RECORDING_TRACK_ID_DEFAULT) {
-              recordingTrackId = id;
+            if (trackId != PreferencesUtils.RECORDING_TRACK_ID_DEFAULT) {
+              recordingTrackId = trackId;
             }
           }
+          if (key == null || key.equals(
+              PreferencesUtils.getKey(context, R.string.recording_track_paused_key))) {
+            recordingTrackPaused = PreferencesUtils.getBoolean(context,
+                R.string.recording_track_paused_key,
+                PreferencesUtils.RECORDING_TRACK_PAUSED_DEFAULT);
+          }
           if (key == null
-              || PreferencesUtils.getKey(context, R.string.metric_units_key).equals(key)) {
+              || key.equals(PreferencesUtils.getKey(context, R.string.metric_units_key))) {
             boolean metricUnits = PreferencesUtils.getBoolean(
                 context, R.string.metric_units_key, PreferencesUtils.METRIC_UNITS_DEFAULT);
             announcementExecutor.setMetricUnits(metricUnits);
             splitExecutor.setMetricUnits(metricUnits);
           }
-          if (key == null || PreferencesUtils.getKey(context, R.string.announcement_frequency_key)
-              .equals(key)) {
+          if (key == null || key.equals(
+              PreferencesUtils.getKey(context, R.string.announcement_frequency_key))) {
             announcementExecutor.setTaskFrequency(PreferencesUtils.getInt(
                 context, R.string.announcement_frequency_key,
                 PreferencesUtils.ANNOUNCEMENT_FREQUENCY_DEFAULT));
           }
           if (key == null
-              || PreferencesUtils.getKey(context, R.string.split_frequency_key).equals(key)) {
+              || key.equals(PreferencesUtils.getKey(context, R.string.split_frequency_key))) {
             splitExecutor.setTaskFrequency(PreferencesUtils.getInt(
                 context, R.string.split_frequency_key, PreferencesUtils.SPLIT_FREQUENCY_DEFAULT));
           }
-          if (key == null || PreferencesUtils.getKey(context, R.string.min_recording_interval_key)
-              .equals(key)) {
+          if (key == null || key.equals(
+              PreferencesUtils.getKey(context, R.string.min_recording_interval_key))) {
             int minRecordingInterval = PreferencesUtils.getInt(context,
                 R.string.min_recording_interval_key,
                 PreferencesUtils.MIN_RECORDING_INTERVAL_DEFAULT);
@@ -190,8 +197,8 @@ public class TrackRecordingService extends Service {
                     minRecordingInterval * ONE_SECOND);
             }
           }
-          if (key == null || PreferencesUtils.getKey(context, R.string.min_recording_distance_key)
-              .equals(key)) {
+          if (key == null || key.equals(
+              PreferencesUtils.getKey(context, R.string.min_recording_distance_key))) {
             minRecordingDistance = PreferencesUtils.getInt(context,
                 R.string.min_recording_distance_key,
                 PreferencesUtils.MIN_RECORDING_DISTANCE_DEFAULT);
@@ -200,19 +207,19 @@ public class TrackRecordingService extends Service {
               markerTripStatisticsBuilder.setMinRecordingDistance(minRecordingDistance);
             }
           }
-          if (key == null || PreferencesUtils.getKey(context, R.string.max_recording_distance_key)
-              .equals(key)) {
+          if (key == null || key.equals(
+              PreferencesUtils.getKey(context, R.string.max_recording_distance_key))) {
             maxRecordingDistance = PreferencesUtils.getInt(context,
                 R.string.max_recording_distance_key,
                 PreferencesUtils.MAX_RECORDING_DISTANCE_DEFAULT);
           }
           if (key == null
-              || PreferencesUtils.getKey(context, R.string.min_required_accuracy_key).equals(key)) {
+              || key.equals(PreferencesUtils.getKey(context, R.string.min_required_accuracy_key))) {
             minRequiredAccuracy = PreferencesUtils.getInt(context,
                 R.string.min_required_accuracy_key, PreferencesUtils.MIN_REQUIRED_ACCURACY_DEFAULT);
           }
-          if (key == null || PreferencesUtils.getKey(
-              context, R.string.auto_resume_track_timeout_key).equals(key)) {
+          if (key == null || key.equals(
+              PreferencesUtils.getKey(context, R.string.auto_resume_track_timeout_key))) {
             autoResumeTrackTimeout = PreferencesUtils.getInt(context,
                 R.string.auto_resume_track_timeout_key,
                 PreferencesUtils.AUTO_RESUME_TRACK_TIMEOUT_DEFAULT);
@@ -238,7 +245,8 @@ public class TrackRecordingService extends Service {
 
       @Override
     public void onLocationChanged(final Location location) {
-      if (!myTracksLocationManager.isAllowed() || executorService.isShutdown()
+      if (myTracksLocationManager == null || executorService == null
+          || !myTracksLocationManager.isAllowed() || executorService.isShutdown()
           || executorService.isTerminated()) {
         return;
       }
@@ -305,8 +313,7 @@ public class TrackRecordingService extends Service {
     } else {
       if (recordingTrackId != PreferencesUtils.RECORDING_TRACK_ID_DEFAULT) {
         Log.w(TAG, "recordingTrackId not -1L, but recordingTrack is null. " + recordingTrackId);
-        recordingTrackId = PreferencesUtils.RECORDING_TRACK_ID_DEFAULT;
-        PreferencesUtils.setLong(this, R.string.recording_track_id_key, recordingTrackId);
+        updateRecordingState(PreferencesUtils.RECORDING_TRACK_ID_DEFAULT, true);
       }
       showNotification();
     }
@@ -393,6 +400,13 @@ public class TrackRecordingService extends Service {
    */
   public boolean isRecording() {
     return recordingTrackId != PreferencesUtils.RECORDING_TRACK_ID_DEFAULT;
+  }
+
+  /**
+   * Returns true if the current recording is paused.
+   */
+  public boolean isPaused() {
+    return recordingTrackPaused;
   }
 
   /**
@@ -503,7 +517,7 @@ public class TrackRecordingService extends Service {
     if (intent != null && intent.getBooleanExtra(RESUME_TRACK_EXTRA_NAME, false)) {
       if (!shouldResumeTrack(recordingTrack)) {
         Log.i(TAG, "Stop resume track.");
-        stopRecording();
+        updateRecordingState(PreferencesUtils.RECORDING_TRACK_ID_DEFAULT, true);
         stopSelfResult(startId);
         return;
       }
@@ -569,15 +583,15 @@ public class TrackRecordingService extends Service {
     tripStatistics.setStartTime(now);
     Uri uri = myTracksProviderUtils.insertTrack(track);
 
-    recordingTrackId = Long.parseLong(uri.getLastPathSegment());
+    updateRecordingState(Long.parseLong(uri.getLastPathSegment()), false);
+    
     track.setId(recordingTrackId);
     track.setName(TrackNameUtils.getTrackName(this, recordingTrackId, now, null));
     track.setCategory(PreferencesUtils.getString(
         this, R.string.default_activity_key, PreferencesUtils.DEFAULT_ACTIVITY_DEFAULT));
     myTracksProviderUtils.updateTrack(track);
-
     insertWaypoint(WaypointCreationRequest.DEFAULT_START_TRACK);
-    PreferencesUtils.setLong(this, R.string.recording_track_id_key, recordingTrackId);
+    
     PreferencesUtils.setInt(this, R.string.auto_resume_track_current_retry_key, 0);
 
     registerLocationListener();
@@ -641,6 +655,7 @@ public class TrackRecordingService extends Service {
         cursor.close();
       }
     }
+    // TODO: update recordingTrackPaused variable based on Track Points table state
     startRecording();
   }
 
@@ -658,6 +673,14 @@ public class TrackRecordingService extends Service {
     sendTrackBroadcast(R.string.track_started_broadcast_action, recordingTrackId);
     announcementExecutor.restore();
     splitExecutor.restore();
+  }
+
+  private void pauseCurrentTrack() {
+    PreferencesUtils.setBoolean(this, R.string.recording_track_paused_key, true);
+  }
+
+  private void resumeCurrentTrack() {
+    PreferencesUtils.setBoolean(this, R.string.recording_track_paused_key, false);
   }
 
   /**
@@ -679,9 +702,9 @@ public class TrackRecordingService extends Service {
       updateTripStatisticsToTime(track.getTripStatistics(), System.currentTimeMillis());
       myTracksProviderUtils.updateTrack(track);
     }
-    // Need to remember the trackId before calling stopRecording
+    // Need to remember the recordingTrackId before setting it to -1L
     long trackId = recordingTrackId;
-    stopRecording();
+    updateRecordingState(PreferencesUtils.RECORDING_TRACK_ID_DEFAULT, true);
 
     if (sensorManager != null) {
       SensorManagerFactory.releaseSystemSensorManager();
@@ -695,11 +718,16 @@ public class TrackRecordingService extends Service {
   }
 
   /**
-   * Common code for stopping a recording.
+   * Updates the recording states.
+   * 
+   * @param trackId the recording track id
+   * @param paused true if the recording is paused
    */
-  private void stopRecording() {
-    recordingTrackId = PreferencesUtils.RECORDING_TRACK_ID_DEFAULT;
+  private void updateRecordingState(long trackId, boolean paused) {
+    recordingTrackId = trackId;
     PreferencesUtils.setLong(this, R.string.recording_track_id_key, recordingTrackId);
+    recordingTrackPaused = paused;
+    PreferencesUtils.setBoolean(this, R.string.recording_track_paused_key, recordingTrackPaused);
   }
 
   /**
@@ -1036,6 +1064,14 @@ public class TrackRecordingService extends Service {
     }
 
     @Override
+    public boolean isPaused() {
+      if (!canAccess()) {
+        return false;
+      }
+      return trackRecordingService.isPaused();
+    }
+ 
+    @Override
     public long getRecordingTrackId() {
       if (!canAccess()) {
         return -1L;
@@ -1057,6 +1093,22 @@ public class TrackRecordingService extends Service {
         return -1L;
       }
       return trackRecordingService.insertWaypoint(waypointCreationRequest);
+    }
+
+    @Override
+    public void pauseCurrentTrack() {
+      if (!canAccess()) {
+        return;
+      }
+      trackRecordingService.pauseCurrentTrack();
+    }
+    
+    @Override
+    public void resumeCurrentTrack() {
+      if (!canAccess()) {
+        return;
+      }
+      trackRecordingService.resumeCurrentTrack();
     }
 
     @Override

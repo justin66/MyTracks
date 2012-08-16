@@ -99,7 +99,7 @@ public class SensorStateActivity extends AbstractMyTracksActivity {
   @Override
   protected void onResume() {
     super.onResume();
-    TrackRecordingServiceConnectionUtils.resume(this, trackRecordingServiceConnection);
+    TrackRecordingServiceConnectionUtils.resumeConnection(this, trackRecordingServiceConnection);
     isVisible = true;
     timer = new Timer();
     timer.schedule(new UpdateTimerTask(), 0, REFRESH_PERIOD_MS);

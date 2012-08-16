@@ -16,6 +16,16 @@ limitations under the License.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
   <item
+    android:icon="@drawable/menu_record_track"
+    android:id="@+id/track_detail_record_track"
+    android:showAsAction="ifRoom"
+    android:title="@string/menu_record_track"/>
+  <item
+    android:icon="@drawable/menu_pause_track"
+    android:id="@+id/track_detail_pause_track"
+    android:showAsAction="ifRoom"
+    android:title="@string/menu_pause_track"/>
+  <item
     android:icon="@drawable/menu_stop_recording"
     android:id="@+id/track_detail_stop_recording"
     android:orderInCategory="1"

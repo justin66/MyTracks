@@ -68,6 +68,7 @@ public class PreferencesUtils {
 
   public static final boolean PICK_EXISTING_MAP_DEFAULT = false;
   public static final long RECORDING_TRACK_ID_DEFAULT = -1L;
+  public static final boolean RECORDING_TRACK_PAUSED_DEFAULT = true;
   public static final boolean REPORT_SPEED_DEFAULT = true;
   public static final long SELECTED_TRACK_ID_DEFAULT = -1L;
   public static final boolean SEND_TO_DOCS_DEFAULT = true;
