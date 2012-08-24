@@ -243,9 +243,9 @@ public interface MyTracksProviderUtils {
   public Location getFirstLocation();
 
   /**
-   * Gets the last recorded location. Returns null if it doesn't exist.
+   * Gets the last valid recorded location. Returns null if it doesn't exist.
    */
-  public Location getLastLocation();
+  public Location getLastValidLocation();
 
   /**
    * Gets a location by track point id. Returns null if not found.

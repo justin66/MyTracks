@@ -772,7 +772,7 @@ public class MyTracksProviderUtilsImplTest extends AndroidTestCase {
   }
   
   /**
-   * Tests the method {@link MyTracksProviderUtilsImpl#getLastLocation()}.
+   * Tests the method {@link MyTracksProviderUtilsImpl#getLastValidLocation()}.
    */
   public void testGetLastLocation() {
     // Insert track, points at first.
@@ -780,7 +780,7 @@ public class MyTracksProviderUtilsImplTest extends AndroidTestCase {
     Track track = getTrack(trackId, 10);
     insertTrackWithLocations(track);
 
-    Location lastLocation = providerUtils.getLastLocation();
+    Location lastLocation = providerUtils.getLastValidLocation();
     checkLocation(9, lastLocation);
   }
   
