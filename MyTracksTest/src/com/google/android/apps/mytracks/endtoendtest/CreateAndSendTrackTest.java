@@ -305,13 +305,47 @@ public class CreateAndSendTrackTest extends ActivityInstrumentationTestCase2<Tra
 
     EndToEndTestUtils.stopRecording(true);
   }
+  
+  
+  /**
+   * Tests the pause recording feature.
+   */
+  public void testPauseRecording() {
+    EndToEndTestUtils.startRecording();
+    assertNotNull(EndToEndTestUtils.SOLO.getButton(activityMyTracks
+        .getString(R.string.menu_pause_track)));
+    assertNotNull(EndToEndTestUtils.SOLO.getButton(activityMyTracks
+        .getString(R.string.menu_stop_recording)));
+    EndToEndTestUtils.SOLO.goBack();
+    assertNotNull(EndToEndTestUtils.SOLO.getButton(activityMyTracks
+        .getString(R.string.menu_pause_track)));
+    assertNotNull(EndToEndTestUtils.SOLO.getButton(activityMyTracks
+        .getString(R.string.menu_stop_recording)));
+    
+    // Pause
+    EndToEndTestUtils.getButtonOnScreen(activityMyTracks.getString(R.string.menu_pause_track),
+        false, true);
+    assertNotNull(EndToEndTestUtils.SOLO.getButton(activityMyTracks
+        .getString(R.string.menu_record_track)));
+    assertNotNull(EndToEndTestUtils.SOLO.getButton(activityMyTracks
+        .getString(R.string.menu_stop_recording)));
+    // Resume
+    EndToEndTestUtils.getButtonOnScreen(activityMyTracks.getString(R.string.menu_record_track),
+        false, true);
+    assertNotNull(EndToEndTestUtils.SOLO.getButton(activityMyTracks
+        .getString(R.string.menu_pause_track)));
+    assertNotNull(EndToEndTestUtils.SOLO.getButton(activityMyTracks
+        .getString(R.string.menu_stop_recording)));
+    // Stop 
+    EndToEndTestUtils.stopRecording(true);
+  }
 
   /**
    * Creates a way point and a split maker during track recording.
    */
   private void createWaypoint() {
     EndToEndTestUtils.findMenuItem(activityMyTracks.getString(R.string.menu_markers), true);
-    EndToEndTestUtils.SOLO.waitForText(activityMyTracks.getString(R.string.marker_list_empty_message));
+    assertTrue(EndToEndTestUtils.SOLO.waitForText(activityMyTracks.getString(R.string.marker_list_empty_message)));
     EndToEndTestUtils.findMenuItem(activityMyTracks.getString(R.string.menu_insert_marker), true);
     EndToEndTestUtils.enterTextAvoidSoftKeyBoard(0, WAYPOINT_NAME);
     EndToEndTestUtils.SOLO.clickOnButton(activityMyTracks.getString(R.string.generic_add));
