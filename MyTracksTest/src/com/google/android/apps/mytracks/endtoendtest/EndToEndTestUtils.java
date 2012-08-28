@@ -308,6 +308,20 @@ public class EndToEndTestUtils {
   }
   
   /**
+   * Creates a track which contains pause during recording.
+   * 
+   * @param numberOfGpsData number of simulated Gps data
+   */
+  public static void createTrackWithPause(int numberOfGpsData) {
+    EndToEndTestUtils.startRecording();
+    EndToEndTestUtils.sendGps(numberOfGpsData);
+    EndToEndTestUtils.findMenuItem(activityMytracks.getString(R.string.menu_pause_track), true);
+    EndToEndTestUtils.findMenuItem(activityMytracks.getString(R.string.menu_record_track), false);
+    EndToEndTestUtils.sendGps(numberOfGpsData);
+    EndToEndTestUtils.stopRecording(true);
+  }
+  
+  /**
    * Checks if there is no track in track list. For some tests need at least one
    * track, the method can save time to create a new track.
    * 
