@@ -212,6 +212,13 @@ public interface MyTracksProviderUtils {
   public Location createTrackPoint(Cursor cursor);
 
   /**
+   * Gets the first location id for a track. Returns -1L if it doesn't exist.
+   * 
+   * @param trackId the track id
+   */
+  public long getFirstTrackPointId(long trackId);
+
+  /**
    * Gets the last location id for a track. Returns -1L if it doesn't exist.
    * 
    * @param trackId the track id

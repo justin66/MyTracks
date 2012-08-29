@@ -83,7 +83,7 @@ public class TrackRecordingService extends Service {
 
   private static final String TAG = TrackRecordingService.class.getSimpleName();
   public static final double PAUSE_LATITUDE = 100.0;
-  private static final double RESUME_LATITUDE = 200.0;
+  public static final double RESUME_LATITUDE = 200.0;
 
   // One second in milliseconds
   private static final long ONE_SECOND = 1000;

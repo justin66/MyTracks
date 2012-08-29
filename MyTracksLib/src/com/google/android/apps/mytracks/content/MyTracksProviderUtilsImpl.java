@@ -698,6 +698,30 @@ public class MyTracksProviderUtilsImpl implements MyTracksProviderUtils {
   }
 
   @Override
+  public long getFirstTrackPointId(long trackId) {
+    if (trackId < 0) {
+      return -1L;
+    }
+    Cursor cursor = null;
+    try {
+      String selection = TrackPointsColumns._ID + "=(select min(" + TrackPointsColumns._ID
+          + ") from " + TrackPointsColumns.TABLE_NAME + " WHERE " + TrackPointsColumns.TRACKID
+          + "=?)";
+      String[] selectionArgs = new String[] { Long.toString(trackId) };
+      cursor = getTrackPointCursor(new String[] { TrackPointsColumns._ID }, selection,
+          selectionArgs, TrackPointsColumns._ID);
+      if (cursor != null && cursor.moveToFirst()) {
+        return cursor.getLong(cursor.getColumnIndexOrThrow(TrackPointsColumns._ID));
+      }
+    } finally {
+      if (cursor != null) {
+        cursor.close();
+      }
+    }
+    return -1L;
+  }
+  
+  @Override
   public long getLastTrackPointId(long trackId) {
     if (trackId < 0) {
       return -1L;

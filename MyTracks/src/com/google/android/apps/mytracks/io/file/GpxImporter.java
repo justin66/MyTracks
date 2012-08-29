@@ -18,9 +18,9 @@ package com.google.android.apps.mytracks.io.file;
 import com.google.android.apps.mytracks.Constants;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
 import com.google.android.apps.mytracks.content.Track;
+import com.google.android.apps.mytracks.services.TrackRecordingService;
 import com.google.android.apps.mytracks.stats.TripStatisticsUpdater;
 import com.google.android.apps.mytracks.util.LocationUtils;
-import com.google.android.apps.mytracks.util.PreferencesUtils;
 import com.google.android.apps.mytracks.util.StringUtils;
 
 import android.location.Location;
@@ -52,121 +52,84 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class GpxImporter extends DefaultHandler {
 
-  // GPX tag names and attributes.
+  // GPX tag names and attributes
+  private static final String TAG_ALTITUDE = "ele";
+  private static final String TAG_DESCRIPTION = "desc";
+  private static final String TAG_NAME = "name";
+  private static final String TAG_TIME = "time";
   private static final String TAG_TRACK = "trk";
   private static final String TAG_TRACK_POINT = "trkpt";
   private static final Object TAG_TRACK_SEGMENT = "trkseg";
-  private static final String TAG_NAME = "name";
-  private static final String TAG_DESCRIPTION = "desc";
-  private static final String TAG_ALTITUDE = "ele";
-  private static final String TAG_TIME = "time";
+
   private static final String ATT_LAT = "lat";
   private static final String ATT_LON = "lon";
 
-  /**
-   * The maximum number of locations to buffer for bulk-insertion into the
-   * database.
-   */
+  // The maximum number of buffered locations for bulk-insertion
   private static final int MAX_BUFFERED_LOCATIONS = 512;
 
-  /**
-   * Utilities for accessing the content provider.
-   */
   private final MyTracksProviderUtils myTracksProviderUtils;
+  private final int minRecordingDistance;
 
-  /**
-   * List of track ids written in the database. Only contains successfully
-   * written tracks.
-   */
+  // List of successfully imported track ids
   private final List<Long> tracksIds;
 
-  /**
-   * Contains the current elements content.
-   */
+  // The SAX locator to get the current line information
+  private Locator locator;
+
+  // The current element content
   private String content;
 
-  /**
-   * Currently location.
-   */
-  private Location location;
-
-  /**
-   * Last location.
-   */
-  private Location lastLocation;
-
-  /**
-   * Last segment location.
-   */
-  private Location lastSegmentLocation;
-
-  /**
-   * Currently reading track.
-   */
-  private Track track;
-
-  /**
-   * Trip statistics updater for the current track.
-   */
-  private TripStatisticsUpdater tripStatisticsUpdater;
-
-  /**
-   * Buffer of locations to be bulk-inserted into the database.
-   */
-  private Location[] bufferedPointInserts = new Location[MAX_BUFFERED_LOCATIONS];
-
-  /**
-   * Number of locations buffered to be inserted into the database.
-   */
-  private int numBufferedPointInserts = 0;
-
-  /**
-   * Number of locations already processed.
-   */
-  private int numberOfLocations = 0;
-
-  /**
-   * Number of segments already processed.
-   */
-  private int numberOfSegments = 0;
-
-  /**
-   * Used to identify if a track was written to the database but not yet
-   * finished successfully.
-   */
-  private boolean isCurrentTrackRollbackable = false;
-
-  /**
-   * Flag to indicate if we're inside a track's xml element. Some sub elements
-   * like name may be used in other parts of the GPX file, and we use this to
-   * ignore them.
-   */
+  // True if if we're inside a track's xml element
   private boolean isInTrackElement = false;
 
-  /**
-   * Counter to find out which child level of the track we are processing.
-   */
+  // The current child depth for the current track
   private int trackChildDepth = 0;
 
-  /**
-   * SAX locator to get the current line information.
-   */
-  private Locator locator;
+  // The current track
+  private Track track;
+
+  // True if the current track parsing is finished
+  private boolean isCurrentTrackFinished = true;
+
+  // The number of track segments processed for the current track
+  private int numberOfTrackSegments = 0;
+
+  // The number of locations processed for the current track
+  private int numberOfLocations = 0;
+
+  // The trip statistics updater for the current track
+  private TripStatisticsUpdater tripStatisticsUpdater;
+  
+  // True if the current track has a start time
+  private boolean hasStartTime;
+
+  // The current location
+  private Location location;
+
+  // The last location in the current segment
+  private Location lastLocationInSegment;
+
+  // The buffered locations
+  private Location[] bufferedLocations = new Location[MAX_BUFFERED_LOCATIONS];
+
+  // The number of buffered locations
+  private int numBufferedLocations = 0;
 
   /**
    * Reads GPS tracks from a GPX file and writes tracks and their coordinates to
    * the database.
    * 
-   * @param inputStream an input stream for the GPX file
+   * @param inputStream the input stream for the GPX file
    * @param myTracksProviderUtils my tracks provider utils
+   * @param minRecordingDistance the min recording distance
    * @return long[] array of track ids written to the database.
    */
-  public static long[] importGPXFile(
-      final InputStream inputStream, final MyTracksProviderUtils myTracksProviderUtils)
+  public static long[] importGPXFile(InputStream inputStream,
+      MyTracksProviderUtils myTracksProviderUtils, int minRecordingDistance)
       throws ParserConfigurationException, SAXException, IOException {
     SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
     SAXParser saxParser = saxParserFactory.newSAXParser();
-    GpxImporter gpxImporter = new GpxImporter(myTracksProviderUtils);
+    GpxImporter gpxImporter = new GpxImporter(myTracksProviderUtils, minRecordingDistance);
     long[] trackIds = new long[0];
 
     try {
@@ -182,15 +145,15 @@ public class GpxImporter extends DefaultHandler {
         throw new IOException("No track imported.");
       }
     } finally {
-      // Delete track if not finished
+      // Delete the current track if not finished
       gpxImporter.rollbackUnfinishedTracks();
     }
-
     return trackIds;
   }
 
-  public GpxImporter(MyTracksProviderUtils myTracksProviderUtils) {
+  public GpxImporter(MyTracksProviderUtils myTracksProviderUtils, int minRecordingDistance) {
     this.myTracksProviderUtils = myTracksProviderUtils;
+    this.minRecordingDistance = minRecordingDistance;
     tracksIds = new ArrayList<Long>();
   }
 
@@ -214,13 +177,13 @@ public class GpxImporter extends DefaultHandler {
       throws SAXException {
     if (isInTrackElement) {
       trackChildDepth++;
-      if (localName.equals(TAG_TRACK_POINT)) {
-        onTrackPointElementStart(attributes);
+      if (localName.equals(TAG_TRACK)) {
+        throw new SAXException(createErrorMessage("Invalid GPX. Already inside a track."));
       } else if (localName.equals(TAG_TRACK_SEGMENT)) {
         onTrackSegmentElementStart();
-      } else if (localName.equals(TAG_TRACK)) {
-        throw new SAXException(createErrorMessage("Invalid GPX detected."));
-      }
+      } else if (localName.equals(TAG_TRACK_POINT)) {
+        onTrackPointElementStart(attributes);
+      } 
     } else if (localName.equals(TAG_TRACK)) {
       isInTrackElement = true;
       trackChildDepth = 0;
@@ -235,13 +198,10 @@ public class GpxImporter extends DefaultHandler {
       return;
     }
 
-    // process these elements only as sub-elements of track
-    if (localName.equals(TAG_TRACK_POINT)) {
-      onTrackPointElementEnd();
-    } else if (localName.equals(TAG_ALTITUDE)) {
-      onAltitudeElementEnd();
-    } else if (localName.equals(TAG_TIME)) {
-      onTimeElementEnd();
+    if (localName.equals(TAG_TRACK)) {
+      onTrackElementEnd();
+      isInTrackElement = false;
+      trackChildDepth = 0;
     } else if (localName.equals(TAG_NAME)) {
       // we are only interested in the first level name element
       if (trackChildDepth == 1) {
@@ -254,10 +214,12 @@ public class GpxImporter extends DefaultHandler {
       }
     } else if (localName.equals(TAG_TRACK_SEGMENT)) {
       onTrackSegmentElementEnd();
-    } else if (localName.equals(TAG_TRACK)) {
-      onTrackElementEnd();
-      isInTrackElement = false;
-      trackChildDepth = 0;
+    } else if (localName.equals(TAG_TRACK_POINT)) {
+      onTrackPointElementEnd();
+    } else if (localName.equals(TAG_ALTITUDE)) {
+      onAltitudeElementEnd();
+    } else if (localName.equals(TAG_TIME)) {
+      onTimeElementEnd();
     }
     trackChildDepth--;
 
@@ -274,9 +236,9 @@ public class GpxImporter extends DefaultHandler {
    * Rolls back last track if possible.
    */
   public void rollbackUnfinishedTracks() {
-    if (isCurrentTrackRollbackable) {
+    if (!isCurrentTrackFinished && track != null) {
       myTracksProviderUtils.deleteTrack(track.getId());
-      isCurrentTrackRollbackable = false;
+      isCurrentTrackFinished = true;
     }
   }
 
@@ -285,185 +247,29 @@ public class GpxImporter extends DefaultHandler {
    */
   private void onTrackElementStart() {
     track = new Track();
-    numberOfLocations = 0;
-
     Uri uri = myTracksProviderUtils.insertTrack(track);
-    long trackId = Long.parseLong(uri.getLastPathSegment());
-    track.setId(trackId);
-    isCurrentTrackRollbackable = true;
+    track.setId(Long.parseLong(uri.getLastPathSegment()));
+    isCurrentTrackFinished = false;
+    numberOfTrackSegments = 0;
+    numberOfLocations = 0;
+    tripStatisticsUpdater = null;
   }
 
   /**
    * On track element end.
    */
   private void onTrackElementEnd() {
-    if (lastLocation != null) {
-      flushPoints();
-
-      // Calculate statistics for the imported track
-      tripStatisticsUpdater.updateTime(lastLocation.getTime());
-      track.setStopId(getLastPointId());
-    } else {
-      tripStatisticsUpdater = new TripStatisticsUpdater(0L);
-      tripStatisticsUpdater.updateTime(0L);
+    flushPoints();
+    if (tripStatisticsUpdater == null) {
+      tripStatisticsUpdater = new TripStatisticsUpdater(-1L);
+      tripStatisticsUpdater.updateTime(-1L);
     }
+    track.setStopId(getLastPointId());
     track.setTripStatistics(tripStatisticsUpdater.getTripStatistics());
     track.setNumberOfPoints(numberOfLocations);
     myTracksProviderUtils.updateTrack(track);
     tracksIds.add(track.getId());
-    isCurrentTrackRollbackable = false;
-    lastSegmentLocation = null;
-    lastLocation = null;
-    tripStatisticsUpdater = null;
-  }
-
-  /**
-   * On track segment start.
-   */
-  private void onTrackSegmentElementStart() {
-    if (numberOfSegments > 0) {
-      // Add a segment separator
-      location = new Location(LocationManager.GPS_PROVIDER);
-      location.setLatitude(100.0);
-      location.setLongitude(100.0);
-      location.setAltitude(0);
-      if (lastLocation != null) {
-        location.setTime(lastLocation.getTime());
-      }
-      insertPoint(location);
-      lastLocation = location;
-      lastSegmentLocation = null;
-      location = null;
-    }
-    numberOfSegments++;
-  }
-
-  /**
-   * On track segment element end.
-   */
-  private void onTrackSegmentElementEnd() {
-    // Nothing to be done
-  }
-
-  /**
-   * On track point element start.
-   * 
-   * @param attributes the attributes
-   */
-  private void onTrackPointElementStart(Attributes attributes) throws SAXException {
-    if (location != null) {
-      throw new SAXException(createErrorMessage("Found a track point inside another one."));
-    }
-    String latitude = attributes.getValue(ATT_LAT);
-    String longitude = attributes.getValue(ATT_LON);
-    
-    if (latitude == null || longitude == null) {
-      throw new SAXException(createErrorMessage("Point with no longitude or latitude."));
-    }
-    
-    Location newLocation = new Location(LocationManager.GPS_PROVIDER);
-    try {
-      newLocation.setLatitude(Double.parseDouble(latitude));
-      newLocation.setLongitude(Double.parseDouble(longitude));
-    } catch (NumberFormatException e) {
-      throw new SAXException(createErrorMessage(
-          "Unable to parse latitude/longitude: " + latitude + "/" + longitude), e);
-    }
-    location = newLocation;
-  }
-
-  /**
-   * On track point element end.
-   */
-  private void onTrackPointElementEnd() throws SAXException {
-    if (LocationUtils.isValidLocation(location)) {
-      if (tripStatisticsUpdater == null) {
-        // first point did not have a time, start stats builder without it
-        tripStatisticsUpdater = new TripStatisticsUpdater(0);
-      }
-      tripStatisticsUpdater.addLocation(location, PreferencesUtils.MIN_RECORDING_DISTANCE_DEFAULT);
-
-      // insert in db
-      insertPoint(location);
-
-      // first track point?
-      if (lastLocation == null && numberOfSegments == 1) {
-        track.setStartId(getLastPointId());
-      }
-
-      lastLocation = location;
-      lastSegmentLocation = location;
-      location = null;
-    } else {
-      // invalid location - abort import
-      throw new SAXException(createErrorMessage("Invalid location detected: " + location));
-    }
-  }
-
-  /**
-   * On time element end. Sets location time and doing additional calculations
-   * as this is the last value required for the location. Also sets the start time
-   * for the trip statistics builder as there is no start time in the track root
-   * element.
-   */
-  private void onTimeElementEnd() throws SAXException {
-    if (location == null) {
-      return;
-    }
-
-    if (content == null) {
-      return;
-    }
-      
-    // Parse the time
-    long time;
-    try {
-      time = StringUtils.getTime(content.trim());
-    } catch (IllegalArgumentException e) {
-      throw new SAXException(createErrorMessage("Unable to parse time: " + content), e);
-    }
-
-    // Calculate derived attributes from previous point
-    if (lastSegmentLocation != null) {
-      long timeDifference = time - lastSegmentLocation.getTime();
-
-      // check for negative time change
-      if (timeDifference < 0) {
-        Log.w(Constants.TAG, "Found negative time change.");
-      } else {
-
-        /*
-         * We don't have a speed and bearing in GPX, make something up from the
-         * last two points. GPS points tend to have some inherent imprecision,
-         * speed and bearing will likely be off, so the statistics for things
-         * like max speed will also be off.
-         */
-        float speed = location.distanceTo(lastLocation) * 1000.0f / timeDifference;
-        location.setSpeed(speed);
-        location.setBearing(lastSegmentLocation.bearingTo(location));
-      }
-    }
-
-    // Fill in the time
-    location.setTime(time);
-
-    // initialize start time with time of first track point
-    if (tripStatisticsUpdater == null) {
-      tripStatisticsUpdater = new TripStatisticsUpdater(time);
-    }
-  }
-
-  /**
-   * On altitude element end.
-   */
-  private void onAltitudeElementEnd() throws SAXException {
-    if (location != null && content != null) {
-      try {
-        location.setAltitude(Double.parseDouble(content));
-      } catch (NumberFormatException e) {
-        throw new SAXException(createErrorMessage("Unable to parse altitude: " + content), e);
-      }
-    }
+    isCurrentTrackFinished = true;
   }
 
   /**
@@ -485,16 +291,178 @@ public class GpxImporter extends DefaultHandler {
   }
 
   /**
+   * On track segment start.
+   */
+  private void onTrackSegmentElementStart() {
+    numberOfTrackSegments++;
+    // If not the first segment, add a pause separator if there is at least one
+    // location in the last segment
+    if (numberOfTrackSegments > 1 && lastLocationInSegment != null) {
+      insertPoint(createNewLocation(
+          TrackRecordingService.PAUSE_LATITUDE, 0.0, lastLocationInSegment.getTime()));
+    }
+    location = null;
+    lastLocationInSegment = null;
+  }
+
+  /**
+   * On track segment element end.
+   */
+  private void onTrackSegmentElementEnd() {
+    // Nothing needs to be done
+  }
+
+  /**
+   * On track point element start.
+   * 
+   * @param attributes the attributes
+   */
+  private void onTrackPointElementStart(Attributes attributes) throws SAXException {
+    if (location != null) {
+      throw new SAXException(createErrorMessage("Found a track point inside another one."));
+    }
+    String latitude = attributes.getValue(ATT_LAT);
+    String longitude = attributes.getValue(ATT_LON);
+
+    if (latitude == null || longitude == null) {
+      throw new SAXException(createErrorMessage("Point with no longitude or latitude."));
+    }
+    double latitudeValue;
+    double longitudeValue;
+    try {
+      latitudeValue = Double.parseDouble(latitude);
+      longitudeValue = Double.parseDouble(longitude);
+    } catch (NumberFormatException e) {
+      throw new SAXException(
+          createErrorMessage("Unable to parse latitude/longitude: " + latitude + "/" + longitude),
+          e);
+    }
+    
+    location = createNewLocation(latitudeValue, longitudeValue, -1L);
+  }
+
+  /**
+   * On track point element end.
+   */
+  private void onTrackPointElementEnd() throws SAXException {
+    if (!LocationUtils.isValidLocation(location)) {
+      throw new SAXException(createErrorMessage("Invalid location detected: " + location));
+    }
+
+    if (numberOfTrackSegments > 1 && lastLocationInSegment == null) {
+      // If not the first segment, add a resume separator before adding the
+      // first location.
+      insertPoint(
+          createNewLocation(TrackRecordingService.RESUME_LATITUDE, 0.0, location.getTime()));
+    }
+
+    // insert in db
+    insertPoint(location);
+
+    // set the start id if necessary
+    if (track.getStartId() == -1L) {
+      track.setStartId(getFirstPointId());
+    }
+
+    lastLocationInSegment = location;
+    location = null;
+  }
+
+  /**
+   * On altitude element end.
+   */
+  private void onAltitudeElementEnd() throws SAXException {
+    if (location == null || content == null) {
+      return;
+    }
+
+    try {
+      location.setAltitude(Double.parseDouble(content));
+    } catch (NumberFormatException e) {
+      throw new SAXException(createErrorMessage("Unable to parse altitude: " + content), e);
+    }
+  }
+
+  /**
+   * On time element end. Sets location time and doing additional calculations
+   * as this is the last value required for the location. Also sets the start
+   * time for the trip statistics builder as there is no start time in the track
+   * root element.
+   */
+  private void onTimeElementEnd() throws SAXException {
+    if (location == null || content == null) {
+      return;
+    }
+
+    // Parse the time
+    long time;
+    try {
+      time = StringUtils.getTime(content.trim());
+    } catch (IllegalArgumentException e) {
+      throw new SAXException(createErrorMessage("Unable to parse time: " + content), e);
+    }
+    location.setTime(time);
+
+    // Calculate derived attributes from previous point
+    if (lastLocationInSegment != null && lastLocationInSegment.getTime() != 0) {
+      long timeDifference = time - lastLocationInSegment.getTime();
+
+      // check for negative time change
+      if (timeDifference <= 0) {
+        Log.w(Constants.TAG, "Time difference not postive.");
+      } else {
+
+        /*
+         * We don't have a speed and bearing in GPX, make something up from the
+         * last two points. GPS points tend to have some inherent imprecision,
+         * speed and bearing will likely be off, so the statistics for things
+         * like max speed will also be off.
+         */
+        float speed = lastLocationInSegment.distanceTo(location) * 1000.0f / timeDifference;
+        location.setSpeed(speed);
+      }
+      location.setBearing(lastLocationInSegment.bearingTo(location));
+    }
+  }
+
+  /**
+   * Creates a new location
+   * @param latitude location latitude
+   * @param longitude location longitude
+   * @param time location time
+   */
+  private Location createNewLocation(double latitude, double longitude, long time) {
+    Location loc = new Location(LocationManager.GPS_PROVIDER);
+    loc.setLatitude(latitude);
+    loc.setLongitude(longitude);
+    loc.setAltitude(0.0f);
+    loc.setTime(time);
+    loc.removeAccuracy();
+    loc.removeBearing();
+    loc.removeSpeed();
+    return loc;
+  }
+
+  /**
    * Inserts a point.
    * 
    * @param newLocation the location
    */
   private void insertPoint(Location newLocation) {
-    bufferedPointInserts[numBufferedPointInserts] = newLocation;
-    numBufferedPointInserts++;
+    if (tripStatisticsUpdater == null) {
+      tripStatisticsUpdater = new TripStatisticsUpdater(newLocation.getTime());
+      hasStartTime = newLocation.getTime() != -1L;
+    }
+    if (!hasStartTime) {
+      newLocation.setTime(-1L);
+    }
+    tripStatisticsUpdater.addLocation(newLocation, minRecordingDistance);
+    
+    bufferedLocations[numBufferedLocations] = newLocation;
+    numBufferedLocations++;
     numberOfLocations++;
 
-    if (numBufferedPointInserts >= MAX_BUFFERED_LOCATIONS) {
+    if (numBufferedLocations >= MAX_BUFFERED_LOCATIONS) {
       flushPoints();
     }
   }
@@ -503,17 +471,16 @@ public class GpxImporter extends DefaultHandler {
    * Flushes the points to the database.
    */
   private void flushPoints() {
-    if (numBufferedPointInserts <= 0) {
+    if (numBufferedLocations <= 0) {
       return;
     }
     myTracksProviderUtils.bulkInsertTrackPoint(
-        bufferedPointInserts, numBufferedPointInserts, track.getId());
-    numBufferedPointInserts = 0;
+        bufferedLocations, numBufferedLocations, track.getId());
+    numBufferedLocations = 0;
   }
 
   /**
    * Gets the imported track ids.
-   *
    */
   private long[] getImportedTrackIds() {
     long[] result = new long[tracksIds.size()];
@@ -521,6 +488,14 @@ public class GpxImporter extends DefaultHandler {
       result[i] = tracksIds.get(i);
     }
     return result;
+  }
+
+  /**
+   * Gets the first point id inserted into the database.
+   */
+  private long getFirstPointId() {
+    flushPoints();
+    return myTracksProviderUtils.getFirstTrackPointId(track.getId());
   }
 
   /**

@@ -747,6 +747,18 @@ public class MyTracksProviderUtilsImplTest extends AndroidTestCase {
   }
 
   /**
+   * Tests the method {@link MyTracksProviderUtilsImpl#getFirstTrackPointId(long)}.
+   */
+  public void testGetFirstTrackPointId() {
+    // Insert track, point at first.
+    long trackId = System.currentTimeMillis();
+    Track track = getTrack(trackId, 10);
+    insertTrackWithLocations(track);
+  
+    assertEquals(1, providerUtils.getFirstTrackPointId(trackId));
+  }
+  
+  /**
    * Tests the method {@link MyTracksProviderUtilsImpl#getLastTrackPointId(long)}.
    */
   public void testGetLastTrackPointId() {

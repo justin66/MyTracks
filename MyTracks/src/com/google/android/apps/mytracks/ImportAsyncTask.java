@@ -172,7 +172,10 @@ public class ImportAsyncTask extends AsyncTask<Void, Integer, Boolean> {
    */
   private boolean importFile(final File file) {
     try {
-      long trackIds[] = GpxImporter.importGPXFile(new FileInputStream(file), myTracksProviderUtils);
+      int minRecordingDistance = PreferencesUtils.getInt(importActivity,
+          R.string.min_recording_distance_key, PreferencesUtils.MIN_RECORDING_DISTANCE_DEFAULT);
+      long trackIds[] = GpxImporter.importGPXFile(
+          new FileInputStream(file), myTracksProviderUtils, minRecordingDistance);
       int length = trackIds.length;
       if (length > 0) {
         trackId = trackIds[length - 1];
