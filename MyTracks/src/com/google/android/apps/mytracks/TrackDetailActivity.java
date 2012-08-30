@@ -475,8 +475,8 @@ public class TrackDetailActivity extends AbstractMyTracksActivity implements Del
     }
     String title;
     if (isRecording) {
-      title = getString(recordingTrackPaused ? R.string.track_detail_title_paused
-          : R.string.track_detail_title_recording);
+      title = getString(
+          recordingTrackPaused ? R.string.generic_paused : R.string.generic_recording);
     } else {
       Track track = MyTracksProviderUtils.Factory.get(this).getTrack(trackId);
       title = track != null ? track.getName() : getString(R.string.my_tracks_app_name);
