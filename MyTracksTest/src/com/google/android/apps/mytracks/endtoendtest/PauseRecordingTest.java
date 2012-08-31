@@ -66,7 +66,7 @@ public class PauseRecordingTest extends ActivityInstrumentationTestCase2<TrackLi
         activityMyTracks.getString(R.string.menu_pause_track), false));
     assertNotNull(EndToEndTestUtils.findMenuItem(
         activityMyTracks.getString(R.string.menu_stop_recording), false));
-    EndToEndTestUtils.sendGps(gpsSignalNumber, 0);
+    EndToEndTestUtils.sendGps(gpsSignalNumber);
 
     // Pause
     EndToEndTestUtils.findMenuItem(activityMyTracks.getString(R.string.menu_pause_track), true);
@@ -74,7 +74,7 @@ public class PauseRecordingTest extends ActivityInstrumentationTestCase2<TrackLi
         activityMyTracks.getString(R.string.menu_record_track), false));
     assertNotNull(EndToEndTestUtils.findMenuItem(
         activityMyTracks.getString(R.string.menu_stop_recording), false));
-    EndToEndTestUtils.sendGps(gpsSignalNumber, gpsSignalNumber);
+    EndToEndTestUtils.sendGps(gpsSignalNumber, gpsSignalNumber, -1);
 
     // Stop
     EndToEndTestUtils.stopRecording(true);
@@ -98,7 +98,7 @@ public class PauseRecordingTest extends ActivityInstrumentationTestCase2<TrackLi
         activityMyTracks.getString(R.string.menu_pause_track), false));
     assertNotNull(EndToEndTestUtils.findMenuItem(
         activityMyTracks.getString(R.string.menu_stop_recording), false));
-    EndToEndTestUtils.sendGps(gpsSignalNumber, 0);
+    EndToEndTestUtils.sendGps(gpsSignalNumber);
 
     // Pause
     EndToEndTestUtils.findMenuItem(activityMyTracks.getString(R.string.menu_pause_track), true);
@@ -108,11 +108,8 @@ public class PauseRecordingTest extends ActivityInstrumentationTestCase2<TrackLi
         activityMyTracks.getString(R.string.menu_stop_recording), false));
 
     // Send Gps signal after pause.
-    int defaultPause = EndToEndTestUtils.PAUSE;
-    EndToEndTestUtils.PAUSE = 10;
-    // Add 100 to make these signals are apparently different.
-    EndToEndTestUtils.sendGps(gpsSignalNumber, gpsSignalNumber + 100);
-    EndToEndTestUtils.PAUSE = defaultPause;
+    // Add 10 to make these signals are apparently different.
+    EndToEndTestUtils.sendGps(gpsSignalNumber, gpsSignalNumber + 10, 10);
 
     // Resume
     EndToEndTestUtils.findMenuItem(activityMyTracks.getString(R.string.menu_record_track), true);
@@ -120,7 +117,7 @@ public class PauseRecordingTest extends ActivityInstrumentationTestCase2<TrackLi
         activityMyTracks.getString(R.string.menu_pause_track), false));
     assertNotNull(EndToEndTestUtils.findMenuItem(
         activityMyTracks.getString(R.string.menu_stop_recording), false));
-    EndToEndTestUtils.sendGps(gpsSignalNumber, gpsSignalNumber);
+    EndToEndTestUtils.sendGps(gpsSignalNumber, gpsSignalNumber, -1);
 
     // Stop
     EndToEndTestUtils.stopRecording(true);
