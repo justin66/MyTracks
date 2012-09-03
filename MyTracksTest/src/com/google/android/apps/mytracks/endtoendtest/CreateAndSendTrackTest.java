@@ -144,9 +144,9 @@ public class CreateAndSendTrackTest extends ActivityInstrumentationTestCase2<Tra
         activityMyTracks.getString(R.string.menu_split_frequency), false));
     EndToEndTestUtils.stopRecording(true);
     
-    assertFalse(EndToEndTestUtils.findMenuItem(
+    assertTrue(EndToEndTestUtils.findMenuItem(
         activityMyTracks.getString(R.string.menu_voice_frequency), false));
-    assertFalse(EndToEndTestUtils.findMenuItem(
+    assertTrue(EndToEndTestUtils.findMenuItem(
         activityMyTracks.getString(R.string.menu_split_frequency), false));
   }
 
@@ -165,7 +165,7 @@ public class CreateAndSendTrackTest extends ActivityInstrumentationTestCase2<Tra
     }
     
     createWaypoint();
-    EndToEndTestUtils.sendGps(2, 2, -1);
+    EndToEndTestUtils.sendGps(2, 2);
     // Back to tracks list.
     EndToEndTestUtils.SOLO.goBack();
     instrumentation.waitForIdleSync();

@@ -164,6 +164,7 @@ public class EndToEndTestUtils {
    * 
    * @param number send times
    * @param offset is used to compute the start latitude and longitude 
+   * @param pause pause interval between each sending
    */
   public static void sendGps(int number, int offset, int pause) {
     if (number < 1) { 
@@ -171,7 +172,7 @@ public class EndToEndTestUtils {
     }
     
     int pauseInterval = PAUSE_DEFAULT;
-    if(pause > -1) {
+    if (pause != -1) {
       pauseInterval = pause;
     }
     
@@ -206,6 +207,16 @@ public class EndToEndTestUtils {
         out.close();
       }
     }
+  }
+  
+  /**
+   * Send Gps data to emulator.
+   * 
+   * @param number number of signals
+   * @param offset is used to compute the start latitude and longitude 
+   */
+  public static void sendGps(int number, int offset) {
+    sendGps(number, offset, -1);
   }
   
   /**
@@ -318,7 +329,7 @@ public class EndToEndTestUtils {
    */
   static void createSimpleTrack(int numberOfGpsData) {
     startRecording();
-    sendGps(numberOfGpsData, 0, -1);
+    sendGps(numberOfGpsData);
     instrumentation.waitForIdleSync();
     stopRecording(true);
   }
@@ -330,10 +341,10 @@ public class EndToEndTestUtils {
    */
   public static void createTrackWithPause(int numberOfGpsData) {
     EndToEndTestUtils.startRecording();
-    EndToEndTestUtils.sendGps(numberOfGpsData, 0, -1);
+    EndToEndTestUtils.sendGps(numberOfGpsData);
     EndToEndTestUtils.findMenuItem(activityMytracks.getString(R.string.menu_pause_track), true);
     EndToEndTestUtils.findMenuItem(activityMytracks.getString(R.string.menu_record_track), true);
-    EndToEndTestUtils.sendGps(numberOfGpsData, numberOfGpsData, -1);
+    EndToEndTestUtils.sendGps(numberOfGpsData, numberOfGpsData);
     EndToEndTestUtils.stopRecording(true);
   }
   

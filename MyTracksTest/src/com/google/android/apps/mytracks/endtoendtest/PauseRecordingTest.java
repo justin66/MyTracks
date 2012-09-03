@@ -69,7 +69,7 @@ public class PauseRecordingTest extends ActivityInstrumentationTestCase2<TrackLi
         activityMyTracks.getString(R.string.menu_record_track), false));
     assertNotNull(EndToEndTestUtils.findMenuItem(
         activityMyTracks.getString(R.string.menu_stop_recording), false));
-    EndToEndTestUtils.sendGps(gpsSignalNumber, gpsSignalNumber, -1);
+    EndToEndTestUtils.sendGps(gpsSignalNumber, gpsSignalNumber);
 
     // Stop
     EndToEndTestUtils.stopRecording(true);
@@ -107,7 +107,7 @@ public class PauseRecordingTest extends ActivityInstrumentationTestCase2<TrackLi
         activityMyTracks.getString(R.string.menu_pause_track), false));
     assertNotNull(EndToEndTestUtils.findMenuItem(
         activityMyTracks.getString(R.string.menu_stop_recording), false));
-    EndToEndTestUtils.sendGps(gpsSignalNumber, gpsSignalNumber, -1);
+    EndToEndTestUtils.sendGps(gpsSignalNumber, gpsSignalNumber);
 
     // Stop
     EndToEndTestUtils.stopRecording(true);

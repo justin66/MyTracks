@@ -127,7 +127,7 @@ public class SettingTest extends ActivityInstrumentationTestCase2<TrackListActiv
     EndToEndTestUtils.SOLO.clickOnText(activityMyTracks.getString(R.string.track_detail_chart_tab));
     EndToEndTestUtils.sendGps(3);
     ChangeStatsSettings(true, false, false, false, false);
-    EndToEndTestUtils.sendGps(3, 3, -1);
+    EndToEndTestUtils.sendGps(3, 3);
     EndToEndTestUtils.stopRecording(true);
 
   }
@@ -141,7 +141,7 @@ public class SettingTest extends ActivityInstrumentationTestCase2<TrackListActiv
     EndToEndTestUtils.SOLO.clickOnText(activityMyTracks.getString(R.string.track_detail_stats_tab));
     EndToEndTestUtils.sendGps(3);
     ChangeStatsSettings(true, true, false, false, false);
-    EndToEndTestUtils.sendGps(3, 3, -1);
+    EndToEndTestUtils.sendGps(3, 3);
     EndToEndTestUtils.stopRecording(true);
 
   }
@@ -237,8 +237,6 @@ public class SettingTest extends ActivityInstrumentationTestCase2<TrackListActiv
     // Delete all backup at first.
     EndToEndTestUtils.deleteExportedFiles(EndToEndTestUtils.BACKUPS);
     EndToEndTestUtils.createTrackIfEmpty(3, true);
-
-    assertTrue(EndToEndTestUtils.SOLO.searchText(EndToEndTestUtils.trackName));
 
     // Write to SD card.
     EndToEndTestUtils.findMenuItem(activityMyTracks.getString(R.string.menu_settings), true);
