@@ -205,14 +205,4 @@ public class PauseRecordingTest extends ActivityInstrumentationTestCase2<TrackLi
     assertTrue(totalTimeOld.equalsIgnoreCase(totalTimeNew));
   }
 
-  @Override
-  protected void tearDown() throws Exception {
-    // In normally, the activities of MyTracks should be closed after every test
-    // is completed. But this case is different, send two go back event to make
-    // it will not block following tests.
-    EndToEndTestUtils.SOLO.goBack();
-    EndToEndTestUtils.SOLO.goBack();
-    super.tearDown();
-  }
-
 }

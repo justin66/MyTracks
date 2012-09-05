@@ -231,7 +231,7 @@ public class EndToEndTestUtils {
   /**
    * Sets the status whether the test is run on an emulator or not.
    */
-  static void setIsEmulator() {
+  private static void setIsEmulator() {
     isEmulator = android.os.Build.MODEL.equals("google_sdk");
   }
 
@@ -241,7 +241,7 @@ public class EndToEndTestUtils {
    * @param instrumentation the instrumentation is used for test
    * @param activityMyTracks the startup activity
    */
-  static void setupForAllTest(Instrumentation instrumentation, TrackListActivity activityMyTracks) {
+  public static void setupForAllTest(Instrumentation instrumentation, TrackListActivity activityMyTracks) {
     EndToEndTestUtils.instrumentation = instrumentation;
     EndToEndTestUtils.activityMytracks = activityMyTracks;
     SOLO = new Solo(EndToEndTestUtils.instrumentation,
@@ -301,7 +301,7 @@ public class EndToEndTestUtils {
    * 
    * @param activity a given activity
    */
-  static void rotateActivity(Activity activity) {
+  private static void rotateActivity(Activity activity) {
     activity
         .setRequestedOrientation(activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT ? ORIENTATION_LANDSCAPE
             : ORIENTATION_PORTRAIT);
@@ -310,7 +310,7 @@ public class EndToEndTestUtils {
   /**
    * Accepts terms and configures units.
    */
-  static void verifyFirstLaunch() {
+  private static void verifyFirstLaunch() {
     getButtonOnScreen(activityMytracks.getString(R.string.eula_accept), true, true);
     if (SOLO.waitForText(activityMytracks.getString(R.string.generic_ok))) {
       // Click for welcome.
@@ -327,7 +327,7 @@ public class EndToEndTestUtils {
    * 
    * @param numberOfGpsData number of simulated Gps data
    */
-  static void createSimpleTrack(int numberOfGpsData) {
+  public static void createSimpleTrack(int numberOfGpsData) {
     startRecording();
     sendGps(numberOfGpsData);
     instrumentation.waitForIdleSync();
@@ -340,12 +340,12 @@ public class EndToEndTestUtils {
    * @param numberOfGpsData number of simulated Gps data before pause and after resume
    */
   public static void createTrackWithPause(int numberOfGpsData) {
-    EndToEndTestUtils.startRecording();
-    EndToEndTestUtils.sendGps(numberOfGpsData);
-    //EndToEndTestUtils.findMenuItem(activityMytracks.getString(R.string.menu_pause_track), true);
-    //EndToEndTestUtils.findMenuItem(activityMytracks.getString(R.string.menu_record_track), true);
-    EndToEndTestUtils.sendGps(numberOfGpsData, numberOfGpsData);
-    EndToEndTestUtils.stopRecording(true);
+    startRecording();
+    sendGps(numberOfGpsData);
+    pauseRecording();
+    resumeRecording();
+    sendGps(numberOfGpsData, numberOfGpsData);
+    stopRecording(true);
   }
   
   
@@ -356,7 +356,7 @@ public class EndToEndTestUtils {
    * @param isClick if not empty, true means click any track
    * @return return true if the track list is empty
    */
-  static boolean isTrackListEmpty(boolean isClick) {
+  public static boolean isTrackListEmpty(boolean isClick) {
     int trackNumber = SOLO.getCurrentListViews().get(0).getCount();
     if(trackNumber <= 0) {
       return true;
@@ -378,7 +378,7 @@ public class EndToEndTestUtils {
    * @param showTrackList whether stay on track list activity or track detail
    *          activity
    */
-  static void createTrackIfEmpty(int gpsNumber, boolean showTrackList) {
+  public static void createTrackIfEmpty(int gpsNumber, boolean showTrackList) {
     if (isTrackListEmpty(!showTrackList)) {
       // Create a simple track.
       createSimpleTrack(gpsNumber);
@@ -393,7 +393,7 @@ public class EndToEndTestUtils {
   /**
    * Starts recoding track.
    */
-  static void startRecording() {
+  public static void startRecording() {
     View startButton = SOLO.getCurrentActivity().findViewById(R.id.track_controller_record);
     if(startButton != null && startButton.isShown()) {
       SOLO.clickOnView(startButton);
@@ -404,7 +404,7 @@ public class EndToEndTestUtils {
   /**
    * Pauses recoding track.
    */
-  static void pauseRecording() {
+  public static void pauseRecording() {
     View pauseButton = SOLO.getCurrentActivity().findViewById(R.id.track_controller_record);
     if(pauseButton != null && pauseButton.isShown()) {
       SOLO.clickOnView(pauseButton);
@@ -415,7 +415,7 @@ public class EndToEndTestUtils {
   /**
    * Resume recoding track.
    */
-  static void resumeRecording() {
+  public static void resumeRecording() {
     View startButton = SOLO.getCurrentActivity().findViewById(R.id.track_controller_record);
     if(startButton != null && startButton.isShown()) {
       SOLO.clickOnView(startButton);
@@ -428,23 +428,8 @@ public class EndToEndTestUtils {
    * 
    * @return true if it is under recording.
    */
-  static boolean isUnderRecording() {
-    View startButton = SOLO.getCurrentActivity().findViewById(R.id.track_controller_record);
-    if (startButton != null && startButton.isShown()) {
-      return false;
-    }
-//    if (hasActionBar) { 
-//      return getButtonOnScreen(activityMytracks
-//        .getString(R.string.menu_record_track), false, false) == null; 
-//    }
-//    showMenuItem();
-//    if (SOLO.searchText(activityMytracks.getString(R.string.menu_record_track))
-//        || SOLO.searchText(activityMytracks.getString(R.string.menu_play))) {
-//      SOLO.goBack();
-//      return false;
-//    }
-//    SOLO.goBack();
-    return true;
+  public static boolean isUnderRecording() {
+    return SOLO.getCurrentActivity().findViewById(R.id.track_controller_stop).isEnabled();
   }
 
   /**
@@ -452,7 +437,7 @@ public class EndToEndTestUtils {
    * 
    * @param isSave true means should save this track
    */
-  static void stopRecording(boolean isSave) {
+  public static void stopRecording(boolean isSave) {
     View stopButton = SOLO.getCurrentActivity().findViewById(R.id.track_controller_stop);
     if(stopButton != null && stopButton.isShown() ) {
       SOLO.clickOnView(stopButton);
@@ -476,7 +461,7 @@ public class EndToEndTestUtils {
    * 
    * @param trackKind the kind of track
    */
-  static void deleteExportedFiles(String trackKind) {
+  public static void deleteExportedFiles(String trackKind) {
     File[] allFiles = (new File(FileUtils.buildExternalDirectoryPath(trackKind.toLowerCase())))
         .listFiles();
     if (allFiles != null) {
@@ -490,7 +475,7 @@ public class EndToEndTestUtils {
    * Deletes all tracks. This method should be call when the TracksListActivity
    * is shown.
    */
-  static void deleteAllTracks() {
+  public static void deleteAllTracks() {
     findMenuItem(activityMytracks.getString(R.string.menu_delete_all), true);
     getButtonOnScreen(activityMytracks.getString(R.string.generic_ok), true, true);
   }
@@ -501,7 +486,7 @@ public class EndToEndTestUtils {
    * @param trackKind the kind of track
    * @return files array of such kind of exported tracks
    */
-  static File[] getExportedFiles(final String trackKind) {
+  public static File[] getExportedFiles(final String trackKind) {
     String filePath = FileUtils.buildExternalDirectoryPath(trackKind);
     FileFilter filter = new FileFilter() {
       @Override
@@ -517,7 +502,7 @@ public class EndToEndTestUtils {
    * 
    * @param trackKind the kind of track
    */
-  static void saveTrackToSdCard(String trackKind) {
+  public static void saveTrackToSdCard(String trackKind) {
     deleteExportedFiles(trackKind);
     instrumentation.waitForIdleSync();
     findMenuItem(activityMytracks.getString(R.string.menu_save), true);
@@ -535,7 +520,7 @@ public class EndToEndTestUtils {
    * @param isClick whether click the button if find it
    * @return the button to search, and null means can not find the button
    */
-  static View getButtonOnScreen(String buttonName, boolean isWait,boolean isClick) {
+  public static View getButtonOnScreen(String buttonName, boolean isWait,boolean isClick) {
     View button = null;
 
     instrumentation.waitForIdleSync();
@@ -585,7 +570,7 @@ public class EndToEndTestUtils {
    * 
    * @return false means can not check failed.
    */
-  static boolean setHasActionBar() {
+  private static boolean setHasActionBar() {
     try {
       return activityMytracks.getActionBar() == null ? false : true;
     }catch (Throwable e) {
@@ -597,7 +582,7 @@ public class EndToEndTestUtils {
   /**
    * Rotates the current activity.
    */
-  static void rotateCurrentActivity() {
+  public static void rotateCurrentActivity() {
     rotateActivity(SOLO.getCurrentActivity());
     instrumentation.waitForIdleSync();
   }
@@ -605,7 +590,7 @@ public class EndToEndTestUtils {
   /**
    * Rotates all activities.
    */
-  static void rotateAllActivities() {
+  public static void rotateAllActivities() {
     if (hasActionBar) {
       ArrayList<Activity> allActivities = SOLO.getAllOpenedActivities();
       for (Activity activity : allActivities) {
@@ -622,7 +607,7 @@ public class EndToEndTestUtils {
    * @param click true means need click this menu
    * @return true if find this menu
    */
-  static boolean findMenuItem(String menuName, boolean click) {
+  public static boolean findMenuItem(String menuName, boolean click) {
     boolean findResult = false;
     boolean isMoreMenuOpened = false;
 
@@ -727,15 +712,15 @@ public class EndToEndTestUtils {
   /**
    * Finds a displayed text view with specified text in a view.
    * 
-   * @param findText text to find
+   * @param text text to find
    * @param parent which text view in in
    * @return the text view, null means can not find it
    */
-  static TextView findTextViewInView(String findText, View parent) {
+  public static TextView findTextViewInView(String text, View parent) {
     ArrayList<TextView> textViews = SOLO.getCurrentTextViews(parent);
     for (TextView textView : textViews) {
-      String text = (String) textView.getText();
-      if (textView.isShown() && text.endsWith(findText)) { 
+      String textString = (String) textView.getText();
+      if (textView.isShown() && textString.endsWith(text)) { 
         return textView; 
       }
     }
@@ -745,16 +730,16 @@ public class EndToEndTestUtils {
   /**
    * Finds a displayed text view with specified text.
    * 
-   * @param findText text to find
+   * @param text text to find
    * @return the text view, null means can not find it
    */
-  static TextView findTextView(String findText) {
+  public static TextView findTextView(String text) {
     ArrayList<View> allViews = SOLO.getViews();
     for (View view : allViews) {
       if (view instanceof TextView) {
         TextView textView = (TextView) view;
-        String text = (String) textView.getText();
-        if (textView.isShown() && text.endsWith(findText)) {
+        String textString = (String) textView.getText();
+        if (textView.isShown() && textString.endsWith(text)) {
           return textView;
         }
       }
@@ -767,7 +752,7 @@ public class EndToEndTestUtils {
    * 
    * @return the ChartView or null if not find
    */
-  static ChartView getChartView() {
+  public static ChartView getChartView() {
     ArrayList<View> views = SOLO.getViews();
     for (View view : views) {
       if (view instanceof ChartView) { 
@@ -817,7 +802,7 @@ public class EndToEndTestUtils {
     try {
       Thread.sleep(milliseconds);
     } catch (InterruptedException e) {
-      Log.e(EndToEndTestUtils.LOG_TAG, "Unable to sleep " + milliseconds, e);
+      Log.e(LOG_TAG, "Unable to sleep " + milliseconds, e);
     }
   }
 
