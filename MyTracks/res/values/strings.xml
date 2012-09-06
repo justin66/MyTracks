@@ -1043,81 +1043,81 @@ limitations under the License.
   <string name="menu_aggregated_statistics"
     translation_description="In the menu, to go to the aggregated statistics page.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Aggregated stats
   </string>
   <string name="menu_delete"
     translation_description="In the menu, to delete a track or a marker.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Delete
   </string>
   <string name="menu_delete_all"
     translation_description="In the menu, to delete all the tracks.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Delete all
   </string>
   <string name="menu_edit"
     translation_description="In the menu, to edit a track or a marker.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Edit
   </string>
   <string name="menu_help"
     translation_description="In the menu, to go to the help page.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Help
   </string>
   <string name="menu_import"
     translation_description="In the menu, to import tracks from the SD card.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Import from SD card
   </string>
   <string name="menu_insert_marker"
     translation_description="In the menu, to insert a marker.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Insert marker
   </string>
   <string name="menu_map_mode"
     translation_description="In the menu, to switch the display to the map mode.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Map mode
   </string>
   <string name="menu_markers"
     translation_description="In the menu, to show a list of markers for the current track.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Markers
   </string>
   <string name="menu_play"
     translation_description="In the menu, to play a track.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Play
   </string>
   <string name="menu_satellite_mode"
     translation_description="In the menu, to switch the display to the satellite mode.
 
-      Character limit: ~21 (1 line)">
-    Satellite mode
+      Character limit: ~20 (1 line)">
+    Satellite
   </string>
   <string name="menu_save"
     translation_description="In the menu, to save a track to the SD card. This menu item has a
       submenu.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Save to SD card
   </string>
   <string name="menu_save_all"
     translation_description="In the menu, to save all the tracks to the SD card. This menu item has
       a submenu.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Save all to SD card
   </string>
   <string name="menu_save_format"
@@ -1125,57 +1125,57 @@ limitations under the License.
       certain file format.
 
       %1$s: file format. 'GPX', 'KML', 'CSV', or 'TCX'.
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Save as %1$s
   </string>
   <string name="menu_search"
     translation_description="In the menu, to start a textual search for tracks or markers.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Search
   </string>
   <string name="menu_send_google"
     translation_description="In the menu, to send a track to Google.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Send to Google
   </string>
   <string name="menu_sensor_state"
     translation_description="In the menu, to go to the sensor state page.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Sensor state
   </string>
   <string name="menu_settings"
     translation_description="In the menu, to go to the settings page.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Settings
   </string>
   <string name="menu_share"
     translation_description="In the menu, to share a track.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Share
   </string>
   <string name="menu_show_on_map"
     translation_description="In the menu, to show a track or a marker on the map.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Show on map
   </string>
   <string name="menu_split_frequency"
     translation_description="In the menu, to configure the split frequency, how frequent to insert a
       split marker.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Split frequency
   </string>
   <string name="menu_voice_frequency"
     translation_description="In the menu, to configure the voice frequency, how frequent to announce
       status.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Voice frequency
   </string>
 
@@ -1624,21 +1624,21 @@ limitations under the License.
     translation_description="In the 'Map' settings, for the 'Track color mode' dropdown, the option
       to use different colors to color a track based on dynamically determined speed thresholds.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Dynamic thresholds
   </string>
   <string name="settings_map_track_color_mode_fixed"
     translation_description="In the 'Map' settings, for the 'Track color mode' dropdown, the option
       to use different colors to color a track based on fixed speed thresholds.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Fixed thresholds
   </string>
   <string name="settings_map_track_color_mode_single"
     translation_description="In the 'Map' settings, for the 'Track color mode' dropdown, the option
       to use a single color for all speeds.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Single color
   </string>
   <string name="settings_map_track_color_mode_summary"
@@ -1753,28 +1753,28 @@ limitations under the License.
     translation_description="In the 'Recording' settings, the option in the 'Track name' dropdown
       list to use the track start time in ISO-8601 date format as the track name.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Date (ISO 8601)
   </string>
   <string name="settings_recording_track_name_date_local_option"
     translation_description="In the 'Recording' settings, the option in the 'Track name' dropdown
       list to use the track start time in local date format as the track name.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Date (local)
   </string>
   <string name="settings_recording_track_name_location_option"
     translation_description="In the 'Recording' settings, the option in the 'Track name' dropdown
       list to use the track location as the track name.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Location
   </string>
   <string name="settings_recording_track_name_number_option"
     translation_description="In the 'Recording' settings, the option in the 'Track name' dropdown
       list to use a number as the track name.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Number
   </string>
   <string name="settings_recording_track_name_summary"
@@ -1912,14 +1912,14 @@ limitations under the License.
     translation_description="In the 'Sensor' settings, for the 'Sensor type' dropdown, the option to
       connect to an ANT+ sensor. Note that ANT+ is a radio standard.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     ANT+
   </string>
   <string name="settings_sensor_type_none"
     translation_description="In the 'Sensor' settings, for the 'Sensor type' dropdown, the option to
       not connect to any sensor.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     None
   </string>
   <string name="settings_sensor_type_polar"
@@ -1927,7 +1927,7 @@ limitations under the License.
       connect to a Polar bluetooth sensor. Do not translate Polar, the company name, but can
       translate Bluetooth, the radio standard.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Polar Bluetooth
   </string>
   <string name="settings_sensor_type_summary"
@@ -1940,7 +1940,7 @@ limitations under the License.
       connect to a Zephyr bluetooth sensor. Do not translate Zephyr, the company name, but can
       translate Bluetooth, the radio standard.
 
-      Character limit: ~21 (1 line)">
+      Character limit: ~20 (1 line)">
     Zephyr Bluetooth
   </string>
 
