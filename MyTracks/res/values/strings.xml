@@ -701,7 +701,7 @@ limitations under the License.
       waiting for a better GPS signal.">
     Waiting for GPS signal. Make sure the sky is visible.
   </string>
-  
+
   <!-- Help page -->
   <string name="help_about"
     translation_description="In the 'Help' page, the button on the bottom to open the 'About My
