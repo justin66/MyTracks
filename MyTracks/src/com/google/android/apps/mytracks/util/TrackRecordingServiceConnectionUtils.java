@@ -133,9 +133,7 @@ public class TrackRecordingServiceConnectionUtils {
         Log.e(TAG, "Unable to stop recording.", e);
       }
     } else {
-      PreferencesUtils.setLong(
-          context, R.string.recording_track_id_key, PreferencesUtils.RECORDING_TRACK_ID_DEFAULT);
-      PreferencesUtils.setBoolean(context,  R.string.recording_track_paused_key, true);
+      resetRecordingState(context);
     }
     trackRecordingServiceConnection.unbindAndStop();
   }
@@ -151,9 +149,21 @@ public class TrackRecordingServiceConnectionUtils {
       Context context, TrackRecordingServiceConnection trackRecordingServiceConnection) {
     trackRecordingServiceConnection.bindIfStarted();
     if (!isRecordingServiceRunning(context)) {
+      resetRecordingState(context);
+    }
+  }
+
+  private static void resetRecordingState(Context context) {
+    long recordingTrackId = PreferencesUtils.getLong(context, R.string.recording_track_id_key);
+    if (recordingTrackId != PreferencesUtils.RECORDING_TRACK_ID_DEFAULT) {
       PreferencesUtils.setLong(
           context, R.string.recording_track_id_key, PreferencesUtils.RECORDING_TRACK_ID_DEFAULT);
-      PreferencesUtils.setBoolean(context, R.string.recording_track_paused_key, true);
+    }
+    boolean recordingTrackPaused = PreferencesUtils.getBoolean(context,
+        R.string.recording_track_paused_key, PreferencesUtils.RECORDING_TRACK_PAUSED_DEFAULT);
+    if (!recordingTrackPaused) {
+      PreferencesUtils.setBoolean(context, R.string.recording_track_paused_key,
+          PreferencesUtils.RECORDING_TRACK_PAUSED_DEFAULT);
     }
   }
 
