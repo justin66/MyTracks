@@ -53,7 +53,9 @@ public class ViewsTest extends ActivityInstrumentationTestCase2<TrackListActivit
   /**
    * Switches view from {@link MapFragment} to @ ChartFragment} , then changes
    * to @ StatsFragment} . Finally back to {@link MapFragment}. And check some
-   * menus in these views.
+   * menus in these views. In MapFragment, the menu should contain satellite/map
+   * mode. In ChartFragment and StatsFragment, the menu should not contain
+   * satellite/map mode.
    */
   public void testSwitchViewsAndMenusOfView() {
     EndToEndTestUtils.createTrackIfEmpty(3, true);
