@@ -822,6 +822,14 @@ limitations under the License.
     translation_description="In the 'Help' page, the question on saved files.">
     What can I do with tracks after saving them to the SD card or sharing such files with friends?
   </string>
+  <string name="help_sd_card_access_answer"
+    translation_description="In the 'Help' page, the answer on sd card access.">
+    Tracks saved on the SD card are not encrypted. Any application on the phone can access them.
+  </string>
+  <string name="help_sd_card_access_question"
+    translation_description="In the 'Help' page, the question on sd card access.">
+    Who can access the tracks saved on the SD card?
+  </string>
   <string name="help_send_track_answer"
     translation_description="In the 'Help' page, the answer on sending a track.
 
@@ -1221,34 +1229,36 @@ limitations under the License.
 
   <!-- Permission -->
   <string name="permission_notification_description"
-    translation_description="When installing a third-party app that wants to receive My Tracks
-      notifications, the permission description that the Android Market shows to the user.">
-    Allows the application to receive notifications when My Tracks starts or stops a recording.
+    translation_description="The permission description the Google Play Store shows during app
+      installtion when the app wants to receive Google My Tracks notifications.">
+    Allows the application to receive notifications when Google My Tracks starts or stops a
+    recording.
   </string>
   <string name="permission_notification_label"
-    translation_description="When installing a third-party app that wants to receive My Tracks
-      notifications, the permission label that the Android Market shows to the user.">
-    receive My Tracks notifications
+    translation_description="The permission label the Google Play Store shows during app
+      installation when the app wants to receive Google My Tracks notifications.">
+    receive Google My Tracks notifications
   </string>
   <string name="permission_read_description"
-    translation_description="When installing a third-party app that wants to read My Tracks data,
-      the permission description that the Android Market shows to the user.">
-    Allows the application to read My Tracks data.
+    translation_description="The permission description the Google Play Store shows during app
+      installtion when the app wants to read Google My Tracks data.">
+    Allows the application to read Google My Tracks data.
   </string>
   <string name="permission_read_label"
-    translation_description="When installing a third-party app that wants to read My Tracks data,
-      the permission label that the Android Market shows to the user.">
-    read My Tracks data
+    translation_description="The permission label the Google Play Store shows during app
+      installation when the app wants to read My Tracks data.">
+    read Google My Tracks data
   </string>
   <string name="permission_write_description"
-    translation_description="When installing a third-party app that wants to write data to My
-      Tracks, the permission description that the Android Market shows to the user.">
-    Allows the application to write data to My Tracks and start/stop My Tracks recording.
+    translation_description="The permission description the Google Play Store shows during app
+      installtion when the app wants to write data to My Tracks.">
+    Allows the application to write data to Google My Tracks and start/stop Google My Tracks
+    recording.
   </string>
   <string name="permission_write_label"
-    translation_description="When installing a third-party app that wants to write data to My
-      Tracks, the permission label that the Android Market shows to the user.">
-    write data to My Tracks and start/stop My Tracks recording
+    translation_description="The permission label the Google Play Store shows during app
+      installation when the app wants to write data to My Tracks.">
+    write data to Google My Tracks and start/stop Google My Tracks recording
   </string>
 
   <!-- SD Card -->
@@ -1340,12 +1350,14 @@ limitations under the License.
 
   <!-- Send Google -->
   <string name="send_google_by_my_tracks"
-    translation_description="When sending a track to Google, a note indicating it is created by My
-      Tracks on Android.
+    translation_description="When sending a track to Google, a note indicating it is created by
+      Google My Tracks on Android.
 
-      %1$s: the html anchor opening tag. Place this placeholder before the app name, 'My Tracks'.
-      %2$s: the html anchor closing tag. Place this placeholder after the app name, 'My Tracks'.">
-    Created by %1$sMy Tracks%2$s on Android.
+      %1$s: the html anchor opening tag. Place this placeholder before the app name,
+      'Google My Tracks'.
+      %2$s: the html anchor closing tag. Place this placeholder after the app name,
+      'Google My Tracks'.">
+    Created by %1$sGoogle My Tracks%2$s on Android.
   </string>
   <string name="send_google_choose_account_title"
     translation_description="When sending to Google, the dialog title to choose a Google account.">
