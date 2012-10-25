@@ -810,7 +810,7 @@ public class TrackDataHub implements DataSourceListener {
   protected void runInHanderThread(Runnable runnable) {
     if (handler == null) {
       // Use a Throwable to ensure the stack trace is logged.
-      Log.e(TAG, "handler is null.", new Throwable());
+      Log.d(TAG, "handler is null.", new Throwable());
       return;
     }
     handler.post(runnable);

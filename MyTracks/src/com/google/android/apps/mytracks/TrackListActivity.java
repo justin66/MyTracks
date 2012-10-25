@@ -42,8 +42,11 @@ import com.google.android.apps.mytracks.util.PreferencesUtils;
 import com.google.android.apps.mytracks.util.StringUtils;
 import com.google.android.apps.mytracks.util.TrackIconUtils;
 import com.google.android.apps.mytracks.util.TrackRecordingServiceConnectionUtils;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.maps.mytracks.R;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -429,6 +432,12 @@ public class TrackListActivity extends FragmentActivity implements DeleteOneTrac
     trackController.update(
         recordingTrackId != PreferencesUtils.RECORDING_TRACK_ID_DEFAULT, recordingTrackPaused);
     handleStartGps();
+    
+    int code = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+    if (code != ConnectionResult.SUCCESS) {
+      Dialog dialog = GooglePlayServicesUtil.getErrorDialog(code, this, 0);
+      dialog.show();
+    }
   }
   
   @Override
