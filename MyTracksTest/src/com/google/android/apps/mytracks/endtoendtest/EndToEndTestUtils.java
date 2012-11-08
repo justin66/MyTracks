@@ -848,7 +848,7 @@ public class EndToEndTestUtils {
         .isEnabled());
     Assert.assertNull(findTextView(activityMytracks.getString(R.string.generic_recording)));
     Assert.assertNull(findTextView(activityMytracks.getString(R.string.generic_paused)));
-    TextView totalTime = (TextView) activityMytracks.findViewById(R.id.track_controller_total_time);
+    TextView totalTime = (TextView) SOLO.getCurrentActivity().findViewById(R.id.track_controller_total_time);
     Assert.assertEquals(StringUtils.formatElapsedTimeWithHour(0), totalTime.getText().toString());
   }
 
@@ -884,10 +884,10 @@ public class EndToEndTestUtils {
     Assert.assertNull(findTextView(activityMytracks.getString(R.string.generic_recording)));
     Assert.assertNotNull(findTextView(activityMytracks.getString(R.string.generic_paused)));
 
-    String totalTimeOld = ((TextView) activityMytracks
+    String totalTimeOld = ((TextView) SOLO.getCurrentActivity()
         .findViewById(R.id.track_controller_total_time)).getText().toString();
     sleep(2000);
-    String totalTimeNew = ((TextView) activityMytracks
+    String totalTimeNew = ((TextView) SOLO.getCurrentActivity()
         .findViewById(R.id.track_controller_total_time)).getText().toString();
     Assert.assertTrue(totalTimeOld.equalsIgnoreCase(totalTimeNew));
   }
