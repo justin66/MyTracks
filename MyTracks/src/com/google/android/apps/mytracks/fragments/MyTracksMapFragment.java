@@ -149,6 +149,13 @@ public class MyTracksMapFragment extends SupportMapFragment implements TrackData
     });
     messageTextView = (TextView) layout.findViewById(R.id.map_message);
 
+    /*
+     * onCreateView can be called multiple times. E.g., when the user switches
+     * tab. We only want to initialize the camera position if googleMap was
+     * null.
+     */
+    boolean initCamera = googleMap == null;
+    
     googleMap = getMap();
     googleMap.setMyLocationEnabled(true);
     googleMap.getUiSettings().setMyLocationButtonEnabled(false);
@@ -193,8 +200,10 @@ public class MyTracksMapFragment extends SupportMapFragment implements TrackData
         }
       }
     });
-    googleMap.moveCamera(
-        CameraUpdateFactory.newLatLngZoom(getDefaultLatLng(), googleMap.getMinZoomLevel()));
+    if (initCamera) {
+        googleMap.moveCamera(
+            CameraUpdateFactory.newLatLngZoom(getDefaultLatLng(), googleMap.getMinZoomLevel()));
+    }
     return layout;
   }
 
