@@ -22,7 +22,6 @@ import static com.google.android.apps.mytracks.Constants.MAX_NETWORK_AGE_MS;
 import static com.google.android.apps.mytracks.Constants.TARGET_DISPLAYED_TRACK_POINTS;
 
 import com.google.android.apps.mytracks.Constants;
-import com.google.android.apps.mytracks.content.MyTracksProviderUtils.DoubleBufferedLocationFactory;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils.LocationIterator;
 import com.google.android.apps.mytracks.content.TrackDataListener.LocationState;
 import com.google.android.apps.mytracks.util.LocationUtils;
@@ -60,7 +59,6 @@ public class TrackDataHub implements DataSourceListener {
   private final TrackDataManager trackDataManager;
   private final MyTracksProviderUtils myTracksProviderUtils;
   private final int targetNumPoints;
-  private final DoubleBufferedLocationFactory locationFactory;
 
   private boolean started;
   private HandlerThread handlerThread;
@@ -116,7 +114,6 @@ public class TrackDataHub implements DataSourceListener {
     this.trackDataManager = trackDataManager;
     this.myTracksProviderUtils = myTracksProviderUtils;
     this.targetNumPoints = targetNumPoints;
-    this.locationFactory = new DoubleBufferedLocationFactory();
     resetSamplingState();
   }
 
@@ -620,8 +617,8 @@ public class TrackDataHub implements DataSourceListener {
 
     long lastTrackPointId = myTracksProviderUtils.getLastTrackPointId(selectedTrackId);
     int samplingFrequency = -1;
-    LocationIterator iterator = myTracksProviderUtils.getTrackPointLocationIterator(
-        selectedTrackId, localLastSeenLocationId + 1, false, locationFactory);
+    LocationIterator iterator = myTracksProviderUtils.getTrackPointLocationIterator(selectedTrackId,
+        localLastSeenLocationId + 1, false, MyTracksProviderUtils.DEFAULT_LOCATION_FACTORY);
     boolean includeNextPoint = false;
     while (iterator.hasNext()) {
       Location location = iterator.next();

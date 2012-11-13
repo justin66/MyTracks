@@ -315,28 +315,9 @@ public interface MyTracksProviderUtils {
   public LocationFactory DEFAULT_LOCATION_FACTORY = new LocationFactory() {
       @Override
     public Location createLocation() {
-      return new Location(LocationManager.GPS_PROVIDER);
+      return new MyTracksLocation(LocationManager.GPS_PROVIDER);
     }
   };
-
-  /**
-   * A {@link LocationFactory} which uses two location instances (one for the
-   * current location and one for the previous), useful when needing to keep the
-   * last location.
-   */
-  public class DoubleBufferedLocationFactory implements LocationFactory {
-
-    private final Location locations[] = new MyTracksLocation[] {
-        new MyTracksLocation(LocationManager.GPS_PROVIDER),
-        new MyTracksLocation(LocationManager.GPS_PROVIDER) };
-    private int lastLocation = 0;
-
-    @Override
-    public Location createLocation() {
-      lastLocation = (lastLocation + 1) % locations.length;
-      return locations[lastLocation];
-    }
-  }
 
   /**
    * A factory which can produce instances of {@link MyTracksProviderUtils}, and
