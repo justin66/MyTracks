@@ -69,6 +69,8 @@ public class EndToEndTestUtils {
   private static final String NO_GPS_MESSAGE_PREFIX = "GPS is not available";
   
   private static final String MOREOPTION_CLASSNAME = "com.android.internal.view.menu.ActionMenuPresenter$OverflowMenuButton";
+  private static final String MENUITEM_CLASSNAME = "com.android.internal.view.menu.IconMenuItemView";
+
 
   static final String DEFAULTACTIVITYTYPE = "TestActivity";
   public static String activityType = DEFAULTACTIVITYTYPE;
@@ -660,11 +662,11 @@ public class EndToEndTestUtils {
       findResult = SOLO.searchText(menuName, 1, true);
     } else {
       // Non-ICS phone.
-      SOLO.sendKey(KeyEvent.KEYCODE_MENU);
+      SOLO.sendKey(KeyEvent.KEYCODE_MENU);      
       if (SOLO.searchText(menuName, 1, true)) {
         findResult = true;
-      } else if (SOLO.searchText(MENU_MORE, 1, true)) {
-        SOLO.clickOnText(MENU_MORE);
+      } else if (getMoreOptionView() != null) {
+        SOLO.clickOnView(getMoreOptionView());
         findResult = SOLO.searchText(menuName, 1, true);
         isMoreMenuOpened = true;
       }
@@ -733,13 +735,25 @@ public class EndToEndTestUtils {
    * @return the more option view. Null means can not find it.
    */
   private static View getMoreOptionView() {
-    ArrayList<View> allViews = SOLO.getViews();
-    for (View view : allViews) {
-      if (view instanceof ImageButton && view.getClass().getName().equals(MOREOPTION_CLASSNAME)) { 
-        return view; 
+    View viewResult = null;
+    if (hasActionBar) {
+      ArrayList<View> allViews = SOLO.getViews();
+      for (View view : allViews) {
+        if (view instanceof ImageButton && view.getClass().getName().equals(MOREOPTION_CLASSNAME)) {
+          viewResult = view;
+          break;
+        }
+      }
+    } else {
+      ArrayList<View> allViews = SOLO.getViews();
+      for (View view : allViews) {
+        if (view.getClass().getName().equals(MENUITEM_CLASSNAME)) {
+          viewResult = view;
+          // No break here to get the last menu item.
+        }
       }
     }
-    return null;
+    return viewResult;
   }
   
   /**
