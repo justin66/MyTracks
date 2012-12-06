@@ -150,59 +150,67 @@ public class MyTracksMapFragment extends SupportMapFragment implements TrackData
     messageTextView = (TextView) layout.findViewById(R.id.map_message);
 
     /*
-     * onCreateView can be called multiple times. E.g., when the user switches
-     * tab. We only want to initialize the camera position if googleMap was
-     * null.
+     * At this point, after super.onCreateView, getMap will not return null and
+     * we can initialize googleMap. However, onCreateView can be called multiple
+     * times, e.g., when the user switches tabs. With
+     * GoogleMapOptions.useViewLifecycleInFragment == false, googleMap lifecycle
+     * is tied to the fragment lifecycle and the same googleMap object is
+     * returned in getMap. Thus we only need to initialize googleMap once, when
+     * it is null.
      */
-    boolean initCamera = googleMap == null;
-    
-    googleMap = getMap();
-    googleMap.setMyLocationEnabled(true);
-    googleMap.getUiSettings().setMyLocationButtonEnabled(false);
-    googleMap.setIndoorEnabled(true);
-    googleMap.setOnMarkerClickListener(new OnMarkerClickListener() {
+    if (googleMap == null) {
+      googleMap = getMap();
+      googleMap.setMyLocationEnabled(true);
 
-        @Override
-      public boolean onMarkerClick(Marker marker) {
-        if (isResumed()) {
-          String title = marker.getTitle();
-          if (title != null && title.length() > 0) {
-            long id = Long.valueOf(title);
-            Context context = getActivity();
-            Intent intent = IntentUtils.newIntent(context, MarkerDetailActivity.class)
-                .putExtra(MarkerDetailActivity.EXTRA_MARKER_ID, id);
-            context.startActivity(intent);
+      /*
+       * My Tracks needs to handle the onClick event when the my location button
+       * is clicked. Currently, the API doesn't allow handling onClick event,
+       * thus hiding the default my location button and providing our own.
+       */
+      googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+      googleMap.setIndoorEnabled(true);
+      googleMap.setOnMarkerClickListener(new OnMarkerClickListener() {
+
+          @Override
+        public boolean onMarkerClick(Marker marker) {
+          if (isResumed()) {
+            String title = marker.getTitle();
+            if (title != null && title.length() > 0) {
+              long id = Long.valueOf(title);
+              Context context = getActivity();
+              Intent intent = IntentUtils.newIntent(context, MarkerDetailActivity.class)
+                  .putExtra(MarkerDetailActivity.EXTRA_MARKER_ID, id);
+              context.startActivity(intent);
+            }
+          }
+          return true;
+        }
+      });
+      googleMap.setLocationSource(new LocationSource() {
+
+          @Override
+        public void activate(OnLocationChangedListener listener) {
+          onLocationChangedListener = listener;
+        }
+
+          @Override
+        public void deactivate() {
+          onLocationChangedListener = null;
+        }
+      });
+      googleMap.setOnCameraChangeListener(new OnCameraChangeListener() {
+
+          @Override
+        public void onCameraChange(CameraPosition cameraPosition) {
+          if (isResumed() && keepCurrentLocationVisible && currentLocation != null
+              && !isLocationVisible(currentLocation)) {
+            keepCurrentLocationVisible = false;
+            zoomToCurrentLocation = false;
           }
         }
-        return true;
-      }
-    });
-    googleMap.setLocationSource(new LocationSource() {
-
-        @Override
-      public void activate(OnLocationChangedListener listener) {
-        onLocationChangedListener = listener;
-      }
-
-        @Override
-      public void deactivate() {
-        onLocationChangedListener = null;
-      }
-    });
-    googleMap.setOnCameraChangeListener(new OnCameraChangeListener() {
-
-        @Override
-      public void onCameraChange(CameraPosition cameraPosition) {
-        if (isResumed() && keepCurrentLocationVisible && currentLocation != null
-            && !isLocationVisible(currentLocation)) {
-          keepCurrentLocationVisible = false;
-          zoomToCurrentLocation = false;
-        }
-      }
-    });
-    if (initCamera) {
-        googleMap.moveCamera(
-            CameraUpdateFactory.newLatLngZoom(getDefaultLatLng(), googleMap.getMinZoomLevel()));
+      });
+      googleMap.moveCamera(
+          CameraUpdateFactory.newLatLngZoom(getDefaultLatLng(), googleMap.getMinZoomLevel()));
     }
     return layout;
   }
@@ -611,6 +619,9 @@ public class MyTracksMapFragment extends SupportMapFragment implements TrackData
           return;
         }
 
+        /**
+         * Check that mapView is valid.
+         */
         if (mapView == null || mapView.getWidth() == 0 || mapView.getHeight() == 0) {
           return;
         }
@@ -626,6 +637,13 @@ public class MyTracksMapFragment extends SupportMapFragment implements TrackData
               tripStatistics.getTopDegrees(), tripStatistics.getRightDegrees());
           LatLngBounds bounds = LatLngBounds.builder()
               .include(southWest).include(northEast).build();
+          
+          /**
+           * Note cannot call CameraUpdate.newLatLngBounds(LatLngBounds bounds, int padding)
+           * if the map view has not undergone layout. Thus calling 
+           * CameraUpdate.newLatLngBounds(LatLngBounds bounds, int width, int height, int padding)
+           * after making sure that mapView is valid in the above code.
+           */
           CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(
               bounds, mapView.getWidth(), mapView.getHeight(), MAP_VIEW_PADDING);
           googleMap.moveCamera(cameraUpdate);
