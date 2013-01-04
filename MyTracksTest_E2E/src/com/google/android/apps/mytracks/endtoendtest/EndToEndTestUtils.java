@@ -548,7 +548,6 @@ public class EndToEndTestUtils {
     findMenuItem(activityMytracks.getString(R.string.menu_save), true);
     instrumentation.waitForIdleSync();
     SOLO.clickOnText(trackKind.toUpperCase());
-    // rotateAllActivities();
     SOLO.waitForText(activityMytracks.getString(R.string.generic_success_title));
   }
 
@@ -962,6 +961,7 @@ public class EndToEndTestUtils {
     findMenuItem(activityMytracks.getString(R.string.menu_insert_marker), true);
     enterTextAvoidSoftKeyBoard(0, WAYPOINT_NAME);
     SOLO.clickOnButton(activityMytracks.getString(R.string.generic_add));
+    instrumentation.waitForIdleSync();
     if (hasGpsSingal) {
       Assert.assertTrue(SOLO.waitForText(WAYPOINT_NAME, 1, LONG_WAIT_TIME, true));
     } else {
