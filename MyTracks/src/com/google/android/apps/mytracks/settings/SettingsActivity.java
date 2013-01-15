@@ -81,7 +81,7 @@ public class SettingsActivity extends AbstractSettingsActivity {
     Preference preference = findPreference(getString(key));
     preference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
         @Override
-      public boolean onPreferenceClick(Preference preference) {
+      public boolean onPreferenceClick(Preference pref) {
         Intent intent = IntentUtils.newIntent(SettingsActivity.this, cl);
         startActivity(intent);
         return true;
