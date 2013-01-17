@@ -1820,73 +1820,84 @@ limitations under the License.
 
   <!-- Settings Recording -->
   <string name="settings_recording"
-    translation_description="In the 'Settings' page, the option to change the track recording
-      settings.
+    translation_description="In the 'Settings' page, the option to change the recording settings.
 
       Character limit: ~26 (1 line)">
     Recording
   </string>
+  <string name="settings_recording_auto_resume_track_timeout_always_summary"
+    translation_description="In the 'Recording' settings, the summary for the 'Auto-resume' setting
+      when 'Always' is selected.">
+    Always resume a recording after reboot
+  </string>
+  <string name="settings_recording_auto_resume_track_timeout_never_summary"
+    translation_description="In the 'Recording' settings, the summary for the 'Auto-resume' setting
+      when 'Never' is selected.">
+    Never resume a recording after reboot
+  </string>
+  <string name="settings_recording_auto_resume_track_timeout_summary"
+    translation_description="In the 'Recording' settings, the summary for the 'Auto-resume' setting
+      when a time value is selected.
+
+      %1$s time value. E.g., '5 min'.">
+    Resume a recording after reboot if the last recorded loation was within the last %1$s
+  </string>
   <string name="settings_recording_auto_resume_track_timeout_title"
-    translation_description="In the 'Recording' settings, the title to configure resuming a
-      recording track after reboot.
+    translation_description="In the 'Recording' settings, the title to configure automatically
+      resuming a recording after reboot.
 
       Character limit: ~23 (1 line)">
     Auto-resume
   </string>
-  <string name="settings_recording_auto_resume_track_timeout_summary"
-    translation_description="In the 'Recording' settings, the summary for the 'Auto-resume' setting.
-      Occasionaly, phones will reboot due to crashes or users would need to change battery during a
-      long recording. My Tracks will resume a recording after reboot if it was recording beforehand
-      and that the last recorded time is recent, within certain minutes.">
-    Recording is resumed after reboot if the last recorded time is within this.
-  </string>
   <string name="settings_recording_default_activity_title"
     translation_description="In the 'Recording' settings, the title to configure the default
-      activity type for a new track.
+      activity type for a new track. E.g., 'hiking'.
 
       Character limit: ~23 (1 line)">
-    Default activity
+    Default activity type
   </string>
-  <string name="settings_recording_default_activity_summary"
-    translation_description="In the 'Recording' settings, the summary for the 'Default activity'
-      setting.">
-    Default activity type for a new track.
+  <string name="settings_recording_location_frequency_summary"
+    translation_description="In the 'Recording' settings, the summary for how frequent a location
+      should be recorded.
+
+      %1$s distance or time. E.g., '5 m' or '1 s'.">
+    %1$s between recorded locations
+  </string>
+  <string name="settings_recording_max_recording_distance_summary"
+    translation_description="In the 'Recording' settings, the summary for the 'Max distance'
+      setting.
+
+      %1$s distance value. E.g., '5 m'.">
+    A new segment is created if the distance between two locations is greater than %1$s
   </string>
   <string name="settings_recording_max_recording_distance_title"
     translation_description="In the 'Recording' settings, the title to configure the maximum
-      distance.
+      distance between 2 locations in a segment. A new segment is created if the distance between 2
+      locations is greater than this value.
 
       Character limit: ~23 (1 line)">
     Max distance
   </string>
-  <string name="settings_recording_max_recording_distance_summary"
-    translation_description="In the 'Recording' settings, the summary for the 'Max distance'
-      setting.">
-    Maximum distance between locations in the same segment.
-  </string>
   <string name="settings_recording_min_recording_distance_title"
-    translation_description="In the 'Recording' settings, the title to configure the minimum
-      distance.
+    translation_description="In the 'Recording' settings, the title to configure the distance
+      between two recorded locations.
 
       Character limit: ~23 (1 line)">
-    Min distance
-  </string>
-  <string name="settings_recording_min_recording_distance_summary"
-    translation_description="In the 'Recording' settings, the summary for the 'Min distance'
-      setting.">
-    Minimum distance between recorded locations.
+    Recording distance interval
   </string>
   <string name="settings_recording_min_recording_interval_title"
     translation_description="In the 'Recording' settings, the title to configure the time between
-      two GPS locations.
+      two recorded locations.
 
       Character limit: ~23 (1 line)">
-    Location frequency
+    Recording time interval
   </string>
-  <string name="settings_recording_min_recording_interval_summary"
-    translation_description="In the 'Recording' settings, the summary for the 'Location frequency'
-      setting.">
-    Time between two GPS locations.
+  <string name="settings_recording_min_required_accuracy_summary"
+    translation_description="In the 'Recording' settings, the summary for the 'GPS accuracy'
+      setting.
+
+      %1$s distance value. E.g., '10 m'.">
+    Location is ignored if its accuracy is less than %1$s
   </string>
   <string name="settings_recording_min_required_accuracy_title"
     translation_description="In the 'Recording' settings, the title to configure the GPS accuracy.
@@ -1894,60 +1905,40 @@ limitations under the License.
       Character limit: ~23 (1 line)">
     GPS accuracy
   </string>
-  <string name="settings_recording_min_required_accuracy_summary"
-    translation_description="In the 'Recording' settings, the summary for the 'GPS accuracy'
-      setting..">
-    GPS location is ignored if it is not this accurate.
-  </string>
-  <string name="settings_recording_split_frequency_summary"
-    translation_description="In the 'Recording' settings, the summary for the 'Split frequency'
-      setting.">
-    Time/distance between two split markers.
-  </string>
   <string name="settings_recording_track_name_date_iso_8601_option"
-    translation_description="In the 'Recording' settings, the option in the 'Track name' setting
-      to use the track starting time in the ISO-8601 format as the track name.
+    translation_description="In the 'Recording' settings, the option in the 'Default track name'
+      setting to use the track starting time in the ISO-8601 format as the default track name.
 
       Character limit: ~20 (1 line)">
     Date (ISO 8601)
   </string>
   <string name="settings_recording_track_name_date_local_option"
-    translation_description="In the 'Recording' settings, the option in the 'Track name' setting to
-      use the track starting time in the local default format as the track name.
+    translation_description="In the 'Recording' settings, the option in the 'Defaul track name'
+     setting to use the track starting time in the local format as the default track name.
 
       Character limit: ~20 (1 line)">
     Date (local)
   </string>
   <string name="settings_recording_track_name_location_option"
-    translation_description="In the 'Recording' settings, the option in the 'Track name' setting to
-      use the track location as the track name.
+    translation_description="In the 'Recording' settings, the option in the 'Defaul track name'
+      setting to use the track starting location as the default track name.
 
       Character limit: ~20 (1 line)">
     Location
   </string>
   <string name="settings_recording_track_name_number_option"
-    translation_description="In the 'Recording' settings, the option in the 'Track name' setting to
-      use a number as the track name.
+    translation_description="In the 'Recording' settings, the option in the 'Default track name'
+      setting to use number as the default track name.
 
       Character limit: ~20 (1 line)">
     Number
   </string>
   <string name="settings_recording_track_name_title"
-    translation_description="In the 'Recording' settings, the title to configure the way to name a
-      new track.
+    translation_description="In the 'Recording' settings, the option to configure how the default
+      track name is named.
 
       Character limit: ~23 (1 line)">
-    Track name
-  </string>
-  <string name="settings_recording_track_name_summary"
-    translation_description="In the 'Recording' settings, the summary for the 'Track name'
-      setting.">
-    Way to name a new track.
-  </string>
-  <string name="settings_recording_voice_frequency_summary"
-    translation_description="In the 'Recording' settings, the summary for the 'Voice frequency'
-      setting.">
-    Time/distance between two voice announcements.
+    Default track name
   </string>
 
   <!-- Settings Reset -->
@@ -2659,6 +2650,10 @@ limitations under the License.
   <string name="value_off"
     translation_description="In a setting picker, the value to turn off the feature.">
     Off
+  </string>
+  <string name="value_smallest"
+    translation_description="In a setting picker, the value to use the smallest value.">
+    Smallest
   </string>
   <string name="value_smallest_recommended"
     translation_description="In a setting picker, the value to use the smallest value, also the

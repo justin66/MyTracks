@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <resources>
+
   <!-- Do not translate any arrays in this file. -->
   <string-array name="activity_types">
     <item>@string/activity_type_airplane</item>
@@ -186,6 +187,11 @@ limitations under the License.
     <item>@string/settings_map_track_color_mode_fixed</item>
     <item>@string/settings_map_track_color_mode_dynamic</item>
   </string-array>
+  <string-array name="track_color_mode_summary">
+    <item>@string/settings_map_track_color_mode_single</item>
+    <item>@string/settings_map_track_color_mode_fixed_summary</item>
+    <item>@string/settings_map_track_color_mode_dynamic_summary</item>
+  </string-array>
   <string-array name="track_color_mode_values">
     <item>@string/settings_map_track_color_mode_single_value</item>
     <item>@string/settings_map_track_color_mode_fixed_value</item>
@@ -256,4 +262,5 @@ limitations under the License.
     <item>@string/waypoint_type_water_fountain</item>
     <item>@string/waypoint_type_waypoint</item>
   </string-array>
+
 </resources>

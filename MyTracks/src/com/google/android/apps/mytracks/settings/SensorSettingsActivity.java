@@ -171,6 +171,6 @@ public class SensorSettingsActivity extends AbstractSettingsActivity {
       }
     }
     configurePreference(bluetoothSensorListPreference, options, values,
-        R.string.settings_sensor_bluetooth_sensor_summary, bluetoothSensorValue);
+        R.string.settings_sensor_bluetooth_sensor_summary, bluetoothSensorValue, null);
   }
 }
