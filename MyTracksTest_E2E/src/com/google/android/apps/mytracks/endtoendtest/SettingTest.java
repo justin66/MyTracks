@@ -83,8 +83,10 @@ public class SettingTest extends ActivityInstrumentationTestCase2<TrackListActiv
     EndToEndTestUtils.SOLO.clickOnCheckBox(0);
     instrumentation.waitForIdleSync();
     assertTrue(EndToEndTestUtils.SOLO.waitForText(
-        activityMyTracks.getString(R.string.settings_sharing_allow_access), 1,
+        activityMyTracks.getString(R.string.settings_sharing_allow_access_confirm_message), 1,
         EndToEndTestUtils.NORMAL_WAIT_TIME));
+    EndToEndTestUtils.SOLO.clickOnButton(activityMyTracks.getString(R.string.generic_ok));
+    instrumentation.waitForIdleSync();
     assertEquals(!newMapsPublic, EndToEndTestUtils.SOLO.getCurrentCheckBoxes().get(0).isChecked());
     EndToEndTestUtils.SOLO.goBack();
 
