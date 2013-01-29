@@ -299,8 +299,6 @@ public class EndToEndTestUtils {
       hasActionBar = setHasActionBar();
       checkLanguage();
       isCheckedFirstLaunch = true;
-      deleteAllTracks();
-      resetAllSettings(activityMyTracks, false);
 
       instrumentation.waitForIdleSync();
       // Check the status of real phone. For emulator, we would fix GPS signal.
@@ -314,6 +312,10 @@ public class EndToEndTestUtils {
         activityMytracks.getString(R.string.welcome_title), 0, SHORT_WAIT_TIME)) {
       resetPreferredUnits();
     }
+    
+    deleteAllTracks();
+    resetAllSettings(activityMyTracks, false);
+    instrumentation.waitForIdleSync();
 
     // Check whether is under recording. If previous test failed, the recording
     // may not be recording.
@@ -1005,6 +1007,7 @@ public class EndToEndTestUtils {
     sendGps(30);
 
     View myLocation = SOLO.getCurrentActivity().findViewById(R.id.map_my_location);
+    instrumentation.waitForIdleSync();
     // Find the My Location button in another if null.
     if (myLocation == null) {
       ArrayList<ImageButton> aa = SOLO.getCurrentImageButtons();
