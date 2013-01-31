@@ -517,10 +517,11 @@ public class MyTracksProvider extends ContentProvider {
    */
   private String getDriveIds(String[] projection, String where, String[] selectionArgs) {
     ArrayList<String> driveIds = new ArrayList<String>();
-    Cursor cursor = query(TracksColumns.CONTENT_URI, projection, where, selectionArgs, null);
-    if (cursor != null) {
-      int index = cursor.getColumnIndex(TracksColumns.DRIVEID);
-      if (cursor.moveToFirst()) {
+    Cursor cursor = null;
+    try {
+      cursor = query(TracksColumns.CONTENT_URI, projection, where, selectionArgs, null);
+      if (cursor != null && cursor.moveToFirst()) {
+        int index = cursor.getColumnIndex(TracksColumns.DRIVEID);
         do {
           String driveId = cursor.getString(index);
           if (driveId != null && !driveId.equals("")) {
@@ -528,7 +529,10 @@ public class MyTracksProvider extends ContentProvider {
           }
         } while (cursor.moveToNext());
       }
-      cursor.close();
+    } finally {
+      if (cursor != null) {
+        cursor.close();
+      }
     }
     return TextUtils.join(";", driveIds);
   }

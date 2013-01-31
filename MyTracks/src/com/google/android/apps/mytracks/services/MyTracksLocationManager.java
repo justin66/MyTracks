@@ -144,13 +144,16 @@ public class MyTracksLocationManager {
    * {@link #USE_LOCATION_FOR_SERVICES} is on.
    */
   private boolean isUseLocationForServicesOn() {
-    if (!isAvailable) { return true; }
+    if (!isAvailable) {
+      return true;
+    }
     Cursor cursor = null;
     try {
       cursor = contentResolver.query(Uri.parse(GOOGLE_SETTINGS_CONTENT_URI), new String[] { VALUE },
           NAME + "=?", new String[] { USE_LOCATION_FOR_SERVICES }, null);
-      if (cursor != null && cursor.moveToNext()) { return USE_LOCATION_FOR_SERVICES_ON.equals(
-          cursor.getString(0)); }
+      if (cursor != null && cursor.moveToNext()) {
+        return USE_LOCATION_FOR_SERVICES_ON.equals(cursor.getString(0));
+      }
     } catch (RuntimeException e) {
       Log.w(TAG, "Failed to read " + USE_LOCATION_FOR_SERVICES, e);
     } finally {

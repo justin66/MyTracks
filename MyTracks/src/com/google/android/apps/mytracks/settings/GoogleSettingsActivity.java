@@ -224,15 +224,22 @@ public class GoogleSettingsActivity extends AbstractSettingsActivity {
         this, R.string.drive_deleted_list_key, PreferencesUtils.DRIVE_DELETED_LIST_DEFAULT);
 
     MyTracksProviderUtils myTracksProviderUtils = MyTracksProviderUtils.Factory.get(this);
-    Cursor cursor = myTracksProviderUtils.getTrackCursor(SyncUtils.DRIVE_IDS_QUERY, null, null);
-    if (cursor != null && cursor.moveToFirst()) {
-      do {
-        Track track = myTracksProviderUtils.createTrack(cursor);
-        track.setDriveId("");
-        track.setModifiedTime(-1L);
-        track.setSharedWithMe(false);
-        myTracksProviderUtils.updateTrack(track);
-      } while (cursor.moveToNext());
+    Cursor cursor = null;
+    try {
+      cursor = myTracksProviderUtils.getTrackCursor(SyncUtils.DRIVE_IDS_QUERY, null, null);
+      if (cursor != null && cursor.moveToFirst()) {
+        do {
+          Track track = myTracksProviderUtils.createTrack(cursor);
+          track.setDriveId("");
+          track.setModifiedTime(-1L);
+          track.setSharedWithMe(false);
+          myTracksProviderUtils.updateTrack(track);
+        } while (cursor.moveToNext());
+      }
+    } finally {
+      if (cursor != null) {
+        cursor.close();
+      }
     }
   }
 

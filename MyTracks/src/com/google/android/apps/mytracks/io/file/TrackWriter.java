@@ -153,26 +153,27 @@ public class TrackWriter {
      * waypoints very high which should not be a problem because we don't try to
      * load them into objects all at the same time.
      */
-    Cursor cursor = myTracksProviderUtils.getWaypointCursor(
-        track.getId(), -1L, Constants.MAX_LOADED_WAYPOINTS_POINTS);
     boolean hasWaypoints = false;
-    if (cursor != null) {
-      try {
-        if (cursor.moveToFirst()) {
-          /*
-           * Yes, this will skip the first waypoint and that is intentional as
-           * the first waypoint holds the stats for the track.
-           */
-          while (cursor.moveToNext()) {
-            if (!hasWaypoints) {
-              trackFormatWriter.writeBeginWaypoints();
-              hasWaypoints = true;
-            }
-            Waypoint waypoint = myTracksProviderUtils.createWaypoint(cursor);
-            trackFormatWriter.writeWaypoint(waypoint);
+    Cursor cursor = null;
+    try {
+      cursor = myTracksProviderUtils.getWaypointCursor(
+          track.getId(), -1L, Constants.MAX_LOADED_WAYPOINTS_POINTS);
+      if (cursor != null && cursor.moveToFirst()) {
+        /*
+         * Yes, this will skip the first waypoint and that is intentional as the
+         * first waypoint holds the stats for the track.
+         */
+        while (cursor.moveToNext()) {
+          if (!hasWaypoints) {
+            trackFormatWriter.writeBeginWaypoints();
+            hasWaypoints = true;
           }
+          Waypoint waypoint = myTracksProviderUtils.createWaypoint(cursor);
+          trackFormatWriter.writeWaypoint(waypoint);
         }
-      } finally {
+      }
+    } finally {
+      if (cursor != null) {
         cursor.close();
       }
     }

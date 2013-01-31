@@ -212,16 +212,20 @@ public class MyTracksProviderUtilsImpl implements MyTracksProviderUtils {
 
   @Override
   public List<Track> getAllTracks() {
-    Cursor cursor = getTrackCursor(null, null, null, TracksColumns._ID);
     ArrayList<Track> tracks = new ArrayList<Track>();
-    if (cursor != null) {
-      tracks.ensureCapacity(cursor.getCount());
-      if (cursor.moveToFirst()) {
+    Cursor cursor = null;
+    try {
+      cursor = getTrackCursor(null, null, null, TracksColumns._ID);
+      if (cursor != null && cursor.moveToFirst()) {
+        tracks.ensureCapacity(cursor.getCount());
         do {
           tracks.add(createTrack(cursor));
         } while (cursor.moveToNext());
       }
-      cursor.close();
+    } finally {
+      if (cursor != null) {
+        cursor.close();
+      }
     }
     return tracks;
   }

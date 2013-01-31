@@ -117,20 +117,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
       } else {
         performIncrementalSync(folderId, largestChangeId);
       }
-      // Insert tracks without driveid as new files in Drive
-      Cursor cursor = myTracksProviderUtils.getTrackCursor(SyncUtils.NO_DRIVE_ID_QUERY, null, null);
-      long recordingTrackId = PreferencesUtils.getLong(context, R.string.recording_track_id_key);
-
-      if (cursor != null && cursor.moveToFirst()) {
-        do {
-          Track track = myTracksProviderUtils.createTrack(cursor);
-          if (track.getId() == recordingTrackId) {
-            continue;
-          }
-          // Note, will retry on the next sync if unable to add drive file
-          SyncUtils.addDriveFile(context, myTracksProviderUtils, drive, folderId, track);
-        } while (cursor.moveToNext());
-      }
+      insertNewTracks(folderId);
     } catch (Exception e) {
       Log.e(TAG, "Exception", e);
     }
@@ -195,9 +182,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     Map<String, File> changes = new HashMap<String, File>();
     largestChangeId = getDriveChanges(folderId, largestChangeId, changes);
 
+    Cursor cursor = null;
     try {
       // Get all the local tracks with drive file id
-      Cursor cursor = myTracksProviderUtils.getTrackCursor(SyncUtils.DRIVE_IDS_QUERY, null, null);
+      cursor = myTracksProviderUtils.getTrackCursor(SyncUtils.DRIVE_IDS_QUERY, null, null);
       if (cursor != null && cursor.moveToFirst()) {
         do {
           Track track = myTracksProviderUtils.createTrack(cursor);
@@ -240,6 +228,38 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
       Log.e(TAG, "IOException", e);
     } catch (RemoteException e) {
       Log.e(TAG, "RemoteException", e);
+    } finally {
+      if (cursor != null) {
+        cursor.close();
+      }
+    }
+  }
+
+  /**
+   * Inserts new tracks.
+   * 
+   * @param folderId the folder id
+   */
+  private void insertNewTracks(String folderId) throws IOException {
+    Cursor cursor = null;
+    try {
+      cursor = myTracksProviderUtils.getTrackCursor(SyncUtils.NO_DRIVE_ID_QUERY, null, null);
+      long recordingTrackId = PreferencesUtils.getLong(context, R.string.recording_track_id_key);
+  
+      if (cursor != null && cursor.moveToFirst()) {
+        do {
+          Track track = myTracksProviderUtils.createTrack(cursor);
+          if (track.getId() == recordingTrackId) {
+            continue;
+          }
+          // Note, will retry on the next sync if unable to add drive file
+          SyncUtils.addDriveFile(context, myTracksProviderUtils, drive, folderId, track);
+        } while (cursor.moveToNext());
+      }
+    } finally {
+      if (cursor != null) {
+        cursor.close();
+      }
     }
   }
 

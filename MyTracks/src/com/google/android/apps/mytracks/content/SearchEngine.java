@@ -186,17 +186,19 @@ public class SearchEngine {
         queryLikeSelection,
         queryLikeSelection };
 
-    Cursor tracksCursor = providerUtils.getTrackCursor(
-        TRACK_SELECTION_QUERY, trackSelectionArgs, TRACK_SELECTION_ORDER);
-    if (tracksCursor != null) {
-      try {
-        tracks.ensureCapacity(tracksCursor.getCount());
-
-        while (tracksCursor.moveToNext()) {
-          tracks.add(providerUtils.createTrack(tracksCursor));
+    Cursor cursor = null;
+    try {
+      cursor = providerUtils.getTrackCursor(
+          TRACK_SELECTION_QUERY, trackSelectionArgs, TRACK_SELECTION_ORDER);
+      if (cursor != null) {
+        tracks.ensureCapacity(cursor.getCount());
+        while (cursor.moveToNext()) {
+          tracks.add(providerUtils.createTrack(cursor));
         }
-      } finally {
-        tracksCursor.close();
+      }
+    } finally {
+      if (cursor != null) {
+        cursor.close();
       }
     }
   }
@@ -213,21 +215,22 @@ public class SearchEngine {
         queryLikeSelection2,
         queryLikeSelection2,
         queryLikeSelection2 };
-    Cursor waypointCursor = providerUtils.getWaypointCursor(
-        WAYPOINT_SELECTION_QUERY, waypointSelectionArgs, WAYPOINT_SELECTION_ORDER,
-        MAX_SCORED_WAYPOINTS);
-    if (waypointCursor != null) {
-      try {
-        waypoints.ensureCapacity(waypointCursor.getCount());
-
-        while (waypointCursor.moveToNext()) {
-          Waypoint waypoint = providerUtils.createWaypoint(waypointCursor);
+    Cursor cursor = null;
+    try {
+      cursor = providerUtils.getWaypointCursor(WAYPOINT_SELECTION_QUERY, waypointSelectionArgs,
+          WAYPOINT_SELECTION_ORDER, MAX_SCORED_WAYPOINTS);
+      if (cursor != null) {
+        waypoints.ensureCapacity(cursor.getCount());
+        while (cursor.moveToNext()) {
+          Waypoint waypoint = providerUtils.createWaypoint(cursor);
           if (LocationUtils.isValidLocation(waypoint.getLocation())) {
             waypoints.add(waypoint);
           }
         }
-      } finally {
-        waypointCursor.close();
+      }
+    } finally {
+      if (cursor != null) {
+        cursor.close();
       }
     }
   }

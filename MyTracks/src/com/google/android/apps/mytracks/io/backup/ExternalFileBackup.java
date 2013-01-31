@@ -174,28 +174,42 @@ class ExternalFileBackup {
     try {
       // Dump the entire contents of each table
       ContentResolver contentResolver = context.getContentResolver();
-      Cursor tracksCursor = contentResolver.query(
-          TracksColumns.CONTENT_URI, null, null, null, null);
+      Cursor tracksCursor = null;
       try {
-        trackDumper.writeAllRows(tracksCursor, outWriter);
+        tracksCursor = contentResolver.query(TracksColumns.CONTENT_URI, null, null, null, null);
+        if (tracksCursor != null) {
+          trackDumper.writeAllRows(tracksCursor, outWriter);
+        }
       } finally {
-        tracksCursor.close();
+        if (tracksCursor != null) {
+          tracksCursor.close();
+        }
       }
 
-      Cursor waypointsCursor = contentResolver.query(
-          WaypointsColumns.CONTENT_URI, null, null, null, null);
+      Cursor waypointsCursor = null;
       try {
-        waypointDumper.writeAllRows(waypointsCursor, outWriter);
+        waypointsCursor = contentResolver.query(
+            WaypointsColumns.CONTENT_URI, null, null, null, null);
+        if (waypointsCursor != null) {
+          waypointDumper.writeAllRows(waypointsCursor, outWriter);
+        }
       } finally {
-        waypointsCursor.close();
+        if (waypointsCursor != null) {
+          waypointsCursor.close();
+        }
       }
 
-      Cursor pointsCursor = contentResolver.query(
-          TrackPointsColumns.CONTENT_URI, null, null, null, null);
+      Cursor pointsCursor = null;
       try {
-        pointDumper.writeAllRows(pointsCursor, outWriter);
+        pointsCursor = contentResolver.query(
+            TrackPointsColumns.CONTENT_URI, null, null, null, null);
+        if (pointsCursor != null) {
+          pointDumper.writeAllRows(pointsCursor, outWriter);
+        }
       } finally {
-        pointsCursor.close();
+        if (pointsCursor != null) {
+          pointsCursor.close();
+        }
       }
 
       // Dump preferences
