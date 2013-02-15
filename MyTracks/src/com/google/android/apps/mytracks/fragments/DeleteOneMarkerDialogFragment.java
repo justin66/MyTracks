@@ -71,7 +71,8 @@ public class DeleteOneMarkerDialogFragment extends DialogFragment {
     try {
       caller = (DeleteOneMarkerCaller) activity;
     } catch (ClassCastException e) {
-      throw new ClassCastException(activity.toString() + " must implement DeleteOneMarkerCaller");
+      throw new ClassCastException(
+          activity.toString() + " must implement " + DeleteOneMarkerCaller.class.getSimpleName());
     }
   }
 

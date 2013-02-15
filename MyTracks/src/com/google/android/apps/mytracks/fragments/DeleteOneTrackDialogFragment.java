@@ -76,7 +76,8 @@ public class DeleteOneTrackDialogFragment extends DialogFragment {
     try {
       caller = (DeleteOneTrackCaller) activity;
     } catch (ClassCastException e) {
-      throw new ClassCastException(activity.toString() + " must implement DeleteOneTrackCaller");
+      throw new ClassCastException(
+          activity.toString() + " must implement " + DeleteOneTrackCaller.class.getSimpleName());
     }
   }
 

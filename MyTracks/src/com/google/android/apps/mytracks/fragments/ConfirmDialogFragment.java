@@ -79,7 +79,8 @@ public class ConfirmDialogFragment extends DialogFragment {
     try {
       caller = (ConfirmCaller) activity;
     } catch (ClassCastException e) {
-      throw new ClassCastException(activity.toString() + " must implement ConfirmCaller");
+      throw new ClassCastException(
+          activity.toString() + " must implement " + ConfirmCaller.class.getSimpleName());
     }
   }
 
