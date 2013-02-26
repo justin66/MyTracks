@@ -196,6 +196,7 @@ public class SyncTestUtils {
       return;
     }
 
+    EndToEndTestUtils.SOLO.waitForDialogToClose(EndToEndTestUtils.SHORT_WAIT_TIME);
     EndToEndTestUtils.instrumentation.waitForIdleSync();
     CheckBox syncCheckBox = EndToEndTestUtils.SOLO.getCurrentCheckBoxes().get(0);
     if (!syncCheckBox.isChecked()) {
