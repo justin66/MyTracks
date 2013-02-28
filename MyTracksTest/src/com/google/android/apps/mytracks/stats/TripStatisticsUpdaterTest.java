@@ -18,6 +18,7 @@ public class TripStatisticsUpdaterTest extends TestCase {
 
   private static final long ONE_SECOND = 1000;
   private static final long TEN_SECONDS = 10 * ONE_SECOND;
+  private float moveSpeed = 11.1f;
 
   private TripStatisticsUpdater tripStatisticsUpdater = null;
 
@@ -26,7 +27,10 @@ public class TripStatisticsUpdaterTest extends TestCase {
     tripStatisticsUpdater = new TripStatisticsUpdater(System.currentTimeMillis());
   }
 
-  public void testAddLocationSimple() throws Exception {
+  /**
+   * Sends some moving and waiting locations and then checks the statistics.
+   */
+  public void testAddLocationSimple() {
     long startTime = 1000;
     tripStatisticsUpdater = new TripStatisticsUpdater(startTime);
     TripStatistics tripStatistics = tripStatisticsUpdater.getTripStatistics();
@@ -40,44 +44,37 @@ public class TripStatisticsUpdaterTest extends TestCase {
     assertEquals(0.0, tripStatistics.getTotalElevationGain());
     assertEquals(0, tripStatistics.getMovingTime());
     assertEquals(0.0, tripStatistics.getTotalDistance());
-    
-    float speed = 11.1f;
-    for (int i = 0; i < 100; i++) {
-      Location location = new Location("test");
-      location.setAccuracy(1.0f);
-      location.setLongitude(45.0);
 
-      // Going up by 1 meter each time.
-      location.setAltitude(i);
+    // Time:0 ~ 99; Location:0 ~ 99
+    addMoveLocations(100, startTime, tripStatistics, 0, 0);
+    // Time:100 ~ 199; Location:99
+    addWaitLocations(100, startTime, tripStatistics, 100, 99);
+    // Time:200 ~ 299; Location:100 ~ 199
+    addMoveLocations(100, startTime, tripStatistics, 200, 100);
+    // Time:300 ~ 399; Location:199
+    addWaitLocations(100, startTime, tripStatistics, 300, 199);
+    // Time:400 ~ 499; Location:200 ~ 299
+    addMoveLocations(100, startTime, tripStatistics, 400, 200);
+    // Time:500 ~ 599; Location:299
+    addWaitLocations(100, startTime, tripStatistics, 500, 299);
+    // Time:600 ~ 699; Location:300 ~ 399
+    addMoveLocations(100, startTime, tripStatistics, 600, 300);
+  }
 
-      // Moving by .001 degree latitude (111 meters)
-      location.setLatitude(i * .001);
+  /**
+   * Sends some disordered locations and checks the statistics. In some
+   * situation, especially when signal is not good, MyTracks may receive such
+   * data.
+   */
+  public void testAddLocation_disorderedLocatiions() {
+    long startTime = 1000;
+    tripStatisticsUpdater = new TripStatisticsUpdater(startTime);
+    TripStatistics tripStatistics = tripStatisticsUpdater.getTripStatistics();
 
-      location.setSpeed(speed);
-
-      // Each time slice is 10 seconds.
-      location.setTime(startTime + i * TEN_SECONDS);
-      tripStatisticsUpdater.addLocation(location, PreferencesUtils.MIN_RECORDING_DISTANCE_DEFAULT);
-
-      tripStatistics = tripStatisticsUpdater.getTripStatistics();
-      assertEquals(i * TEN_SECONDS, tripStatistics.getTotalTime());
-      assertEquals(i * TEN_SECONDS, tripStatistics.getMovingTime());
-      assertEquals(i, tripStatisticsUpdater.getSmoothedElevation(),
-          Constants.ELEVATION_SMOOTHING_FACTOR / 2);
-      assertEquals(0.0, tripStatistics.getMinElevation());
-      assertEquals(i, tripStatistics.getMaxElevation(), Constants.ELEVATION_SMOOTHING_FACTOR / 2);
-      assertEquals(i, tripStatistics.getTotalElevationGain(), Constants.ELEVATION_SMOOTHING_FACTOR);
-
-      if (i >= Constants.SPEED_SMOOTHING_FACTOR) {
-        assertEquals(speed, tripStatistics.getMaxSpeed(), 0.1);
-      }
-      if (i >= Constants.DISTANCE_SMOOTHING_FACTOR && i >= Constants.ELEVATION_SMOOTHING_FACTOR) {
-        // 1 m / 111 m = .009
-        assertEquals(0.009, tripStatistics.getMinGrade(), 0.0001);
-        assertEquals(0.009, tripStatistics.getMaxGrade(), 0.0001);
-      }
-      assertEquals(i * 111.0, tripStatistics.getTotalDistance(), 100);
-    }
+    addLocations(5, startTime, tripStatistics, 0, 0);
+    addLocations(5, startTime, tripStatistics, 5, 0);
+    addLocations(5, startTime, tripStatistics, 10, -5);
+    addLocations(5, startTime, tripStatistics, 15, 5);
   }
 
   /**
@@ -167,10 +164,10 @@ public class TripStatisticsUpdaterTest extends TestCase {
        */
       tripStatisticsUpdater.updateElevation(i);
       tripStatisticsUpdater.updateGrade(1, 100);
-      assertEquals(
-          Double.NEGATIVE_INFINITY, tripStatisticsUpdater.getTripStatistics().getMaxGrade());
-      assertEquals(
-          Double.POSITIVE_INFINITY, tripStatisticsUpdater.getTripStatistics().getMinGrade());
+      assertEquals(Double.NEGATIVE_INFINITY, tripStatisticsUpdater.getTripStatistics()
+          .getMaxGrade());
+      assertEquals(Double.POSITIVE_INFINITY, tripStatisticsUpdater.getTripStatistics()
+          .getMinGrade());
     }
   }
 
@@ -216,6 +213,130 @@ public class TripStatisticsUpdaterTest extends TestCase {
       if (i >= Constants.SPEED_SMOOTHING_FACTOR) {
         assertEquals(speed, tripStatisticsUpdater.getTripStatistics().getMaxSpeed());
       }
+    }
+  }
+
+  /**
+   * Sends some locations which keeping moving and checks the statistics.
+   * 
+   * @param points number of locations
+   * @param startTime start time of this track
+   * @param tripStatistics the TripStatistics object
+   * @param timeOffset offset to start time
+   * @param LocationOffset location offset to start
+   */
+  private void addMoveLocations(int points, long startTime, TripStatistics tripStatistics,
+      int timeOffset, int LocationOffset) {
+    for (int i = 0; i < points; i++) {
+      Location location = new Location("test");
+      location.setAccuracy(1.0f);
+      location.setLongitude(45.0);
+
+      // Going up by 1 meter each time.
+      location.setAltitude(i + LocationOffset);
+
+      // Moving by .001 degree latitude (111 meters)
+      location.setLatitude((i + LocationOffset) * .001);
+
+      location.setSpeed(moveSpeed);
+
+      // Each time slice is 10 seconds.
+      location.setTime(startTime + (timeOffset + i) * TEN_SECONDS);
+      tripStatisticsUpdater.addLocation(location, PreferencesUtils.MIN_RECORDING_DISTANCE_DEFAULT);
+      tripStatistics = tripStatisticsUpdater.getTripStatistics();
+      assertEquals((timeOffset + i) * TEN_SECONDS, tripStatistics.getTotalTime());
+      assertEquals((LocationOffset + i) * TEN_SECONDS, tripStatistics.getMovingTime());
+      assertEquals(i + LocationOffset, tripStatisticsUpdater.getSmoothedElevation(),
+          Constants.ELEVATION_SMOOTHING_FACTOR / 2);
+      assertEquals(0.0, tripStatistics.getMinElevation());
+      assertEquals(i + LocationOffset, tripStatistics.getMaxElevation(),
+          Constants.ELEVATION_SMOOTHING_FACTOR / 2);
+      assertEquals(i + LocationOffset, tripStatistics.getTotalElevationGain(),
+          Constants.ELEVATION_SMOOTHING_FACTOR);
+
+      if (i + LocationOffset >= Constants.SPEED_SMOOTHING_FACTOR) {
+        assertEquals(moveSpeed, tripStatistics.getMaxSpeed(), 0.1);
+      }
+
+      // If there are only moving locations in the track.
+      if (LocationOffset == 0 && (i + LocationOffset) >= Constants.DISTANCE_SMOOTHING_FACTOR
+          && (i + LocationOffset) >= Constants.ELEVATION_SMOOTHING_FACTOR) {
+        // 1 m / 111 m = .009
+        assertEquals(0.009, tripStatistics.getMinGrade(), 0.0001);
+        assertEquals(0.009, tripStatistics.getMaxGrade(), 0.0001);
+      }
+      assertEquals((i + LocationOffset) * 111.0, tripStatistics.getTotalDistance(),
+          (i + LocationOffset) * 111.0 * 0.01);
+    }
+  }
+
+  /**
+   * Sends some locations which are not moving and checks the statistics.
+   * 
+   * @param points number of locations
+   * @param startTime start time of this track
+   * @param tripStatistics the TripStatistics object
+   * @param timeOffset offset to start time
+   * @param LocationOffset location offset to start
+   */
+  private void addWaitLocations(int points, long startTime, TripStatistics tripStatistics,
+      int timeOffset, int LocationOffset) {
+    for (int i = 0; i < points; i++) {
+      Location location = new Location("test");
+      location.setAccuracy(1.0f);
+      location.setLongitude(45.0);
+      location.setAltitude(LocationOffset);
+      location.setLatitude(LocationOffset * .001);
+      location.setSpeed(0);
+      // Each time slice is 10 seconds.
+      location.setTime(startTime + (i + timeOffset) * TEN_SECONDS);
+      tripStatisticsUpdater.addLocation(location, PreferencesUtils.MIN_RECORDING_DISTANCE_DEFAULT);
+
+      tripStatistics = tripStatisticsUpdater.getTripStatistics();
+      assertEquals((i + timeOffset) * TEN_SECONDS, tripStatistics.getTotalTime());
+      assertEquals((LocationOffset) * TEN_SECONDS, tripStatistics.getMovingTime());
+      assertEquals(LocationOffset, tripStatisticsUpdater.getSmoothedElevation(),
+          Constants.ELEVATION_SMOOTHING_FACTOR / 2);
+      assertEquals(0.0, tripStatistics.getMinElevation());
+      assertEquals(LocationOffset, tripStatistics.getMaxElevation(),
+          Constants.ELEVATION_SMOOTHING_FACTOR / 2);
+      assertEquals(LocationOffset, tripStatistics.getTotalElevationGain(),
+          Constants.ELEVATION_SMOOTHING_FACTOR);
+      if (LocationOffset >= Constants.SPEED_SMOOTHING_FACTOR) {
+        assertEquals(moveSpeed, tripStatistics.getMaxSpeed(), 0.1);
+      }
+      assertEquals(moveSpeed, tripStatistics.getMaxSpeed(), 0.1);
+      assertEquals(LocationOffset * 111.0, tripStatistics.getTotalDistance(),
+          LocationOffset * 111.0 * 0.01);
+    }
+  }
+
+  /**
+   * Sends some locations which are moving and checks some simple policy.
+   * 
+   * @param points number of locations
+   * @param startTime start time of this track
+   * @param tripStatistics the TripStatistics object
+   * @param timeOffset offset to start time
+   * @param LocationOffset location offset to start
+   */
+  private void addLocations(int points, long startTime, TripStatistics tripStatistics,
+      int timeOffset, int LocationOffset) {
+    for (int i = 0; i < points; i++) {
+      Location location = new Location("test");
+      location.setAccuracy(1.0f);
+      location.setLongitude(45.0);
+      location.setAltitude(i + LocationOffset);
+      location.setLatitude((i + LocationOffset) * .001);
+      location.setSpeed(moveSpeed);
+      location.setTime(startTime + (timeOffset + i) * TEN_SECONDS);
+      tripStatisticsUpdater.addLocation(location, PreferencesUtils.MIN_RECORDING_DISTANCE_DEFAULT);
+      tripStatistics = tripStatisticsUpdater.getTripStatistics();
+
+      assertTrue(tripStatistics.getMovingTime() <= tripStatistics.getTotalTime());
+      assertTrue(tripStatistics.getAverageSpeed() <= tripStatistics.getAverageMovingSpeed());
+      assertTrue(tripStatistics.getAverageMovingSpeed() <= tripStatistics.getMaxSpeed());
+      assertTrue(tripStatistics.getStopTime() >= tripStatistics.getStartTime());
     }
   }
 }
