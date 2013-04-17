@@ -81,7 +81,7 @@ public class CreateTrackTest extends ActivityInstrumentationTestCase2<TrackListA
         .getString(R.string.send_google_no_service_selected)));
     // Stop here for do not really send.
   }
-  
+
   /**
    * Tests editing a track.
    */
@@ -106,7 +106,7 @@ public class CreateTrackTest extends ActivityInstrumentationTestCase2<TrackListA
         R.id.track_edit_activity_type_icon));
     EndToEndTestUtils.SOLO.waitForText(activityMyTracks
         .getString(R.string.track_edit_activity_type_hint));
-    EndToEndTestUtils.SOLO.clickOnView(EndToEndTestUtils.SOLO.getImage(0));
+    EndToEndTestUtils.SOLO.clickOnView(EndToEndTestUtils.SOLO.getImage(1));
     // The test type should be replaced by the first type option.
     assertFalse(EndToEndTestUtils.SOLO.searchText(newType));
 
