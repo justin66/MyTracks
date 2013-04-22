@@ -51,6 +51,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -270,8 +271,14 @@ public class TrackDetailActivity extends AbstractSendToGoogleActivity
 
   @Override
   protected void onHomeSelected() {
-    Intent intent = IntentUtils.newIntent(this, TrackListActivity.class);
-    startActivity(intent);
+    /*
+     * According to
+     * http://developer.android.com/training/implementing-navigation
+     * /ancestral.html, we should use NavUtils.shouldUpRecreateTask instead of
+     * always creating a new back stack. However, NavUtils.shouldUpRecreateTask
+     * seems to always return false.
+     */
+    TaskStackBuilder.create(this).addParentStack(TrackDetailActivity.class).startActivities();
     finish();
   }
 

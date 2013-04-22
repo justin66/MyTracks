@@ -288,16 +288,16 @@ public class TrackWidgetProvider extends AppWidgetProvider {
    */
   private static void updateStatisticsContainer(
       Context context, RemoteViews remoteViews, Track track) {
-    Intent intent;
+    PendingIntent pendingIntent;
     if (track != null) {
-      intent = IntentUtils.newIntent(context, TrackDetailActivity.class)
+      Intent intent = IntentUtils.newIntent(context, TrackDetailActivity.class)
           .putExtra(TrackDetailActivity.EXTRA_TRACK_ID, track.getId());
+      pendingIntent = TaskStackBuilder.create(context)
+          .addParentStack(TrackDetailActivity.class).addNextIntent(intent).getPendingIntent(0, 0);
     } else {
-      intent = IntentUtils.newIntent(context, TrackListActivity.class);
+      Intent intent = IntentUtils.newIntent(context, TrackListActivity.class);
+      pendingIntent = TaskStackBuilder.create(context).addNextIntent(intent).getPendingIntent(0, 0);
     }
-    TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(context);
-    taskStackBuilder.addNextIntent(intent);
-    PendingIntent pendingIntent = taskStackBuilder.getPendingIntent(0, 0);
     remoteViews.setOnClickPendingIntent(R.id.track_widget_stats_container, pendingIntent);
   }
 

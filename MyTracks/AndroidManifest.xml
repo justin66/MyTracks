@@ -187,7 +187,13 @@ limitations under the License.
     <activity
       android:label="@string/menu_sensor_state"
       android:name="com.google.android.apps.mytracks.SensorStateActivity" />
-    <activity android:name="com.google.android.apps.mytracks.TrackDetailActivity" />
+    <activity
+      android:name="com.google.android.apps.mytracks.TrackDetailActivity"
+      android:parentActivityName="com.google.android.apps.mytracks.TrackListActivity" >
+      <meta-data
+        android:name="android.support.PARENT_ACTIVITY"
+        android:value="com.google.android.apps.mytracks.TrackListActivity" />
+    </activity>
     <activity android:name="com.google.android.apps.mytracks.TrackEditActivity" />
     <activity android:name="com.google.android.apps.mytracks.TrackListActivity" >
       <intent-filter>
