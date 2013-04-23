@@ -52,6 +52,7 @@ import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.TaskStackBuilder;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -85,7 +86,8 @@ public class TrackDetailActivity extends AbstractSendToGoogleActivity
   private TrackRecordingServiceConnection trackRecordingServiceConnection;
   private TrackDataHub trackDataHub;
   private TabHost tabHost;
-  private TabManager tabManager;
+  private ViewPager viewPager;
+  private TabsAdapter tabsAdapter;
   private TrackController trackController;
 
   // From intent
@@ -195,18 +197,25 @@ public class TrackDetailActivity extends AbstractSendToGoogleActivity
 
     tabHost = (TabHost) findViewById(android.R.id.tabhost);
     tabHost.setup();
-    tabManager = new TabManager(this, tabHost, R.id.realtabcontent);
+
+    viewPager = (ViewPager) findViewById(R.id.pager);
+
+    tabsAdapter = new TabsAdapter(this, tabHost, viewPager);
+
     TabSpec mapTabSpec = tabHost.newTabSpec(MyTracksMapFragment.MAP_FRAGMENT_TAG).setIndicator(
         getString(R.string.track_detail_map_tab), getResources().getDrawable(R.drawable.tab_map));
-    tabManager.addTab(mapTabSpec, MyTracksMapFragment.class, null);
+    tabsAdapter.addTab(mapTabSpec, MyTracksMapFragment.class, null);
+
     TabSpec chartTabSpec = tabHost.newTabSpec(ChartFragment.CHART_FRAGMENT_TAG).setIndicator(
         getString(R.string.track_detail_chart_tab),
         getResources().getDrawable(R.drawable.tab_chart));
-    tabManager.addTab(chartTabSpec, ChartFragment.class, null);
+    tabsAdapter.addTab(chartTabSpec, ChartFragment.class, null);
+
     TabSpec statsTabSpec = tabHost.newTabSpec(StatsFragment.STATS_FRAGMENT_TAG).setIndicator(
         getString(R.string.track_detail_stats_tab),
         getResources().getDrawable(R.drawable.tab_stats));
-    tabManager.addTab(statsTabSpec, StatsFragment.class, null);
+    tabsAdapter.addTab(statsTabSpec, StatsFragment.class, null);
+
     if (savedInstanceState != null) {
       tabHost.setCurrentTabByTag(savedInstanceState.getString(CURRENT_TAB_TAG_KEY));
     }
