@@ -33,6 +33,7 @@ import com.google.api.services.drive.model.File;
 
 import android.app.Instrumentation;
 import android.content.Context;
+import android.util.Log;
 import android.widget.CheckBox;
 
 import java.io.BufferedReader;
@@ -53,7 +54,7 @@ public class SyncTestUtils {
 
   public static boolean isCheckedRunSyncTest = false;
   public static final String KML_FILE_POSTFIX = ".kml";
-  public static final long MAX_TIME_TO_WAIT_SYNC = 100000;
+  public static final long MAX_TIME_TO_WAIT_SYNC = 1000000;
 
   /**
    * Sets up sync tests.
@@ -189,7 +190,7 @@ public class SyncTestUtils {
               R.string.generic_confirm_title), 1,
           EndToEndTestUtils.SHORT_WAIT_TIME)) {
         EndToEndTestUtils.SOLO.clickOnText(EndToEndTestUtils.activityMytracks
-            .getString(R.string.generic_ok));
+            .getString(R.string.generic_yes));
       }
     } else {
       Assert.fail();
@@ -209,7 +210,7 @@ public class SyncTestUtils {
           EndToEndTestUtils.SHORT_WAIT_TIME);
       Assert.assertTrue(EndToEndTestUtils.SOLO.searchText(accountName, true));
       EndToEndTestUtils.SOLO.clickOnText(EndToEndTestUtils.activityMytracks
-          .getString(R.string.generic_ok));
+          .getString(R.string.generic_yes));
     }
     EndToEndTestUtils.SOLO.goBack();
     EndToEndTestUtils.SOLO.goBack();
@@ -227,6 +228,8 @@ public class SyncTestUtils {
     while (System.currentTimeMillis() - startTime < MAX_TIME_TO_WAIT_SYNC) {
       try {
         EndToEndTestUtils.sleep(EndToEndTestUtils.SHORT_WAIT_TIME);
+        EndToEndTestUtils.findMenuItem(
+            EndToEndTestUtils.activityMytracks.getString(R.string.menu_sync_now), true);
         int trackNumber = EndToEndTestUtils.SOLO.getCurrentListViews().get(0).getCount();
         List<File> files = getDriveFiles(
             EndToEndTestUtils.activityMytracks.getApplicationContext(), drive);
@@ -234,7 +237,7 @@ public class SyncTestUtils {
           return;
         }
       } catch (GoogleJsonResponseException e) {
-        EndToEndTestUtils.sleep(EndToEndTestUtils.SHORT_WAIT_TIME);
+        Log.i(EndToEndTestUtils.LOG_TAG, e.getMessage());
       }
     }
     Assert.fail();

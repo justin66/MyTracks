@@ -121,7 +121,7 @@ public class MultiAccountsSyncTest extends ActivityInstrumentationTestCase2<Trac
     EndToEndTestUtils.SOLO.clickOnMenuItem(EndToEndTestUtils.activityMytracks
         .getString(R.string.menu_delete));
     EndToEndTestUtils.SOLO.clickOnText(EndToEndTestUtils.activityMytracks
-        .getString(R.string.generic_ok));
+        .getString(R.string.generic_yes));
 
     // Switch account and delete another track.
     SyncTestUtils.enableSync(GoogleUtils.ACCOUNT_NAME_2);
@@ -130,7 +130,7 @@ public class MultiAccountsSyncTest extends ActivityInstrumentationTestCase2<Trac
     EndToEndTestUtils.SOLO.clickOnMenuItem(EndToEndTestUtils.activityMytracks
         .getString(R.string.menu_delete));
     EndToEndTestUtils.SOLO.clickOnText(EndToEndTestUtils.activityMytracks
-        .getString(R.string.generic_ok));
+        .getString(R.string.generic_yes));
 
     // Check Google Drive of the first account.
     SyncTestUtils.enableSync(GoogleUtils.ACCOUNT_NAME_1);

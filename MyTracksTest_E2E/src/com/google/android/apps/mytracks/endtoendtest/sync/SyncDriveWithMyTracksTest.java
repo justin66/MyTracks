@@ -60,7 +60,6 @@ public class SyncDriveWithMyTracksTest extends ActivityInstrumentationTestCase2<
     if (!RunConfiguration.getInstance().runSyncTest) {
       return;
     }
-    EndToEndTestUtils.deleteAllTracks();
     EndToEndTestUtils.findMenuItem(
         EndToEndTestUtils.activityMytracks.getString(R.string.menu_sync_now), true);
     SyncTestUtils.checkFilesNumber(drive);
@@ -79,7 +78,7 @@ public class SyncDriveWithMyTracksTest extends ActivityInstrumentationTestCase2<
     EndToEndTestUtils.SOLO.clickOnMenuItem(EndToEndTestUtils.activityMytracks
         .getString(R.string.menu_delete));
     EndToEndTestUtils.SOLO.clickOnText(EndToEndTestUtils.activityMytracks
-        .getString(R.string.generic_ok));
+        .getString(R.string.generic_yes));
     EndToEndTestUtils.findMenuItem(
         EndToEndTestUtils.activityMytracks.getString(R.string.menu_sync_now), true);
     SyncTestUtils.checkFile(EndToEndTestUtils.trackName, false, drive);
@@ -95,7 +94,6 @@ public class SyncDriveWithMyTracksTest extends ActivityInstrumentationTestCase2<
     if (!RunConfiguration.getInstance().runSyncTest) {
       return;
     }
-    EndToEndTestUtils.deleteAllTracks();
     EndToEndTestUtils.createSimpleTrack(0, true);
     EndToEndTestUtils.createSimpleTrack(3, true);
     EndToEndTestUtils.findMenuItem(
