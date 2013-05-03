@@ -15,7 +15,6 @@
  */
 package com.google.android.apps.mytracks.endtoendtest;
 
-
 import android.os.Bundle;
 import android.test.InstrumentationTestRunner;
 import android.util.Log;
@@ -44,7 +43,8 @@ public class EndToEndTestRunner extends InstrumentationTestRunner {
 
     RunConfiguration.runStressTest = "true".equalsIgnoreCase(arguments.getString("stress"));
     RunConfiguration.runSensorTest = "true".equalsIgnoreCase(arguments.getString("sensor"));
-    RunConfiguration.runResourceUsageTest = "true".equalsIgnoreCase(arguments.getString("resource"));
+    RunConfiguration.runResourceUsageTest = "true"
+        .equalsIgnoreCase(arguments.getString("resource"));
 
     Log.d(EndToEndTestUtils.LOG_TAG, "Use port number when run test on emulator:"
         + EndToEndTestUtils.emulatorPort);

@@ -1,3 +1,5 @@
+package com.google.android.apps.mytracks.endtoendtest;
+
 /*
  * Copyright 2012 Google Inc.
  * 
@@ -13,7 +15,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.android.apps.mytracks.endtoendtest;
 
 import com.google.android.apps.mytracks.ChartView;
 import com.google.android.apps.mytracks.TrackListActivity;
@@ -547,7 +548,7 @@ public class EndToEndTestUtils {
     instrumentation.waitForIdleSync();
     SOLO.clickOnText(trackKind.toUpperCase());
     EndToEndTestUtils
-    .getButtonOnScreen(activityMytracks.getString(R.string.generic_ok), true, true);
+        .getButtonOnScreen(activityMytracks.getString(R.string.generic_ok), true, true);
     SOLO.waitForText(activityMytracks.getString(R.string.generic_success_title));
   }
 
@@ -895,7 +896,7 @@ public class EndToEndTestUtils {
   /**
    * Checks whether the recording is not started.
    */
-  static void checkNotRecording() {
+  public static void checkNotRecording() {
     instrumentation.waitForIdleSync();
     Assert.assertEquals(activityMytracks.getString(R.string.icon_record_track), (String) SOLO
         .getCurrentActivity().findViewById(R.id.track_controller_record).getContentDescription());
@@ -911,7 +912,7 @@ public class EndToEndTestUtils {
   /**
    * Checks whether the MyTracks is under recording.
    */
-  static void checkUnderRecording() {
+  public static void checkUnderRecording() {
     instrumentation.waitForIdleSync();
     Assert.assertEquals(activityMytracks.getString(R.string.icon_pause_recording), (String) SOLO
         .getCurrentActivity().findViewById(R.id.track_controller_record).getContentDescription());
@@ -931,7 +932,7 @@ public class EndToEndTestUtils {
   /**
    * Checks whether the recording is paused.
    */
-  static void checkUnderPaused() {
+  public static void checkUnderPaused() {
     instrumentation.waitForIdleSync();
     Assert.assertEquals(activityMytracks.getString(R.string.icon_record_track), (String) SOLO
         .getCurrentActivity().findViewById(R.id.track_controller_record).getContentDescription());
