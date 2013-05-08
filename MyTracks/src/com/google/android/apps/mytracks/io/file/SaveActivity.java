@@ -42,7 +42,7 @@ import java.io.File;
 public class SaveActivity extends Activity {
 
   public static final String EXTRA_TRACK_FILE_FORMAT = "track_file_format";
-  public static final String EXTRA_TRACK_ID = "track_id";
+  public static final String EXTRA_TRACK_IDS = "track_ids";
   public static final String EXTRA_PLAY_TRACK = "play_track";
   public static final String EXTRA_SHARE_TRACK = "share_track";
 
@@ -50,7 +50,7 @@ public class SaveActivity extends Activity {
   private static final int DIALOG_RESULT_ID = 1;
 
   private TrackFileFormat trackFileFormat;
-  private long trackId;
+  private long[] trackIds;
   private boolean playTrack;
   private boolean shareTrack;
   private String directoryName;
@@ -70,7 +70,7 @@ public class SaveActivity extends Activity {
 
     Intent intent = getIntent();
     trackFileFormat = intent.getParcelableExtra(EXTRA_TRACK_FILE_FORMAT);
-    trackId = intent.getLongExtra(EXTRA_TRACK_ID, -1L);
+    trackIds = intent.getLongArrayExtra(EXTRA_TRACK_IDS);
     playTrack = intent.getBooleanExtra(EXTRA_PLAY_TRACK, false);
     shareTrack = intent.getBooleanExtra(EXTRA_SHARE_TRACK, false);
 
@@ -96,7 +96,7 @@ public class SaveActivity extends Activity {
       saveAsyncTask = (SaveAsyncTask) retained;
       saveAsyncTask.setActivity(this);
     } else {
-      saveAsyncTask = new SaveAsyncTask(this, trackFileFormat, trackId, directory);
+      saveAsyncTask = new SaveAsyncTask(this, trackFileFormat, trackIds, directory);
       saveAsyncTask.execute();
     }
   }
@@ -171,7 +171,7 @@ public class SaveActivity extends Activity {
         finish();
         return;
       } else if (shareTrack) {
-        Intent intent = IntentUtils.newShareFileIntent(this, trackId, savedPath, trackFileFormat);
+        Intent intent = IntentUtils.newShareFileIntent(this, trackIds[0], savedPath, trackFileFormat);
         startActivity(Intent.createChooser(intent, getString(R.string.share_track_picker_title)));
         finish();
         return;

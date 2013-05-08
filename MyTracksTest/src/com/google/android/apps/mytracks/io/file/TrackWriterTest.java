@@ -76,7 +76,7 @@ public class TrackWriterTest extends AndroidTestCase {
 
       }
     };
-    trackWriter = new TrackWriter(myTracksProviderUtils, track, trackFormatWriter, onWriteListener);
+    trackWriter = new TrackWriter(myTracksProviderUtils, new Track[] {track}, trackFormatWriter, onWriteListener);
   }
 
   @Override

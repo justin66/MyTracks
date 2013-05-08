@@ -24,13 +24,11 @@ import com.google.android.apps.mytracks.content.WaypointCreationRequest;
 import com.google.android.apps.mytracks.fragments.ChartFragment;
 import com.google.android.apps.mytracks.fragments.ChooseUploadServiceDialogFragment;
 import com.google.android.apps.mytracks.fragments.ChooseUploadServiceDialogFragment.ChooseUploadServiceCaller;
-import com.google.android.apps.mytracks.fragments.ConfirmDialogFragment;
 import com.google.android.apps.mytracks.fragments.DeleteTrackDialogFragment;
 import com.google.android.apps.mytracks.fragments.DeleteTrackDialogFragment.DeleteTrackCaller;
 import com.google.android.apps.mytracks.fragments.FileTypeDialogFragment;
 import com.google.android.apps.mytracks.fragments.FileTypeDialogFragment.FileTypeCaller;
 import com.google.android.apps.mytracks.fragments.FrequencyDialogFragment;
-import com.google.android.apps.mytracks.fragments.InstallEarthDialogFragment;
 import com.google.android.apps.mytracks.fragments.MyTracksMapFragment;
 import com.google.android.apps.mytracks.fragments.StatsFragment;
 import com.google.android.apps.mytracks.io.file.SaveActivity;
@@ -39,7 +37,6 @@ import com.google.android.apps.mytracks.io.sendtogoogle.SendRequest;
 import com.google.android.apps.mytracks.services.TrackRecordingServiceConnection;
 import com.google.android.apps.mytracks.settings.SettingsActivity;
 import com.google.android.apps.mytracks.util.AnalyticsUtils;
-import com.google.android.apps.mytracks.util.GoogleEarthUtils;
 import com.google.android.apps.mytracks.util.GoogleFeedbackUtils;
 import com.google.android.apps.mytracks.util.IntentUtils;
 import com.google.android.apps.mytracks.util.PreferencesUtils;
@@ -342,15 +339,7 @@ public class TrackDetailActivity extends AbstractSendToGoogleActivity
         startActivity(intent);
         return true;
       case R.id.track_detail_play:
-        if (GoogleEarthUtils.isEarthInstalled(this)) {
-          ConfirmDialogFragment.newInstance(R.string.confirm_play_earth_key,
-              PreferencesUtils.CONFIRM_PLAY_EARTH_DEFAULT,
-              getString(R.string.track_detail_play_confirm_message), new long[] { trackId })
-              .show(getSupportFragmentManager(), ConfirmDialogFragment.CONFIRM_DIALOG_TAG);
-        } else {
-          new InstallEarthDialogFragment().show(
-              getSupportFragmentManager(), InstallEarthDialogFragment.INSTALL_EARTH_DIALOG_TAG);
-        }
+        confirmPlay(new long[] {trackId});
         return true;
       case R.id.track_detail_share:
         confirmShare(trackId);
@@ -425,22 +414,6 @@ public class TrackDetailActivity extends AbstractSendToGoogleActivity
   }
 
   @Override
-  public void onConfirmDone(int confirmId, long[] confirmTrackIds) {
-    switch (confirmId) {
-      case R.string.confirm_play_earth_key:
-        AnalyticsUtils.sendPageViews(this, "/action/play");
-        Intent intent = IntentUtils.newIntent(this, SaveActivity.class)
-            .putExtra(SaveActivity.EXTRA_TRACK_ID, confirmTrackIds[0])
-            .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) TrackFileFormat.KML)
-            .putExtra(SaveActivity.EXTRA_PLAY_TRACK, true);
-        startActivity(intent);
-        break;
-      default:
-        super.onConfirmDone(confirmId, confirmTrackIds);
-    }
-  }
-
-  @Override
   public void onChooseUploadServiceDone(boolean sendDrive, boolean sendMaps,
       boolean sendFusionTables, boolean sendSpreadsheets, boolean mapsExistingMap) {
     SendRequest sendRequest = new SendRequest(trackId);
@@ -486,7 +459,7 @@ public class TrackDetailActivity extends AbstractSendToGoogleActivity
         AnalyticsUtils.sendPageViews(
             this, "/action/save_" + trackFileFormat.name().toLowerCase(Locale.US));
         Intent intent = IntentUtils.newIntent(this, SaveActivity.class)
-            .putExtra(SaveActivity.EXTRA_TRACK_ID, trackId)
+            .putExtra(SaveActivity.EXTRA_TRACK_IDS, new long[] {trackId})
             .putExtra(SaveActivity.EXTRA_TRACK_FILE_FORMAT, (Parcelable) trackFileFormat);
         startActivity(intent);
         break;
