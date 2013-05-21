@@ -26,12 +26,14 @@ import com.google.android.apps.mytracks.content.TrackDataHub;
 import com.google.android.apps.mytracks.content.TrackDataListener;
 import com.google.android.apps.mytracks.content.TrackDataType;
 import com.google.android.apps.mytracks.content.Waypoint;
+import com.google.android.apps.mytracks.services.MyTracksLocationManager;
 import com.google.android.apps.mytracks.stats.TripStatistics;
 import com.google.android.apps.mytracks.util.ApiAdapterFactory;
 import com.google.android.apps.mytracks.util.GoogleLocationUtils;
 import com.google.android.apps.mytracks.util.IntentUtils;
 import com.google.android.apps.mytracks.util.LocationUtils;
 import com.google.android.apps.mytracks.util.PreferencesUtils;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -51,6 +53,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Looper;
 import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -161,10 +164,28 @@ public class MyTracksMapFragment extends SupportMapFragment implements TrackData
     myLocationImageButton.setOnClickListener(new View.OnClickListener() {
         @Override
       public void onClick(View v) {
-        forceUpdateLocation();
-        keepCurrentLocationVisible = true;
-        zoomToCurrentLocation = true;
-        updateCurrentLocation();
+        final MyTracksLocationManager myTracksLocationManager = new MyTracksLocationManager(
+            getActivity(), Looper.myLooper());
+        if (!myTracksLocationManager.isAllowed()) {
+          String setting = getString(
+              GoogleLocationUtils.isAvailable(getActivity()) ? R.string.gps_google_location_settings
+                  : R.string.gps_location_access);
+          Toast.makeText(
+              getActivity(), getString(R.string.my_location_no_gps, setting), Toast.LENGTH_LONG)
+              .show();
+          myTracksLocationManager.close();
+        } else {
+          myTracksLocationManager.requestLastLocation(new LocationListener() {
+              @Override
+            public void onLocationChanged(Location location) {
+              myTracksLocationManager.close();
+              keepCurrentLocationVisible = true;
+              zoomToCurrentLocation = true;
+              setCurrentLocation(location);
+              updateCurrentLocation();
+            }
+          });
+        }
       }
     });
     messageTextView = (TextView) layout.findViewById(R.id.map_message);
@@ -559,7 +580,7 @@ public class MyTracksMapFragment extends SupportMapFragment implements TrackData
     // We don't care.
     return false;
   }
-  
+
   @Override
   public boolean onMinRecordingDistanceChanged(int minRecordingDistance) {
     // We don't care.
@@ -594,16 +615,6 @@ public class MyTracksMapFragment extends SupportMapFragment implements TrackData
    */
   private synchronized boolean isSelectedTrackRecording() {
     return trackDataHub != null && trackDataHub.isSelectedTrackRecording();
-  }
-
-  /**
-   * Forces update location. Needs to be synchronized because the trackDataHub
-   * can be accessed by multiple threads.
-   */
-  private synchronized void forceUpdateLocation() {
-    if (trackDataHub != null) {
-      trackDataHub.forceUpdateLocation();
-    }
   }
 
   /**
@@ -724,7 +735,7 @@ public class MyTracksMapFragment extends SupportMapFragment implements TrackData
         return new LatLng(location.getLatitude(), location.getLongitude());
       }
     }
-    return new LatLng(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);    
+    return new LatLng(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
   }
 
   /**
