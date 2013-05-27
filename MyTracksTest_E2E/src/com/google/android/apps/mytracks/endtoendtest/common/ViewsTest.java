@@ -22,6 +22,7 @@ import com.google.android.maps.mytracks.R;
 
 import android.app.Instrumentation;
 import android.graphics.Point;
+import android.os.Build;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
 import android.view.Display;
@@ -139,6 +140,7 @@ public class ViewsTest extends ActivityInstrumentationTestCase2<TrackListActivit
    * Checks the position of track controller in landscape view and portrait
    * view.
    */
+  @SuppressWarnings("deprecation")
   private void checkTrackController() {
     View controller = EndToEndTestUtils.SOLO.getCurrentActivity().findViewById(
         R.id.track_controler_container);
@@ -146,7 +148,12 @@ public class ViewsTest extends ActivityInstrumentationTestCase2<TrackListActivit
     Display display = EndToEndTestUtils.SOLO.getCurrentActivity().getWindowManager()
         .getDefaultDisplay();
     Point size = new Point();
-    display.getSize(size);
+    if (Build.VERSION.SDK_INT >= 13) {
+      display.getSize(size);
+    } else {
+      size.x = display.getWidth();
+      size.y = display.getHeight();
+    }
     int width = size.x;
     int height = size.y;
 
