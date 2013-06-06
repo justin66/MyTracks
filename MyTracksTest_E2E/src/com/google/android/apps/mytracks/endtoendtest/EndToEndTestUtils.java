@@ -543,10 +543,10 @@ public class EndToEndTestUtils {
    * 
    * @param trackKind the kind of track
    */
-  public static void saveTrackToSdCard(String trackKind) {
+  public static void saveAllTrackToSdCard(String trackKind) {
     deleteExportedFiles(trackKind);
     instrumentation.waitForIdleSync();
-    findMenuItem(activityMytracks.getString(R.string.menu_export), true);
+    findMenuItem(activityMytracks.getString(R.string.menu_export_all), true);
     instrumentation.waitForIdleSync();
     SOLO.clickOnText(trackKind.toUpperCase());
     EndToEndTestUtils

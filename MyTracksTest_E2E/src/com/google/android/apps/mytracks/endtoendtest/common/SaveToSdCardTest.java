@@ -30,6 +30,7 @@ public class SaveToSdCardTest extends ActivityInstrumentationTestCase2<TrackList
 
   private Instrumentation instrumentation;
   private TrackListActivity activityMyTracks;
+  int trackNumber = 0;
 
   public SaveToSdCardTest() {
     super(TrackListActivity.class);
@@ -41,39 +42,40 @@ public class SaveToSdCardTest extends ActivityInstrumentationTestCase2<TrackList
     instrumentation = getInstrumentation();
     activityMyTracks = getActivity();
     EndToEndTestUtils.setupForAllTest(instrumentation, activityMyTracks);
-    EndToEndTestUtils.createTrackIfEmpty(1, false);
+    trackNumber = EndToEndTestUtils.SOLO.getCurrentListViews().get(0).getCount();
+    EndToEndTestUtils.createTrackIfEmpty(1, true);
   }
 
   /**
    * Tests saving a track to SD card as a GPX file.
    */
   public void testSaveToSdCard_GPX() {
-    EndToEndTestUtils.saveTrackToSdCard(EndToEndTestUtils.GPX);
-    assertEquals(1, EndToEndTestUtils.getExportedFiles(EndToEndTestUtils.GPX).length);
+    EndToEndTestUtils.saveAllTrackToSdCard(EndToEndTestUtils.GPX);
+    assertEquals(trackNumber, EndToEndTestUtils.getExportedFiles(EndToEndTestUtils.GPX).length);
   }
 
   /**
    * Tests saving a track to SD card as a KML file.
    */
   public void testSaveToSdCard_KML() {
-    EndToEndTestUtils.saveTrackToSdCard(EndToEndTestUtils.KML);
-    assertEquals(1, EndToEndTestUtils.getExportedFiles(EndToEndTestUtils.KML).length);
+    EndToEndTestUtils.saveAllTrackToSdCard(EndToEndTestUtils.KML);
+    assertEquals(trackNumber, EndToEndTestUtils.getExportedFiles(EndToEndTestUtils.KML).length);
   }
 
   /**
    * Tests saving a track to SD card as a CSV file.
    */
   public void testSaveToSdCard_CSV() {
-    EndToEndTestUtils.saveTrackToSdCard(EndToEndTestUtils.CSV);
-    assertEquals(1, EndToEndTestUtils.getExportedFiles(EndToEndTestUtils.CSV).length);
+    EndToEndTestUtils.saveAllTrackToSdCard(EndToEndTestUtils.CSV);
+    assertEquals(trackNumber, EndToEndTestUtils.getExportedFiles(EndToEndTestUtils.CSV).length);
   }
 
   /**
    * Tests saving a track to SD card as a TCX file.
    */
   public void testSaveToSdCard_TCX() {
-    EndToEndTestUtils.saveTrackToSdCard(EndToEndTestUtils.TCX);
-    assertEquals(1, EndToEndTestUtils.getExportedFiles(EndToEndTestUtils.TCX).length);
+    EndToEndTestUtils.saveAllTrackToSdCard(EndToEndTestUtils.TCX);
+    assertEquals(trackNumber, EndToEndTestUtils.getExportedFiles(EndToEndTestUtils.TCX).length);
   }
 
   @Override
