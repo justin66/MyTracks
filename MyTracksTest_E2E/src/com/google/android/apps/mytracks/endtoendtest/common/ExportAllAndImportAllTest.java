@@ -30,12 +30,13 @@ import java.io.File;
  * 
  * @author Youtao Liu
  */
-public class ExportAndImportTest extends ActivityInstrumentationTestCase2<TrackListActivity> {
+public class ExportAllAndImportAllTest extends ActivityInstrumentationTestCase2<TrackListActivity> {
 
   private Instrumentation instrumentation;
   private TrackListActivity activityMyTracks;
+  private int trackNumber = 0;
 
-  public ExportAndImportTest() {
+  public ExportAllAndImportAllTest() {
     super(TrackListActivity.class);
   }
 
@@ -45,13 +46,15 @@ public class ExportAndImportTest extends ActivityInstrumentationTestCase2<TrackL
     instrumentation = getInstrumentation();
     activityMyTracks = getActivity();
     EndToEndTestUtils.setupForAllTest(instrumentation, activityMyTracks);
+    trackNumber = EndToEndTestUtils.SOLO.getCurrentListViews().get(0).getCount();
+    EndToEndTestUtils.createTrackIfEmpty(1, true);
   }
 
   /**
    * Tests export and import tracks after creating a track with Gps signal and
    * an empty track.
    */
-  public void testExportAndImportTracks() {
+  public void testExportAllAndImportAllTracks_GPX_KML() {
     // Create a new track with 3 gps data.
     EndToEndTestUtils.createTrackIfEmpty(3, true);
     instrumentation.waitForIdleSync();
@@ -63,9 +66,25 @@ public class ExportAndImportTest extends ActivityInstrumentationTestCase2<TrackL
   }
 
   /**
+   * Tests saving tracks to SD card as a CSV files.
+   */
+  public void testExportAll_CSV() {
+    EndToEndTestUtils.saveAllTrackToSdCard(EndToEndTestUtils.CSV);
+    assertEquals(trackNumber, EndToEndTestUtils.getExportedFiles(EndToEndTestUtils.CSV).length);
+  }
+
+  /**
+   * Tests saving tracks to SD card as a TCX files.
+   */
+  public void testExportAll_TCX() {
+    EndToEndTestUtils.saveAllTrackToSdCard(EndToEndTestUtils.TCX);
+    assertEquals(trackNumber, EndToEndTestUtils.getExportedFiles(EndToEndTestUtils.TCX).length);
+  }
+
+  /**
    * Tests export and import track. Then check the properties of this track.
    */
-  public void testExportAndImportTrack_properties() {
+  public void testExportAllAndImportAllTrack_properties_GPX() {
     EndToEndTestUtils.deleteAllTracks();
 
     // Create a new track with two markers.
@@ -142,7 +161,7 @@ public class ExportAndImportTest extends ActivityInstrumentationTestCase2<TrackL
    * Tests export and import tracks after creating a track with Gps signal and
    * an empty track. Both tracks are paused during recording.
    */
-  public void testExportAndImportTracks_pausedTrack() {
+  public void testExportAllAndImportAllTracks_pausedTrack_GPX_KML() {
     EndToEndTestUtils.deleteAllTracks();
     // Create a new track with 3 gps data.
     EndToEndTestUtils.createTrackWithPause(3);
@@ -180,7 +199,7 @@ public class ExportAndImportTest extends ActivityInstrumentationTestCase2<TrackL
     }
 
     // Get track number in current track list of MyTracks.
-    int trackNumber = EndToEndTestUtils.SOLO.getCurrentListViews().get(0).getCount();
+    trackNumber = EndToEndTestUtils.SOLO.getCurrentListViews().get(0).getCount();
 
     // No Gpx file to imported.
     importTracks(EndToEndTestUtils.GPX);
