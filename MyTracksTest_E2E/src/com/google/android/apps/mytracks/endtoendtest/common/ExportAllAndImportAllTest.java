@@ -109,9 +109,7 @@ public class ExportAllAndImportAllTest extends ActivityInstrumentationTestCase2<
 
     // Click to export tracks(At least one track) to Gpx files.
     EndToEndTestUtils.findMenuItem(activityMyTracks.getString(R.string.menu_export_all), true);
-    EndToEndTestUtils.SOLO.clickOnText(String.format(
-        activityMyTracks.getString(R.string.export_all_option),
-        EndToEndTestUtils.GPX.toUpperCase()));
+    EndToEndTestUtils.SOLO.clickOnText(EndToEndTestUtils.GPX.toUpperCase());
     EndToEndTestUtils.getButtonOnScreen(
         EndToEndTestUtils.activityMytracks.getString(R.string.generic_ok), true, true);
     EndToEndTestUtils.SOLO.waitForText(getSaveSuccessMessage(1, EndToEndTestUtils.GPX));
@@ -210,9 +208,7 @@ public class ExportAllAndImportAllTest extends ActivityInstrumentationTestCase2<
 
     // Click to export tracks(At least one track) to Gpx files.
     EndToEndTestUtils.findMenuItem(activityMyTracks.getString(R.string.menu_export_all), true);
-    EndToEndTestUtils.SOLO.clickOnText(String.format(
-        activityMyTracks.getString(R.string.export_all_option),
-        EndToEndTestUtils.GPX.toUpperCase()));
+    EndToEndTestUtils.SOLO.clickOnText(EndToEndTestUtils.GPX.toUpperCase());
     EndToEndTestUtils.getButtonOnScreen(
         EndToEndTestUtils.activityMytracks.getString(R.string.generic_ok), true, true);
     EndToEndTestUtils.SOLO.waitForText(getSaveSuccessMessage(1, EndToEndTestUtils.GPX));
@@ -246,16 +242,14 @@ public class ExportAllAndImportAllTest extends ActivityInstrumentationTestCase2<
         .getButtonOnScreen(activityMyTracks.getString(R.string.generic_ok), true, true);
     instrumentation.waitForIdleSync();
     assertTrue(EndToEndTestUtils.SOLO.waitForText(EndToEndTestUtils.trackName));
-    assertEquals(trackNumber + gpxFilesNumber, EndToEndTestUtils.SOLO.getCurrentViews(ListView.class).get(0)
-        .getCount());
+    assertEquals(trackNumber + gpxFilesNumber,
+        EndToEndTestUtils.SOLO.getCurrentViews(ListView.class).get(0).getCount());
 
     // Click to export tracks(At least two tracks) to KML files.
     gpxFilesNumber = EndToEndTestUtils.getExportedFiles(EndToEndTestUtils.GPX).length;
     trackNumber = EndToEndTestUtils.SOLO.getCurrentViews(ListView.class).get(0).getCount();
     EndToEndTestUtils.findMenuItem(activityMyTracks.getString(R.string.menu_export_all), true);
-    EndToEndTestUtils.SOLO.clickOnText(String.format(
-        activityMyTracks.getString(R.string.export_all_option),
-        EndToEndTestUtils.KML.toUpperCase()));
+    EndToEndTestUtils.SOLO.clickOnText(EndToEndTestUtils.KML.toUpperCase());
     EndToEndTestUtils.getButtonOnScreen(
         EndToEndTestUtils.activityMytracks.getString(R.string.generic_ok), true, true);
     EndToEndTestUtils.SOLO.waitForText(getSaveSuccessMessage(2, EndToEndTestUtils.KM));
@@ -289,8 +283,8 @@ public class ExportAllAndImportAllTest extends ActivityInstrumentationTestCase2<
     EndToEndTestUtils
         .getButtonOnScreen(activityMyTracks.getString(R.string.generic_ok), true, true);
     instrumentation.waitForIdleSync();
-    assertEquals(trackNumber + KMLFilesNumber, EndToEndTestUtils.SOLO.getCurrentViews(ListView.class).get(0)
-        .getCount());
+    assertEquals(trackNumber + KMLFilesNumber,
+        EndToEndTestUtils.SOLO.getCurrentViews(ListView.class).get(0).getCount());
   }
 
   @Override
@@ -300,11 +294,11 @@ public class ExportAllAndImportAllTest extends ActivityInstrumentationTestCase2<
   }
 
   private String getSaveSuccessMessage(int count, String type) {
-    String tracks = activityMyTracks.getResources()
-        .getQuantityString(R.plurals.tracks, count, count);
+    String tracks = activityMyTracks.getResources().getQuantityString(R.plurals.tracks, count,
+        count);
     String directoryDisplayName = FileUtils.getDirectoryDisplayName(type);
-    return activityMyTracks.getString(
-        R.string.export_external_storage_success, tracks, directoryDisplayName);
+    return activityMyTracks.getString(R.string.export_external_storage_success, tracks,
+        directoryDisplayName);
   }
 
   private String getImportSuccessMessage(int count, String type) {

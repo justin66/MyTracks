@@ -17,7 +17,6 @@ package com.google.android.apps.mytracks.endtoendtest.common;
 
 import com.google.android.apps.mytracks.TrackListActivity;
 import com.google.android.apps.mytracks.endtoendtest.EndToEndTestUtils;
-import com.google.android.apps.mytracks.util.FileUtils;
 import com.google.android.maps.mytracks.R;
 
 import android.app.Instrumentation;
@@ -64,6 +63,8 @@ public class DeleteTest extends ActivityInstrumentationTestCase2<TrackListActivi
     EndToEndTestUtils.rotateCurrentActivity();
     EndToEndTestUtils.getButtonOnScreen(activityMyTracks.getString(R.string.generic_yes), true,
         true);
+    EndToEndTestUtils.waitTextToDisappear(activityMyTracks
+        .getString(R.string.generic_progress_title));
     instrumentation.waitForIdleSync();
     assertTrue(EndToEndTestUtils.SOLO.waitForText(activityMyTracks
         .getString(R.string.track_list_empty_message)));
@@ -73,18 +74,12 @@ public class DeleteTest extends ActivityInstrumentationTestCase2<TrackListActivi
     // Export when there is no track.
     EndToEndTestUtils.findMenuItem(activityMyTracks.getString(R.string.menu_export_all), true);
     EndToEndTestUtils.SOLO.clickOnText(EndToEndTestUtils.GPX.toUpperCase());
-    EndToEndTestUtils.getButtonOnScreen(
-        EndToEndTestUtils.activityMytracks.getString(R.string.generic_ok), true, true);
-    String totalTracks = activityMyTracks.getResources().getQuantityString(R.plurals.tracks, 0, 0);
-    String directoryDisplayName = FileUtils.getDirectoryDisplayName(EndToEndTestUtils.GPX);
-    String message = activityMyTracks.getString(R.string.export_external_storage_error, 0,
-        totalTracks, directoryDisplayName);
-    assertTrue(EndToEndTestUtils.SOLO.waitForText(
-        activityMyTracks.getString(R.string.external_storage_not_available), 1,
-        EndToEndTestUtils.SHORT_WAIT_TIME)
-        || EndToEndTestUtils.SOLO.waitForText(
-            activityMyTracks.getString(R.string.external_storage_not_writable), 1,
-            EndToEndTestUtils.SHORT_WAIT_TIME) || EndToEndTestUtils.SOLO.waitForText(message));
+    EndToEndTestUtils
+        .getButtonOnScreen(activityMyTracks.getString(R.string.generic_ok), true, true);
+    EndToEndTestUtils.waitTextToDisappear(activityMyTracks
+        .getString(R.string.generic_progress_title));
+    assertTrue(EndToEndTestUtils.SOLO.waitForText(activityMyTracks
+        .getString(R.string.export_external_storage_no_track)));
     EndToEndTestUtils
         .getButtonOnScreen(activityMyTracks.getString(R.string.generic_ok), true, true);
   }
@@ -104,7 +99,8 @@ public class DeleteTest extends ActivityInstrumentationTestCase2<TrackListActivi
     EndToEndTestUtils.findMenuItem(activityMyTracks.getString(R.string.menu_delete), true);
     EndToEndTestUtils.getButtonOnScreen(activityMyTracks.getString(R.string.generic_yes), true,
         true);
-    instrumentation.waitForIdleSync();
+    EndToEndTestUtils.waitTextToDisappear(activityMyTracks
+        .getString(R.string.generic_progress_title));
     trackListView = EndToEndTestUtils.SOLO.getCurrentViews(ListView.class);
     int trackNumberNew = trackListView.get(0).getCount();
     assertEquals(trackNumberOld - 1, trackNumberNew);
@@ -155,7 +151,8 @@ public class DeleteTest extends ActivityInstrumentationTestCase2<TrackListActivi
     EndToEndTestUtils.getButtonOnScreen(activityMyTracks.getString(R.string.generic_yes), true,
         true);
 
-    instrumentation.waitForIdleSync();
+    EndToEndTestUtils.waitTextToDisappear(activityMyTracks
+        .getString(R.string.generic_progress_title));
     int trackNumberNew = trackNumberOld;
     long startTime = System.currentTimeMillis();
     // Wait a few seconds for the delete.
@@ -179,7 +176,8 @@ public class DeleteTest extends ActivityInstrumentationTestCase2<TrackListActivi
     EndToEndTestUtils.findMenuItem(activityMyTracks.getString(R.string.menu_delete), true);
     EndToEndTestUtils.getButtonOnScreen(activityMyTracks.getString(R.string.generic_yes), true,
         true);
-    instrumentation.waitForIdleSync();
+    EndToEndTestUtils.waitTextToDisappear(activityMyTracks
+        .getString(R.string.generic_progress_title));
     EndToEndTestUtils.checkNotRecording();
   }
 

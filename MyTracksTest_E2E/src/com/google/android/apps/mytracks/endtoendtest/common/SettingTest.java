@@ -92,7 +92,8 @@ public class SettingTest extends ActivityInstrumentationTestCase2<TrackListActiv
         EndToEndTestUtils.NORMAL_WAIT_TIME));
     EndToEndTestUtils.SOLO.clickOnButton(activityMyTracks.getString(R.string.generic_yes));
     instrumentation.waitForIdleSync();
-    assertEquals(!newMapsPublic, EndToEndTestUtils.SOLO.getCurrentViews(CheckBox.class).get(0).isChecked());
+    assertEquals(!newMapsPublic, EndToEndTestUtils.SOLO.getCurrentViews(CheckBox.class).get(0)
+        .isChecked());
     EndToEndTestUtils.SOLO.goBack();
 
     // Reset all settings.
@@ -210,8 +211,18 @@ public class SettingTest extends ActivityInstrumentationTestCase2<TrackListActiv
 
     // Change preferred units.
     if (changeUnits) {
+      boolean isImperial = EndToEndTestUtils.findTextViewInView(
+          activityMyTracks.getString(R.string.settings_stats_units_imperial),
+          EndToEndTestUtils.SOLO.getCurrentViews(ListView.class).get(0)) != null;
+
+      // Change preferred units.
       EndToEndTestUtils.SOLO.clickOnText(activityMyTracks
           .getString(R.string.settings_stats_units_title));
+      if (isImperial) {
+        EndToEndTestUtils.SOLO.clickOnText(activityMyTracks.getString(R.string.unit_kilometer));
+      } else {
+        EndToEndTestUtils.SOLO.clickOnText(activityMyTracks.getString(R.string.unit_feet));
+      }
     }
     if (changeRate) {
       EndToEndTestUtils.SOLO.clickOnText(activityMyTracks
@@ -239,12 +250,17 @@ public class SettingTest extends ActivityInstrumentationTestCase2<TrackListActiv
         .getString(R.string.settings_stats_units_title)));
 
     boolean isImperial = EndToEndTestUtils.findTextViewInView(activityMyTracks
-        .getString(R.string.settings_stats_units_imperial), EndToEndTestUtils.SOLO
-        .getCurrentViews(ListView.class).get(0)) != null;
+        .getString(R.string.settings_stats_units_imperial),
+        EndToEndTestUtils.SOLO.getCurrentViews(ListView.class).get(0)) != null;
 
     // Change preferred units.
     EndToEndTestUtils.SOLO.clickOnText(activityMyTracks
         .getString(R.string.settings_stats_units_title));
+    if (isImperial) {
+      EndToEndTestUtils.SOLO.clickOnText(activityMyTracks.getString(R.string.unit_kilometer));
+    } else {
+      EndToEndTestUtils.SOLO.clickOnText(activityMyTracks.getString(R.string.unit_feet));
+    }
     isImperial = !isImperial;
     EndToEndTestUtils.SOLO.goBack();
     EndToEndTestUtils.SOLO.goBack();
@@ -291,8 +307,8 @@ public class SettingTest extends ActivityInstrumentationTestCase2<TrackListActiv
     assertEquals(2, EndToEndTestUtils.SOLO.getCurrentViews(ListView.class).get(0).getCount());
 
     // Click the first one.
-    EndToEndTestUtils.SOLO.clickOnView(EndToEndTestUtils.SOLO.getCurrentViews(ListView.class).get(0)
-        .getChildAt(0));
+    EndToEndTestUtils.SOLO.clickOnView(EndToEndTestUtils.SOLO.getCurrentViews(ListView.class)
+        .get(0).getChildAt(0));
     assertTrue(EndToEndTestUtils.SOLO.waitForText(
         activityMyTracks.getString(R.string.settings_backup_restore_success), 0,
         EndToEndTestUtils.SUPER_LONG_WAIT_TIME));
@@ -309,8 +325,8 @@ public class SettingTest extends ActivityInstrumentationTestCase2<TrackListActiv
     instrumentation.waitForIdleSync();
 
     // Click the second one.
-    EndToEndTestUtils.SOLO.clickOnView(EndToEndTestUtils.SOLO.getCurrentViews(ListView.class).get(0)
-        .getChildAt(1));
+    EndToEndTestUtils.SOLO.clickOnView(EndToEndTestUtils.SOLO.getCurrentViews(ListView.class)
+        .get(0).getChildAt(1));
     assertTrue(EndToEndTestUtils.SOLO.waitForText(
         activityMyTracks.getString(R.string.settings_backup_restore_success), 0,
         EndToEndTestUtils.SUPER_LONG_WAIT_TIME));
@@ -427,22 +443,19 @@ public class SettingTest extends ActivityInstrumentationTestCase2<TrackListActiv
         EndToEndTestUtils.TINY_WAIT_TIME)) {
       EndToEndTestUtils.SOLO.clickOnText(GoogleUtils.ACCOUNT_NAME_1);
       instrumentation.waitForIdleSync();
-      EndToEndTestUtils.SOLO.waitForText(activityMyTracks
-          .getString(R.string.menu_sync_drive));
+      EndToEndTestUtils.SOLO.waitForText(activityMyTracks.getString(R.string.menu_sync_drive));
       assertTrue(EndToEndTestUtils.findTextView(
           activityMyTracks.getString(R.string.menu_sync_drive)).isEnabled());
     } else {
       EndToEndTestUtils.SOLO.clickOnText(activityMyTracks.getString(R.string.value_none));
       instrumentation.waitForIdleSync();
-      EndToEndTestUtils.SOLO.waitForText(activityMyTracks
-          .getString(R.string.menu_sync_drive));
+      EndToEndTestUtils.SOLO.waitForText(activityMyTracks.getString(R.string.menu_sync_drive));
       assertFalse(EndToEndTestUtils.findTextView(
           activityMyTracks.getString(R.string.menu_sync_drive)).isEnabled());
       return;
     }
 
-    EndToEndTestUtils.SOLO.clickOnText(activityMyTracks
-        .getString(R.string.menu_sync_drive));
+    EndToEndTestUtils.SOLO.clickOnText(activityMyTracks.getString(R.string.menu_sync_drive));
 
     boolean isSyncChecked = false;
     if (EndToEndTestUtils.SOLO.waitForText(

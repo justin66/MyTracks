@@ -26,10 +26,12 @@ import com.jayway.android.robotium.solo.Solo;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Instrumentation;
+import android.content.Context;
 import android.content.res.Configuration;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -500,8 +502,7 @@ public class EndToEndTestUtils {
    * @param trackKind the kind of track
    */
   public static void deleteExportedFiles(String trackKind) {
-    File[] allFiles = (new File(FileUtils.getDirectoryPath(trackKind.toLowerCase())))
-        .listFiles();
+    File[] allFiles = (new File(FileUtils.getDirectoryPath(trackKind.toLowerCase()))).listFiles();
     if (allFiles != null) {
       for (File oneFile : allFiles) {
         oneFile.delete();
@@ -517,6 +518,8 @@ public class EndToEndTestUtils {
     if (!isTrackListEmpty(false)) {
       findMenuItem(activityMytracks.getString(R.string.menu_delete_all), true);
       getButtonOnScreen(activityMytracks.getString(R.string.generic_yes), true, true);
+      EndToEndTestUtils.waitTextToDisappear(activityMytracks
+          .getString(R.string.generic_progress_title));
     }
   }
 
@@ -865,6 +868,11 @@ public class EndToEndTestUtils {
     EditText editText = SOLO.getEditText(editTextIndex);
     SOLO.enterText(editText, text);
     SOLO.hideSoftKeyboard();
+
+    // Above line does not work every time. And it is should be a Robotium issue.
+    InputMethodManager imm = (InputMethodManager) activityMytracks.getApplicationContext()
+        .getSystemService(Context.INPUT_METHOD_SERVICE);
+    imm.hideSoftInputFromWindow(editText.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
   }
 
   /**
