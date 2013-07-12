@@ -56,7 +56,7 @@ import junit.framework.Assert;
  * @author Youtao Liu
  */
 public class EndToEndTestUtils {
-  public static int emulatorPort = 5556;
+  public static int emulatorPort = 5554;
   // usually 5554.
   private static final int ORIENTATION_PORTRAIT = 1;
   private static final int ORIENTATION_LANDSCAPE = 0;
@@ -301,7 +301,7 @@ public class EndToEndTestUtils {
       instrumentation.waitForIdleSync();
       // Check the status of real phone. For emulator, we would fix GPS signal.
       if (!isEmulator) {
-        EndToEndTestUtils.findAndClickMyLocation(activityMyTracks);
+        findAndClickMyLocation(activityMyTracks);
         hasGpsSingal = !SOLO.waitForText(NO_GPS_MESSAGE_PREFIX, 1, SHORT_WAIT_TIME);
         SOLO.goBack();
       }
@@ -407,8 +407,7 @@ public class EndToEndTestUtils {
     if (isClick) {
       SOLO.scrollUp();
       SOLO.clickOnView(oneTrack);
-      EndToEndTestUtils.SOLO.waitForText(activityMytracks
-          .getString(R.string.track_detail_chart_tab));
+      SOLO.waitForText(activityMytracks.getString(R.string.track_detail_chart_tab));
     }
     return false;
   }
@@ -518,8 +517,7 @@ public class EndToEndTestUtils {
     if (!isTrackListEmpty(false)) {
       findMenuItem(activityMytracks.getString(R.string.menu_delete_all), true);
       getButtonOnScreen(activityMytracks.getString(R.string.generic_yes), true, true);
-      EndToEndTestUtils.waitTextToDisappear(activityMytracks
-          .getString(R.string.generic_progress_title));
+      waitTextToDisappear(activityMytracks.getString(R.string.generic_progress_title));
     }
   }
 
@@ -551,8 +549,7 @@ public class EndToEndTestUtils {
     findMenuItem(activityMytracks.getString(R.string.menu_export_all), true);
     instrumentation.waitForIdleSync();
     SOLO.clickOnText(trackKind.toUpperCase());
-    EndToEndTestUtils
-        .getButtonOnScreen(activityMytracks.getString(R.string.generic_ok), true, true);
+    getButtonOnScreen(activityMytracks.getString(R.string.generic_ok), true, true);
     SOLO.waitForText(activityMytracks.getString(R.string.generic_success_title));
   }
 
@@ -844,9 +841,9 @@ public class EndToEndTestUtils {
    */
   public static void resetAllSettings(Activity activityMyTracks, boolean keepInSettingList) {
     findMenuItem(activityMyTracks.getString(R.string.menu_settings), true);
-    EndToEndTestUtils.SOLO.clickOnText(activityMyTracks.getString(R.string.settings_backup_reset));
-    SOLO.waitForText(activityMyTracks.getString(R.string.settings_reset));
-    SOLO.clickOnText(activityMyTracks.getString(R.string.settings_reset));
+    SOLO.clickOnText(activityMyTracks.getString(R.string.settings_backup_reset));
+    Assert.assertTrue(SOLO.waitForText(activityMyTracks.getString(R.string.settings_reset)));
+    SOLO.clickOnText(activityMyTracks.getString(R.string.settings_reset_summary));
     getButtonOnScreen(activityMytracks.getString(R.string.generic_yes), true, true);
     Assert.assertTrue(SOLO.waitForText(activityMyTracks.getString(R.string.settings_reset_done)));
     instrumentation.waitForIdleSync();
@@ -869,7 +866,8 @@ public class EndToEndTestUtils {
     SOLO.enterText(editText, text);
     SOLO.hideSoftKeyboard();
 
-    // Above line does not work every time. And it is should be a Robotium issue.
+    // Above line does not work every time. And it is should be a Robotium
+    // issue.
     InputMethodManager imm = (InputMethodManager) activityMytracks.getApplicationContext()
         .getSystemService(Context.INPUT_METHOD_SERVICE);
     imm.hideSoftInputFromWindow(editText.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
