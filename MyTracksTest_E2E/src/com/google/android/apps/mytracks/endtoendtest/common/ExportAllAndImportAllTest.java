@@ -15,16 +15,24 @@
  */
 package com.google.android.apps.mytracks.endtoendtest.common;
 
+import com.google.android.apps.mytracks.TrackDetailActivity;
 import com.google.android.apps.mytracks.TrackListActivity;
 import com.google.android.apps.mytracks.endtoendtest.EndToEndTestUtils;
 import com.google.android.apps.mytracks.util.FileUtils;
+import com.google.android.apps.mytracks.util.PreferencesUtils;
 import com.google.android.maps.mytracks.R;
 
+import android.app.Activity;
 import android.app.Instrumentation;
+import android.location.Location;
 import android.test.ActivityInstrumentationTestCase2;
+import android.util.Log;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * Tests the import and export of MyTracks.
@@ -36,6 +44,10 @@ public class ExportAllAndImportAllTest extends ActivityInstrumentationTestCase2<
   private Instrumentation instrumentation;
   private TrackListActivity activityMyTracks;
   private int trackNumber = 0;
+
+  private final static String tracksName = "testTrackName1373523959524";
+  private final static String maxAltitude = "33.3";
+  private final static String minAltitude = "22.2";
 
   public ExportAllAndImportAllTest() {
     super(TrackListActivity.class);
@@ -108,13 +120,7 @@ public class ExportAllAndImportAllTest extends ActivityInstrumentationTestCase2<
     EndToEndTestUtils.deleteExportedFiles(EndToEndTestUtils.GPX);
 
     // Click to export tracks(At least one track) to Gpx files.
-    EndToEndTestUtils.findMenuItem(activityMyTracks.getString(R.string.menu_export_all), true);
-    EndToEndTestUtils.SOLO.clickOnText(EndToEndTestUtils.GPX.toUpperCase());
-    EndToEndTestUtils.getButtonOnScreen(
-        EndToEndTestUtils.activityMytracks.getString(R.string.generic_ok), true, true);
-    EndToEndTestUtils.SOLO.waitForText(getSaveSuccessMessage(1, EndToEndTestUtils.GPX));
-    EndToEndTestUtils
-        .getButtonOnScreen(activityMyTracks.getString(R.string.generic_ok), true, true);
+    exportTracks(EndToEndTestUtils.GPX);
     EndToEndTestUtils.deleteAllTracks();
 
     // Import this tracks.
@@ -167,7 +173,7 @@ public class ExportAllAndImportAllTest extends ActivityInstrumentationTestCase2<
     instrumentation.waitForIdleSync();
     EndToEndTestUtils.SOLO.goBack();
 
-    // Create a empty track.
+    // Create an empty track.
     EndToEndTestUtils.createTrackWithPause(0);
     instrumentation.waitForIdleSync();
     EndToEndTestUtils.SOLO.goBack();
@@ -207,13 +213,7 @@ public class ExportAllAndImportAllTest extends ActivityInstrumentationTestCase2<
         .getButtonOnScreen(activityMyTracks.getString(R.string.generic_ok), true, true);
 
     // Click to export tracks(At least one track) to Gpx files.
-    EndToEndTestUtils.findMenuItem(activityMyTracks.getString(R.string.menu_export_all), true);
-    EndToEndTestUtils.SOLO.clickOnText(EndToEndTestUtils.GPX.toUpperCase());
-    EndToEndTestUtils.getButtonOnScreen(
-        EndToEndTestUtils.activityMytracks.getString(R.string.generic_ok), true, true);
-    EndToEndTestUtils.SOLO.waitForText(getSaveSuccessMessage(1, EndToEndTestUtils.GPX));
-    EndToEndTestUtils
-        .getButtonOnScreen(activityMyTracks.getString(R.string.generic_ok), true, true);
+    exportTracks(EndToEndTestUtils.GPX);
 
     // Check export Gpx file.
     assertEquals(gpxFilesNumber + trackNumber,
@@ -226,21 +226,8 @@ public class ExportAllAndImportAllTest extends ActivityInstrumentationTestCase2<
 
     importTracks(EndToEndTestUtils.GPX);
     EndToEndTestUtils.rotateCurrentActivity();
+    checkImport();
 
-    /*
-     * Wait for the prefix of import success string is much faster than wait the
-     * whole string.
-     */
-    EndToEndTestUtils.SOLO.waitForText(activityMyTracks.getString(R.string.import_success).split(
-        "%")[0]);
-
-    /*
-     * Check import tracks should be equal with the sum of trackNumber and
-     * gpxFilesNumber;
-     */
-    EndToEndTestUtils
-        .getButtonOnScreen(activityMyTracks.getString(R.string.generic_ok), true, true);
-    instrumentation.waitForIdleSync();
     assertTrue(EndToEndTestUtils.SOLO.waitForText(EndToEndTestUtils.trackName));
     assertEquals(trackNumber + gpxFilesNumber,
         EndToEndTestUtils.SOLO.getCurrentViews(ListView.class).get(0).getCount());
@@ -248,13 +235,8 @@ public class ExportAllAndImportAllTest extends ActivityInstrumentationTestCase2<
     // Click to export tracks(At least two tracks) to KML files.
     gpxFilesNumber = EndToEndTestUtils.getExportedFiles(EndToEndTestUtils.GPX).length;
     trackNumber = EndToEndTestUtils.SOLO.getCurrentViews(ListView.class).get(0).getCount();
-    EndToEndTestUtils.findMenuItem(activityMyTracks.getString(R.string.menu_export_all), true);
-    EndToEndTestUtils.SOLO.clickOnText(EndToEndTestUtils.KML.toUpperCase());
-    EndToEndTestUtils.getButtonOnScreen(
-        EndToEndTestUtils.activityMytracks.getString(R.string.generic_ok), true, true);
-    EndToEndTestUtils.SOLO.waitForText(getSaveSuccessMessage(2, EndToEndTestUtils.KM));
-    EndToEndTestUtils
-        .getButtonOnScreen(activityMyTracks.getString(R.string.generic_ok), true, true);
+
+    exportTracks(EndToEndTestUtils.KML);
 
     // Check export files.
     assertEquals(gpxFilesNumber, EndToEndTestUtils.getExportedFiles(EndToEndTestUtils.GPX).length);
@@ -266,23 +248,9 @@ public class ExportAllAndImportAllTest extends ActivityInstrumentationTestCase2<
     trackNumber = EndToEndTestUtils.SOLO.getCurrentViews(ListView.class).get(0).getCount();
 
     importTracks(EndToEndTestUtils.KML);
+    checkImport();
+    EndToEndTestUtils.SOLO.waitForActivity(TrackListActivity.class);
 
-    /*
-     * Wait for the prefix of import success string is much faster than wait the
-     * whole string.
-     */
-    EndToEndTestUtils.waitTextToDisappear(activityMyTracks
-        .getString(R.string.generic_progress_title));
-    EndToEndTestUtils.SOLO.waitForText(activityMyTracks.getString(R.string.import_success).split(
-        "%")[0]);
-
-    /*
-     * Check import KML tracks should be equal with the sum of trackNumber and
-     * KMLFilesNumber;
-     */
-    EndToEndTestUtils
-        .getButtonOnScreen(activityMyTracks.getString(R.string.generic_ok), true, true);
-    instrumentation.waitForIdleSync();
     assertEquals(trackNumber + KMLFilesNumber,
         EndToEndTestUtils.SOLO.getCurrentViews(ListView.class).get(0).getCount());
   }
@@ -323,5 +291,211 @@ public class ExportAllAndImportAllTest extends ActivityInstrumentationTestCase2<
     EndToEndTestUtils.SOLO.clickOnText(fileType.toUpperCase());
     EndToEndTestUtils.getButtonOnScreen(
         EndToEndTestUtils.activityMytracks.getString(R.string.generic_ok), true, true);
+  }
+
+  /**
+   * Exports tracks to external storage.
+   * 
+   * @param fileType the file type, can be GPX/KML/TCX/CSV currently
+   */
+  private void exportTracks(String fileType) {
+    EndToEndTestUtils.findMenuItem(activityMyTracks.getString(R.string.menu_export_all), true);
+    EndToEndTestUtils.SOLO.clickOnText(fileType.toUpperCase());
+    EndToEndTestUtils.getButtonOnScreen(
+        EndToEndTestUtils.activityMytracks.getString(R.string.generic_ok), true, true);
+    EndToEndTestUtils.SOLO.waitForText(getSaveSuccessMessage(2, fileType));
+    EndToEndTestUtils
+        .getButtonOnScreen(activityMyTracks.getString(R.string.generic_ok), true, true);
+  }
+
+  /**
+   * Test export/import one track and checks the detail of this track.
+   */
+  public void testExportImport_checkTrackDetails() {
+    EndToEndTestUtils.deleteAllTracks();
+    EndToEndTestUtils.deleteExportedFiles(EndToEndTestUtils.GPX);
+    EndToEndTestUtils.deleteExportedFiles(EndToEndTestUtils.KML);
+    EndToEndTestUtils.deleteExportedFiles(EndToEndTestUtils.TCX);
+    EndToEndTestUtils.deleteExportedFiles(EndToEndTestUtils.CSV);
+    writeGPXTrackFile();
+
+    importTracks(EndToEndTestUtils.GPX);
+    checkImport();
+    checkSingleTrack();
+    EndToEndTestUtils.deleteExportedFiles(EndToEndTestUtils.GPX);
+
+    exportTracks(EndToEndTestUtils.KML);
+    exportTracks(EndToEndTestUtils.GPX);
+    exportTracks(EndToEndTestUtils.TCX);
+    exportTracks(EndToEndTestUtils.CSV);
+
+    EndToEndTestUtils.deleteAllTracks();
+    importTracks(EndToEndTestUtils.GPX);
+    checkImport();
+    checkSingleTrack();
+    EndToEndTestUtils.deleteAllTracks();
+    importTracks(EndToEndTestUtils.KML);
+    checkImport();
+    checkSingleTrack();
+  }
+
+  /**
+   * Checks the status of import.
+   */
+  private void checkImport() {
+    /*
+     * Wait for the prefix of import success string is much faster than wait the
+     * whole string.
+     */
+    EndToEndTestUtils.waitTextToDisappear(activityMyTracks
+        .getString(R.string.generic_progress_title));
+    EndToEndTestUtils.SOLO.waitForText(activityMyTracks.getString(R.string.import_success).split(
+        "%")[0]);
+
+    /*
+     * Check import KML tracks should be equal with the sum of trackNumber and
+     * KMLFilesNumber;
+     */
+    EndToEndTestUtils
+        .getButtonOnScreen(activityMyTracks.getString(R.string.generic_ok), true, true);
+    instrumentation.waitForIdleSync();
+  }
+
+  /**
+   * Checks the detail of one track.
+   */
+  private void checkSingleTrack() {
+    if (!PreferencesUtils.isMetricUnits(activityMyTracks)) {
+      EndToEndTestUtils.findMenuItem(activityMyTracks.getString(R.string.menu_settings), true);
+      EndToEndTestUtils.SOLO.clickOnText(activityMyTracks
+          .getString(R.string.track_detail_stats_tab));
+      assertTrue(EndToEndTestUtils.SOLO.waitForText(activityMyTracks
+          .getString(R.string.settings_stats_units_title)));
+
+      // Change preferred units.
+      EndToEndTestUtils.SOLO.clickOnText(activityMyTracks
+          .getString(R.string.settings_stats_units_title));
+      EndToEndTestUtils.SOLO.clickOnText(activityMyTracks.getString(R.string.unit_kilometer));
+      EndToEndTestUtils.SOLO.goBack();
+      EndToEndTestUtils.SOLO.goBack();
+    }
+    PreferencesUtils.setBoolean(activityMyTracks, R.string.stats_show_grade_elevation_key, true);
+
+    EndToEndTestUtils.SOLO.clickOnText(tracksName);
+    instrumentation.waitForIdleSync();
+    EndToEndTestUtils.SOLO.waitForActivity(TrackDetailActivity.class,
+        EndToEndTestUtils.LONG_WAIT_TIME);
+    EndToEndTestUtils.SOLO.clickOnText(activityMyTracks.getString(R.string.track_detail_stats_tab));
+    instrumentation.waitForIdleSync();
+
+    float acceptDeviation = 0.1f;
+    Activity detailActivity = EndToEndTestUtils.SOLO.getCurrentActivity();
+    float minAltitudeActual = Float.parseFloat(((TextView) detailActivity.findViewById(
+        R.id.stats_elevation_min).findViewById(R.id.stats_value)).getText().toString());
+    float maxAltitudeActual = Float.parseFloat(((TextView) detailActivity.findViewById(
+        R.id.stats_elevation_max).findViewById(R.id.stats_value)).getText().toString());
+    float distanceActual = Float.parseFloat(((TextView) detailActivity.findViewById(
+        R.id.stats_distance).findViewById(R.id.stats_value)).getText().toString());
+    float averageSpeedActual = Float.parseFloat(((TextView) detailActivity.findViewById(
+        R.id.stats_average_speed).findViewById(R.id.stats_value)).getText().toString());
+    // Seconds.
+    int timeSpan = 9;
+
+    float distance = 0;
+    double initialLat = 39.30;
+    double initialLng = 116;
+    Location start = new Location("gps");
+    start.setLatitude(initialLat);
+    start.setLongitude(initialLng);
+    for (int i = 1; i < 10; i++) {
+      Location end = new Location("gps");
+      end.setLatitude(initialLat - 0.0005 * i);
+      end.setLongitude(initialLng + 0.0005 * i);
+      distance = distance + end.distanceTo(start) / 1000;
+      start = end;
+    }
+
+    // KM/H
+    float averageSpeed = distance * 3600 / timeSpan;
+    assertEquals(Float.parseFloat(minAltitude), minAltitudeActual);
+    assertEquals(Float.parseFloat(maxAltitude), maxAltitudeActual);
+    Log.i(EndToEndTestUtils.LOG_TAG, distance + ":" + distanceActual);
+    assertTrue((distance - distanceActual) / distance < acceptDeviation);
+    assertTrue((averageSpeed - averageSpeedActual) / averageSpeed < acceptDeviation);
+
+    EndToEndTestUtils.SOLO.goBack();
+  }
+
+  /**
+   * Writes a GPX track file to MyTracks folder.
+   */
+  private void writeGPXTrackFile() {
+    String fileName = tracksName + ".gpx";
+    String fileContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?> "
+        + "<gpx "
+        + "version=\"1.1\" "
+        + "creator=\"Created by Google My Tracks on Android.\" "
+        + "xmlns=\"http://www.topografix.com/GPX/1/1\" "
+        + "xmlns:topografix=\"http://www.topografix.com/GPX/Private/TopoGrafix/0/1\" "
+        + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+        + "xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.topografix.com/GPX/Private/TopoGrafix/0/1 http://www.topografix.com/GPX/Private/TopoGrafix/0/1/topografix.xsd\"> "
+        + "<metadata> " + "<name><![CDATA[testTrackName1373523959524]]></name> "
+        + "<desc><![CDATA[testTrackDesc1373523959524]]></desc> " + "</metadata> " + "<trk> "
+        + "<name><![CDATA[testTrackName1373523959524]]></name> "
+        + "<desc><![CDATA[testTrackDesc1373523959524]]></desc> "
+        + "<type><![CDATA[TestActivity]]></type> "
+        + "<extensions><topografix:color>c0c0c0</topografix:color></extensions> " + "<trkseg> "
+        + "<trkpt lat=\"39.30\" lon=\"116\"> " + "<time>2013-07-10T08:00:00.000Z</time> <ele>"
+        + minAltitude
+        + "</ele>"
+        + "</trkpt> "
+        + "<trkpt lat=\"39.2995\" lon=\"116.0005\"> "
+        + "<time>2013-07-10T08:00:01.000Z</time> "
+        + "</trkpt> "
+        + "<trkpt lat=\"39.299\" lon=\"116.001\"> "
+        + "<time>2013-07-10T08:00:02.000Z</time> "
+        + "</trkpt> "
+        + "<trkpt lat=\"39.2985\" lon=\"116.0015\"> "
+        + "<time>2013-07-10T08:00:03.000Z</time> "
+        + "</trkpt> "
+        + "<trkpt lat=\"39.298\" lon=\"116.002\"> "
+        + "<time>2013-07-10T08:00:04.000Z</time> "
+        + "</trkpt> "
+        + "<trkpt lat=\"39.2975\" lon=\"116.0025\"> "
+        + "<time>2013-07-10T08:00:05.000Z</time> "
+        + "</trkpt> "
+        + "<trkpt lat=\"39.297\" lon=\"116.003\"> "
+        + "<time>2013-07-10T08:00:06.000Z</time> "
+        + "</trkpt> "
+        + "<trkpt lat=\"39.2965\" lon=\"116.0035\"> "
+        + "<time>2013-07-10T08:00:07.000Z</time> "
+        + "</trkpt> "
+        + "<trkpt lat=\"39.296\" lon=\"116.004\"> "
+        + "<time>2013-07-10T08:00:08.000Z</time> "
+        + "</trkpt> "
+        + "<trkpt lat=\"39.2955\" lon=\"116.0045\"> "
+        + "<time>2013-07-10T08:00:09.000Z</time> <ele>"
+        + maxAltitude
+        + "</ele>"
+        + "</trkpt> "
+        + "</trkseg> " + "</trk> " + "</gpx>";
+
+    try {
+      File file = new File(FileUtils.getDirectoryPath(EndToEndTestUtils.GPX.toLowerCase())
+          + File.separator + fileName);
+      FileOutputStream fop = new FileOutputStream(file);
+      // if file doesnt exists, then create it
+      if (!file.exists()) {
+        file.createNewFile();
+      }
+      // get the content in bytes
+      byte[] contentInBytes = fileContent.getBytes();
+      fop.write(contentInBytes);
+      fop.flush();
+      fop.close();
+      Log.i(EndToEndTestUtils.LOG_TAG, file.getAbsolutePath());
+    } catch (IOException e) {
+      fail();
+    }
   }
 }
