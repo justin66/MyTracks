@@ -35,6 +35,13 @@ limitations under the License.
       <TextView
         android:id="@+id/marker_detail_waypoint_description"
         style="@style/TextLarge.WithTopMargin" />
+      <ImageView
+        android:adjustViewBounds="true"
+        android:id="@+id/marker_detail_waypoint_photo"
+        android:layout_height="wrap_content"        
+        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
+        android:scaleType="centerInside" />
     </LinearLayout>
     <LinearLayout
       android:id="@+id/marker_detail_statistics_section"
