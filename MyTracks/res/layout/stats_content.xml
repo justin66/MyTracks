@@ -129,4 +129,19 @@ limitations under the License.
       android:id="@+id/stats_longitude"
       layout="@layout/stats_small_item" />
   </LinearLayout>
+  
+   <!-- Row 7: calories horizontal line -->
+  <View
+    android:id="@+id/stats_calories_horizontal_line"
+    style="@style/StatsHorizontalLine" />
+  <!-- Row 7: calories -->
+  <LinearLayout
+    android:id="@+id/stats_calories_container"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent" >
+    <!-- Calories value -->
+    <include
+      android:id="@+id/stats_calories"
+      layout="@layout/stats_small_item" />
+  </LinearLayout>
 </merge>

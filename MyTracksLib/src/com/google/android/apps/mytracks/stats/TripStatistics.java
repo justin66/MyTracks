@@ -62,6 +62,9 @@ public class TripStatistics implements Parcelable {
   // The min and max grade seen on this trip.
   private final ExtremityMonitor gradeExtremities = new ExtremityMonitor();
 
+  // The calorie expenditure of current track.
+  private double caloricExpenditure = 0;
+
   /**
    * Default constructor.
    */
@@ -86,6 +89,7 @@ public class TripStatistics implements Parcelable {
         other.elevationExtremities.getMin(), other.elevationExtremities.getMax());
     totalElevationGain = other.totalElevationGain;
     gradeExtremities.set(other.gradeExtremities.getMin(), other.gradeExtremities.getMax());
+    caloricExpenditure = other.caloricExpenditure;
   }
 
   /**
@@ -118,6 +122,7 @@ public class TripStatistics implements Parcelable {
       gradeExtremities.update(other.gradeExtremities.getMin());
       gradeExtremities.update(other.gradeExtremities.getMax());
     }
+    caloricExpenditure += other.caloricExpenditure;
   }
 
   /**
@@ -561,5 +566,28 @@ public class TripStatistics implements Parcelable {
     dest.writeDouble(totalElevationGain);
     dest.writeDouble(gradeExtremities.getMin());
     dest.writeDouble(gradeExtremities.getMax());
+  }
+
+  /**
+   * Adds calories value.
+   * 
+   * @param calories
+   */
+  public void addCaloticExpenditure(double calories) {
+    caloricExpenditure = caloricExpenditure + calories;
+  }
+  
+  /**
+   * Sets calories value.
+   */
+  public void setCaloricExpenditure(double value) {
+    caloricExpenditure = value;
+  }
+
+  /**
+   * Gets calories value.
+   */
+  public double getCaloricExpenditure() {
+    return caloricExpenditure;
   }
 }

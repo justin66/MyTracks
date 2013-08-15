@@ -20,6 +20,8 @@ import static com.google.android.apps.mytracks.Constants.TAG;
 import static com.google.android.apps.mytracks.services.TrackRecordingService.MAX_NO_MOVEMENT_SPEED;
 import static com.google.android.apps.mytracks.services.TrackRecordingService.PAUSE_LATITUDE;
 
+import com.google.android.apps.mytracks.util.CalorieUtils;
+import com.google.android.apps.mytracks.util.CalorieUtils.ActivityType;
 import com.google.android.apps.mytracks.util.LocationUtils;
 import com.google.common.annotations.VisibleForTesting;
 
@@ -180,13 +182,20 @@ public class TripStatisticsUpdater {
 
     // Update grade
     double run = lastLocation.distanceTo(location);
-    updateGrade(run, elevationDifference);    
+    updateGrade(run, elevationDifference);
 
     // Update max speed
     if (location.hasSpeed() && lastLocation.hasSpeed()) {
       updateSpeed(
           location.getTime(), location.getSpeed(), lastLocation.getTime(), lastLocation.getSpeed());
     }
+
+    // TODO 1: How to get the value of weight.
+    // TODO 2: How to get the value of ActivityType.
+    
+    double value = CalorieUtils.getCalories(lastMovingLocation, location,
+        gradeBuffer.getAverage(), 65, ActivityType.FOOT);
+    currentSegment.addCaloticExpenditure(value);
 
     lastLocation = location;
     lastMovingLocation = location;
