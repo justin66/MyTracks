@@ -24,6 +24,24 @@ public class UnitConversions {
 
   private UnitConversions() {}
 
+  // Milliliter to liter
+  public static final double ML_TO_L = 1 / 1000.0;
+
+  // Millisecond to second
+  public static final double MS_TO_S = 1 / 1000.0;
+
+  // Minute to second
+  public static final double MIN_TO_S = 60.0;
+
+  // Second to minute
+  public static final double S_TO_MIN = 1 / MIN_TO_S;
+
+  // Minute to hour
+  public static final double HR_TO_MIN = 60.0;
+
+  // Minute to hour
+  public static final double MIN_TO_HR = 1 / HR_TO_MIN;
+
   // multiplication factor to convert kilometers to miles
   public static final double KM_TO_MI = 0.621371192;
 
@@ -38,6 +56,8 @@ public class UnitConversions {
 
   // multiplication factor to convert meters to kilometers
   public static final double M_TO_KM = 1 / 1000.0;
+
+  public static final double KM_TO_M = 1 / M_TO_KM;
 
   // multiplication factor to convert meters per second to kilometers per hour
   public static final double MS_TO_KMH = 3.6;

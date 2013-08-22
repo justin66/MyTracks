@@ -38,7 +38,8 @@ public class StatsUtils {
 
   private static final String ELEVATION_FORMAT = "%1$.2f";
   private static final String GRADE_FORMAT = "%1$d";
-
+  private static final String CALORIES_FORMAT = "%1$.0f";
+  
   private StatsUtils() {}
 
   /**
@@ -172,6 +173,10 @@ public class StatsUtils {
       gradeElevationHorizontalLine.setVisibility(View.GONE);
       gradeElevationContainer.setVisibility(View.GONE);
     }
+    
+    // Set calories
+    double calories = tripStatistics == null ? Double.NaN : tripStatistics.getCalorie();
+    setCalorie(activity, R.id.stats_calorie, R.string.stats_calorie, calories);
   }
 
   /**
@@ -312,5 +317,18 @@ public class StatsUtils {
       }
     }
     valueTextView.setText(value);
+  }
+
+  /**
+   * Sets calorie.
+   * 
+   * @param activity the activity
+   * @param itemId the item id
+   * @param labelId the calorie label id
+   * @param calorie the value of calorie
+   */
+  private static void setCalorie(Activity activity, int itemId, int labelId, double calorie) {
+    setItem(activity, itemId, labelId,
+        String.format(Locale.getDefault(), CALORIES_FORMAT, calorie), activity.getString(R.string.unit_calorie));
   }
 }

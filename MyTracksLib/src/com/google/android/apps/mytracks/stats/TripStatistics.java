@@ -62,6 +62,9 @@ public class TripStatistics implements Parcelable {
   // The min and max grade seen on this trip.
   private final ExtremityMonitor gradeExtremities = new ExtremityMonitor();
 
+  // The calorie of current track.
+  private double calorie;
+
   /**
    * Default constructor.
    */
@@ -86,6 +89,7 @@ public class TripStatistics implements Parcelable {
         other.elevationExtremities.getMin(), other.elevationExtremities.getMax());
     totalElevationGain = other.totalElevationGain;
     gradeExtremities.set(other.gradeExtremities.getMin(), other.gradeExtremities.getMax());
+    calorie = other.calorie;
   }
 
   /**
@@ -118,6 +122,7 @@ public class TripStatistics implements Parcelable {
       gradeExtremities.update(other.gradeExtremities.getMin());
       gradeExtremities.update(other.gradeExtremities.getMax());
     }
+    calorie += other.calorie;
   }
 
   /**
@@ -488,7 +493,8 @@ public class TripStatistics implements Parcelable {
         + "; Max Longitude: " + getRightDegrees() + "; Max Speed: " + getMaxSpeed()
         + "; Min Elevation: " + getMinElevation() + "; Max Elevation: " + getMaxElevation()
         + "; Elevation Gain: " + getTotalElevationGain() + "; Min Grade: " + getMinGrade()
-        + "; Max Grade: " + getMaxGrade() + "}";
+        + "; Max Grade: " + getMaxGrade() + "; Calorie: " + getCalorie()
+        + "}";
   }
 
   /**
@@ -524,6 +530,8 @@ public class TripStatistics implements Parcelable {
       double minGrade = source.readDouble();
       double maxGrade = source.readDouble();
       data.gradeExtremities.set(minGrade, maxGrade);
+      
+      data.calorie = source.readDouble();
 
       return data;
     }
@@ -561,5 +569,31 @@ public class TripStatistics implements Parcelable {
     dest.writeDouble(totalElevationGain);
     dest.writeDouble(gradeExtremities.getMin());
     dest.writeDouble(gradeExtremities.getMax());
+    dest.writeDouble(calorie);
+  }
+
+  /**
+   * Adds calorie value.
+   * 
+   * @param calorieAdded add the value to the total calorie
+   */
+  public void addCalorie(double calorieAdded) {
+    this.calorie += calorieAdded;
+  }
+
+  /**
+   * Sets calorie value.
+   * 
+   * @param calorie the new value of calorie
+   */
+  public void setCalorie(double calorie) {
+    this.calorie = calorie;
+  }
+
+  /**
+   * Gets calories value.
+   */
+  public double getCalorie() {
+    return calorie;
   }
 }

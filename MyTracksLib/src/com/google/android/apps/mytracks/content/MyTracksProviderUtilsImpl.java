@@ -87,6 +87,7 @@ public class MyTracksProviderUtilsImpl implements MyTracksProviderUtils {
     int modifiedTimeIndex = cursor.getColumnIndexOrThrow(TracksColumns.MODIFIEDTIME);
     int sharedWithMeIndex = cursor.getColumnIndexOrThrow(TracksColumns.SHAREDWITHME);
     int sharedOwnerIndex = cursor.getColumnIndexOrThrow(TracksColumns.SHAREDOWNER);
+    int caloriesIndex = cursor.getColumnIndexOrThrow(TracksColumns.CALORIE);
     
     Track track = new Track();
     TripStatistics tripStatistics = track.getTripStatistics();
@@ -151,6 +152,9 @@ public class MyTracksProviderUtilsImpl implements MyTracksProviderUtils {
     }
     if (!cursor.isNull(maxGradeIndex)) {
       tripStatistics.setMaxGrade(cursor.getFloat(maxGradeIndex));
+    }
+    if (!cursor.isNull(caloriesIndex)) {
+      tripStatistics.setCalorie(cursor.getFloat(caloriesIndex));
     }
     if (!cursor.isNull(iconIndex)) {
       track.setIcon(cursor.getString(iconIndex));
@@ -316,6 +320,8 @@ public class MyTracksProviderUtilsImpl implements MyTracksProviderUtils {
     values.put(TracksColumns.MODIFIEDTIME, track.getModifiedTime());
     values.put(TracksColumns.SHAREDWITHME, track.isSharedWithMe());
     values.put(TracksColumns.SHAREDOWNER, track.getSharedOwner());
+    values.put(TracksColumns.CALORIE, tripStatistics.getCalorie());
+    
     return values;
   }
 

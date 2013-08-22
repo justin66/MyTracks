@@ -129,6 +129,9 @@ public class MyTracksProvider extends ContentProvider {
           Log.w(TAG, "Upgrade DB: Adding photo url column.");
           db.execSQL("ALTER TABLE " + WaypointsColumns.TABLE_NAME + " ADD " + WaypointsColumns.PHOTOURL
               + " STRING");
+          Log.w(TAG, "Upgrade DB: Adding track calorie column.");
+          db.execSQL("ALTER TABLE " + TracksColumns.TABLE_NAME + " ADD " + TracksColumns.CALORIE
+              + " INTEGER");
         }
       }
     }
