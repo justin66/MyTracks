@@ -2014,6 +2014,22 @@ limitations under the License.
       Character limit: ~23 (1 line)">
     Grade/Elevation
   </string>
+  <string name="settings_stats_calorie"
+    translation_description="In the 'Stats settings, the option to show calorie value.
+
+      Character limit: ~23 (1 line)">
+    Calorie
+  </string>
+  <string name="settings_stats_calorie_weight"
+    translation_description="In the 'Stats settings, the option to configure user's weight.
+
+      Character limit: ~23 (1 line)">
+    Weight
+  </string>
+  <string name="settings_stats_calorie_weight_summary"
+    translation_description="In the 'Stats settings, the description message about weight setting item.">
+    Your weight in kilogram. This value is used to calculate the calorie expenditure and would be private for yourself.
+  </string>
   <string name="settings_stats_rate_title"
     translation_description="In the 'Stats' settings, the option to change the preferred rate,
       either speed (mi/hr) or pace (min/mi).

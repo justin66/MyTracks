@@ -23,6 +23,7 @@ import static com.google.android.apps.mytracks.services.TrackRecordingService.PA
 import com.google.android.apps.mytracks.util.CalorieUtils;
 import com.google.android.apps.mytracks.util.CalorieUtils.ActivityType;
 import com.google.android.apps.mytracks.util.LocationUtils;
+import com.google.android.apps.mytracks.util.PreferencesUtils;
 import com.google.common.annotations.VisibleForTesting;
 
 import android.location.Location;
@@ -93,9 +94,6 @@ public class TripStatisticsUpdater {
 
   // A buffer of the recent speed readings (m/s) for calculating max speed
   private final DoubleBuffer speedBuffer = new DoubleBuffer(SPEED_SMOOTHING_FACTOR);
-
-  // Default weight, in kilogram
-  private int defaultWeight = 65;
   
   /**
    * Creates a new trip statistics updater.
@@ -195,10 +193,10 @@ public class TripStatisticsUpdater {
 
     // TODO 1: How to get the value of weight.
     // TODO 2: How to get the value of ActivityType.
-    
+
     // Update calorie
     double calorie = CalorieUtils.getCalories(lastMovingLocation, location,
-        gradeBuffer.getAverage(), defaultWeight, ActivityType.FOOT);
+        gradeBuffer.getAverage(), PreferencesUtils.STATS_WEIGHT_DEFAULT, ActivityType.FOOT);
     currentSegment.addCalorie(calorie);
 
     lastLocation = location;
