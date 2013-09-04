@@ -30,7 +30,6 @@ import com.google.android.apps.mytracks.util.PreferencesUtils;
 import com.google.android.apps.mytracks.util.StringUtils;
 import com.google.android.apps.mytracks.util.TrackIconUtils;
 import com.google.android.maps.mytracks.R;
-import com.google.common.annotations.VisibleForTesting;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -123,6 +122,7 @@ abstract class AbstractFileTrackImporter extends DefaultHandler implements Track
   protected String altitude;
   protected String time;
   protected String waypointType;
+  protected String photoUrl;
 
   /**
    * Constructor.
@@ -131,12 +131,7 @@ abstract class AbstractFileTrackImporter extends DefaultHandler implements Track
    * @param importTrackId the track id to import to. -1L to import to a new
    *          track.
    */
-  protected AbstractFileTrackImporter(Context context, long importTrackId) {
-    this(context, importTrackId, MyTracksProviderUtils.Factory.get(context));
-  }
-
-  @VisibleForTesting
-  protected AbstractFileTrackImporter(
+  AbstractFileTrackImporter(
       Context context, long importTrackId, MyTracksProviderUtils myTracksProviderUtils) {
     this.context = context;
     this.importTrackId = importTrackId;
@@ -175,7 +170,7 @@ abstract class AbstractFileTrackImporter extends DefaultHandler implements Track
    * @return an array of imported track ids.
    */
   public long[] importFile(InputStream inputStream)
-      throws SAXException, IOException, ParserConfigurationException {
+      throws IOException, ParserConfigurationException, SAXException {
     SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
     SAXParser saxParser = saxParserFactory.newSAXParser();
 
@@ -282,7 +277,7 @@ abstract class AbstractFileTrackImporter extends DefaultHandler implements Track
             // Insert waypoint
             Waypoint newWaypoint = new Waypoint(waypoint.getName(), waypointDescription,
                 waypoint.getCategory(), icon, track.getId(), waypoint.getType(), length, duration,
-                -1L, -1L, trackPoint, tripStatistics, "");
+                -1L, -1L, trackPoint, tripStatistics, waypoint.getPhotoUrl());
             myTracksProviderUtils.insertWaypoint(newWaypoint);
           }
           waypoint = null;
@@ -387,6 +382,10 @@ abstract class AbstractFileTrackImporter extends DefaultHandler implements Track
       waypoint.setCategory(category);
     }
     waypoint.setType(type);
+    
+    if (photoUrl != null) {
+      waypoint.setPhotoUrl(photoUrl);
+    }
     waypoints.add(waypoint);
   }
 

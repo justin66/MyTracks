@@ -72,12 +72,20 @@ public class CsvTrackWriter implements TrackWriter {
   }
 
   @Override
-  public void prepare(OutputStream out) {
-    printWriter = new PrintWriter(out);
+  public void prepare(OutputStream outputStream) {
+    printWriter = new PrintWriter(outputStream);
     segmentIndex = 0;
     pointIndex = 0;
   }
 
+  @Override
+  public void close() {
+    if (printWriter != null) {
+      printWriter.flush();
+      printWriter = null;
+    }
+  }
+  
   @Override
   public void writeHeader(Track track) {
     writeCommaSeparatedLine(context.getString(R.string.generic_name),

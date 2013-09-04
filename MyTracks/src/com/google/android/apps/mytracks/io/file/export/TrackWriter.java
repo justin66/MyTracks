@@ -65,6 +65,11 @@ public interface TrackWriter {
   public void prepare(OutputStream outputStream);
 
   /**
+   * Closes the underlying file handler.
+   */
+  public void close();
+
+  /**
    * Writes the header for a file
    * 
    * @param track the track

@@ -348,7 +348,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
       if (driveFile != null) {
         InputStream inputStream = downloadDriveFile(driveFile, true);
         if (inputStream != null) {
-          KmlFileTrackImporter kmlFileTrackImporter = new KmlFileTrackImporter(context, -1L);
+          KmlFileTrackImporter kmlFileTrackImporter = new KmlFileTrackImporter(context, -1L, null);
           try {
             long[] trackIds = kmlFileTrackImporter.importFile(inputStream);
             if (trackIds.length == 1) {
@@ -494,7 +494,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
       Log.e(TAG, "Unable to update track. Input stream is null for track " + track.getName());
       return false;
     }
-    KmlFileTrackImporter kmlFileTrackImporter = new KmlFileTrackImporter(context, track.getId());
+    KmlFileTrackImporter kmlFileTrackImporter = new KmlFileTrackImporter(
+        context, track.getId(), null);
     try {
       long[] trackIds = kmlFileTrackImporter.importFile(inputStream);
       if (trackIds.length == 1) {

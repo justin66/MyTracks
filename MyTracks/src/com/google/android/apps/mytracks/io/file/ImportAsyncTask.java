@@ -16,12 +16,15 @@
 
 package com.google.android.apps.mytracks.io.file;
 
+import com.google.android.apps.mytracks.io.file.export.KmzTrackExporter;
+import com.google.android.apps.mytracks.util.FileUtils;
 import com.google.android.apps.mytracks.util.PreferencesUtils;
 import com.google.android.apps.mytracks.util.SystemUtils;
 import com.google.android.maps.mytracks.R;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.os.PowerManager.WakeLock;
 import android.util.Log;
 
@@ -158,9 +161,23 @@ public class ImportAsyncTask extends AsyncTask<Void, Integer, Boolean> {
    */
   private boolean importFile(final File file) {
     try {
-      TrackImporter trackImporter = trackFileFormat == TrackFileFormat.KML ? new KmlFileTrackImporter(
-          context, -1L)
-          : new GpxFileTrackImporter(context, -1L);
+      TrackImporter trackImporter;
+      if (trackFileFormat == TrackFileFormat.KML) {
+        String name = file.getName();
+        if (name.endsWith("." + TrackFileFormat.KML.getExtension())) {
+          trackImporter = new KmlFileTrackImporter(context, -1L, null);
+        } else {
+          File dir = new File(
+              Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+              FileUtils.SDCARD_TOP_DIR);
+          FileUtils.ensureDirectoryExists(dir);
+          dir = new File(dir, name.substring(0, name.lastIndexOf('.')));
+          FileUtils.ensureDirectoryExists(dir);          
+          trackImporter = new KmzTrackImporter(context, dir.getPath());
+        }
+      } else {
+        trackImporter = new GpxFileTrackImporter(context);
+      }      
       long trackIds[] = trackImporter.importFile(new FileInputStream(file));
       int length = trackIds.length;
       if (length > 0) {
@@ -185,10 +202,17 @@ public class ImportAsyncTask extends AsyncTask<Void, Integer, Boolean> {
       File[] candidates = file.listFiles();
       if (candidates != null) {
         for (File candidate : candidates) {
-          if (!candidate.isDirectory() && candidate.getName()
-              .endsWith(trackFileFormat == TrackFileFormat.KML ? ".kml" : ".gpx")) {
-            files.add(candidate);
-          }
+          if (!candidate.isDirectory()) {
+            String name = candidate.getName();
+            if (trackFileFormat == TrackFileFormat.KML && (
+                name.endsWith("." + TrackFileFormat.KML.getExtension())
+                || name.endsWith("." + KmzTrackExporter.KMZ_EXTENSION))) {
+              files.add(candidate);
+            } else if (trackFileFormat == TrackFileFormat.GPX
+                && name.endsWith("." + TrackFileFormat.GPX.getExtension())) {
+              files.add(candidate);
+            } 
+          }         
         }
       }
     } else {

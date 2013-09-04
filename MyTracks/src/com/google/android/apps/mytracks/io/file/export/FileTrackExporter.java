@@ -81,6 +81,7 @@ public class FileTrackExporter extends AbstractTrackExporter {
       writeLocations(tracks[i], offset);
     }
     trackWriter.writeFooter();
+    trackWriter.close();
   }
 
   /**

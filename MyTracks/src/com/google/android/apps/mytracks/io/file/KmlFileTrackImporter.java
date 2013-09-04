@@ -25,7 +25,9 @@ import com.google.common.annotations.VisibleForTesting;
 
 import android.content.Context;
 import android.location.Location;
+import android.net.Uri;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import org.xml.sax.Attributes;
@@ -52,8 +54,10 @@ public class KmlFileTrackImporter extends AbstractFileTrackImporter {
   private static final String TAG_GX_SIMPLE_ARRAY_DATA = "gx:SimpleArrayData";
   private static final String TAG_GX_TRACK = "gx:Track";
   private static final String TAG_GX_VALUE = "gx:value";
+  private static final String TAG_HREF = "href";
   private static final String TAG_KML = "kml";
   private static final String TAG_NAME = "name";
+  private static final String TAG_PHOTO_OVERLAY = "PhotoOverlay";
   private static final String TAG_PLACEMARK = "Placemark";
   private static final String TAG_STYLE_URL = "styleUrl";
   private static final String TAG_VALUE = "value";
@@ -61,6 +65,7 @@ public class KmlFileTrackImporter extends AbstractFileTrackImporter {
 
   private static final String ATTRIBUTE_NAME = "name";
 
+  private final String photoPath;
   private boolean trackStarted = false;
   private String sensorName;
   private ArrayList<Location> locationList;
@@ -74,19 +79,21 @@ public class KmlFileTrackImporter extends AbstractFileTrackImporter {
    * @param context the context
    * @param importTrackId track id to import to. -1L to import to a new track.
    */
-  public KmlFileTrackImporter(Context context, long importTrackId) {
-    super(context, importTrackId);
+  public KmlFileTrackImporter(Context context, long importTrackId, String photoPath) {
+    this(context, importTrackId, photoPath, MyTracksProviderUtils.Factory.get(context));
   }
 
   @VisibleForTesting
-  public KmlFileTrackImporter(Context context, MyTracksProviderUtils myTracksProviderUtils) {
-    super(context, -1L, myTracksProviderUtils);
+  public KmlFileTrackImporter(Context context, long importTrackId, String photoPath,
+      MyTracksProviderUtils myTracksProviderUtils) {
+    super(context, importTrackId, myTracksProviderUtils);
+    this.photoPath = photoPath;
   }
 
   @Override
   public void startElement(String uri, String localName, String tag, Attributes attributes)
       throws SAXException {
-    if (tag.equals(TAG_PLACEMARK)) {
+    if (tag.equals(TAG_PLACEMARK) || tag.equals(TAG_PHOTO_OVERLAY)) {
       onWaypointStart();
     } else if (tag.equals(TAG_GX_MULTI_TRACK)) {
       trackStarted = true;
@@ -105,7 +112,7 @@ public class KmlFileTrackImporter extends AbstractFileTrackImporter {
   public void endElement(String uri, String localName, String tag) throws SAXException {
     if (tag.equals(TAG_KML)) {
       onFileEnd();
-    } else if (tag.equals(TAG_PLACEMARK)) {
+    } else if (tag.equals(TAG_PLACEMARK) || tag.equals(TAG_PHOTO_OVERLAY)) {
       onWaypointEnd();
     } else if (localName.equals(TAG_COORDINATES)) {
       onWaypointLocationEnd();
@@ -137,6 +144,10 @@ public class KmlFileTrackImporter extends AbstractFileTrackImporter {
       if (content != null) {
         waypointType = content.trim();
       }
+    } else if (localName.equals(TAG_HREF)) {
+      if (content != null) {
+        photoUrl = content.trim();
+      }
     }
 
     // Reset element content
@@ -156,6 +167,7 @@ public class KmlFileTrackImporter extends AbstractFileTrackImporter {
     altitude = null;
     time = null;
     waypointType = null;
+    photoUrl = null;
   }
 
   /**
@@ -171,6 +183,10 @@ public class KmlFileTrackImporter extends AbstractFileTrackImporter {
     }
     if (type == null) {
       return;
+    }
+    if (photoUrl != null && photoPath != null) {
+      Uri uri = Uri.parse(photoUrl);
+      photoUrl = photoPath + File.separatorChar + uri.getLastPathSegment(); 
     }
     addWaypoint(type);
   }

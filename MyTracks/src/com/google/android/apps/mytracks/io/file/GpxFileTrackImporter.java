@@ -52,14 +52,13 @@ public class GpxFileTrackImporter extends AbstractFileTrackImporter {
    * Constructor.
    * 
    * @param context the context
-   * @param importTrackId track id to import to. -1L to import to a new track.
    */
-  public GpxFileTrackImporter(Context context, long importTrackId) {
-    super(context, importTrackId);
+  public GpxFileTrackImporter(Context context) {
+    this(context, MyTracksProviderUtils.Factory.get(context));
   }
 
   @VisibleForTesting
-  public GpxFileTrackImporter(Context context, MyTracksProviderUtils myTracksProviderUtils) {
+  GpxFileTrackImporter(Context context, MyTracksProviderUtils myTracksProviderUtils) {
     super(context, -1L, myTracksProviderUtils);
   }
 

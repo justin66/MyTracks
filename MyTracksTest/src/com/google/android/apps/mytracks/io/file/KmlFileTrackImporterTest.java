@@ -86,7 +86,7 @@ public class KmlFileTrackImporterTest extends AbstractTestFileTrackImporter {
 
     InputStream inputStream = new ByteArrayInputStream(VALID_ONE_TRACK_ONE_SEGMENT_GPX.getBytes());
     KmlFileTrackImporter kmlFileTrackImporter = new KmlFileTrackImporter(
-        getContext(), myTracksProviderUtils);
+        getContext(), -1L, null, myTracksProviderUtils);
     long[] trackIds = kmlFileTrackImporter.importFile(inputStream);
     assertEquals(1, trackIds.length);
     assertEquals(TRACK_ID_0, trackIds[0]);
@@ -120,7 +120,7 @@ public class KmlFileTrackImporterTest extends AbstractTestFileTrackImporter {
 
     InputStream inputStream = new ByteArrayInputStream(VALID_ONE_TRACK_TWO_SEGMENTS_GPX.getBytes());
     KmlFileTrackImporter kmlFileTrackImporter = new KmlFileTrackImporter(
-        getContext(), myTracksProviderUtils);
+        getContext(), -1L, null, myTracksProviderUtils);
     long[] trackIds = kmlFileTrackImporter.importFile(inputStream);
     assertEquals(1, trackIds.length);
     assertEquals(TRACK_ID_0, trackIds[0]);

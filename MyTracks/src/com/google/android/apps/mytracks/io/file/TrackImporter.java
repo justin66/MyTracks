@@ -30,5 +30,5 @@ import org.xml.sax.SAXException;
 public interface TrackImporter {
 
   public long[] importFile(InputStream inputStream)
-      throws SAXException, IOException, ParserConfigurationException;
+      throws IOException, ParserConfigurationException, SAXException;
 }

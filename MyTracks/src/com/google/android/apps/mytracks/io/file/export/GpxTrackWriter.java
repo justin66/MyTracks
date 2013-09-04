@@ -68,6 +68,14 @@ public class GpxTrackWriter implements TrackWriter {
   public void prepare(OutputStream outputStream) {
     this.printWriter = new PrintWriter(outputStream);
   }
+  
+  @Override
+  public void close() {
+    if (printWriter != null) {
+      printWriter.flush();
+      printWriter = null;
+    }
+  }
 
   @Override
   public void writeHeader(Track track) {

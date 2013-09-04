@@ -93,8 +93,16 @@ public class TcxTrackWriter implements TrackWriter {
   }
 
   @Override
-  public void prepare(OutputStream out) {
-    this.printWriter = new PrintWriter(out);
+  public void prepare(OutputStream outputStream) {
+    this.printWriter = new PrintWriter(outputStream);
+  }
+  
+  @Override
+  public void close() {
+    if (printWriter != null) {
+      printWriter.flush();
+      printWriter = null;
+    }
   }
 
   @Override

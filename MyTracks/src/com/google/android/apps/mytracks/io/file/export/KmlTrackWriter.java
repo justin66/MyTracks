@@ -105,6 +105,14 @@ public class KmlTrackWriter implements TrackWriter {
   }
 
   @Override
+  public void close() {
+    if (printWriter != null) {
+      printWriter.flush();
+      printWriter = null;
+    }
+  }
+
+  @Override
   public void writeHeader(Track track) {
     if (printWriter != null) {
       printWriter.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
