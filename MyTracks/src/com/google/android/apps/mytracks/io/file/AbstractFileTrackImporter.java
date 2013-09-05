@@ -95,6 +95,8 @@ abstract class AbstractFileTrackImporter extends DefaultHandler implements Track
     int numBufferedLocations = 0;
   }
 
+  private static final String TAG = AbstractFileTrackImporter.class.getSimpleName();
+  
   // The maximum number of buffered locations for bulk-insertion
   private static final int MAX_BUFFERED_LOCATIONS = 512;
 
@@ -163,36 +165,33 @@ abstract class AbstractFileTrackImporter extends DefaultHandler implements Track
     }
   }
 
-  /**
-   * Imports a file.
-   * 
-   * @param inputStream the input stream.
-   * @return an array of imported track ids.
-   */
-  public long[] importFile(InputStream inputStream)
-      throws IOException, ParserConfigurationException, SAXException {
-    SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
-    SAXParser saxParser = saxParserFactory.newSAXParser();
-
+  @Override
+  public long importFile(InputStream inputStream) {
     try {
+      SAXParser saxParser = SAXParserFactory.newInstance().newSAXParser();
       long start = System.currentTimeMillis();
 
       saxParser.parse(inputStream, this);
-
-      long end = System.currentTimeMillis();
-      Log.d(Constants.TAG, "Total import time: " + (end - start) + "ms");
-    } catch (SAXException e) {
-      handleException();
-      throw e;
+      Log.d(Constants.TAG, "Total import time: " + (System.currentTimeMillis() - start) + "ms");
+      if (trackIds.size() != 1) {
+        Log.d(TAG, trackIds.size() + " tracks imported");
+        cleanImport();
+        return -1L;
+      }
+      return trackIds.get(0);
     } catch (IOException e) {
-      handleException();
-      throw e;
+      Log.e(TAG, "Unable to import file", e);
+      cleanImport();
+      return -1L;
+    } catch (ParserConfigurationException e) {
+      Log.e(TAG, "Unable to import file", e);
+      cleanImport();
+      return -1L;
+    } catch (SAXException e) {
+      Log.e(TAG, "Unable to import file", e);
+      cleanImport();
+      return -1L;
     }
-    long[] result = new long[trackIds.size()];
-    for (int i = 0; i < result.length; i++) {
-      result[i] = trackIds.get(i);
-    }
-    return result;
   }
 
   /**
@@ -594,9 +593,9 @@ abstract class AbstractFileTrackImporter extends DefaultHandler implements Track
   }
 
   /**
-   * Handles an exception.
+   * Cleans up import.
    */
-  private void handleException() {
+  private void cleanImport() {
     for (long trackId : trackIds) {
       myTracksProviderUtils.deleteTrack(trackId);
     }

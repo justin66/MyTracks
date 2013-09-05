@@ -30,6 +30,7 @@ import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -133,9 +134,6 @@ public class ImportAsyncTask extends AsyncTask<Void, Integer, Boolean> {
         publishProgress(i + 1, totalCount);
       }
       return true;
-    } catch (IOException e) {
-      Log.e(TAG, "IOException", e);
-      return false;
     } finally {
       if (wakeLock != null && wakeLock.isHeld()) {
         wakeLock.release();
@@ -158,12 +156,20 @@ public class ImportAsyncTask extends AsyncTask<Void, Integer, Boolean> {
     }
   }
 
+  @Override
+  protected void onCancelled() {
+    completed = true;
+    if (importActivity != null) {
+      importActivity.onAsyncTaskCompleted(successCount, totalCount, trackId);
+    }
+  }
+  
   /**
    * Imports a file.
    * 
    * @param file the file
    */
-  private boolean importFile(final File file) throws IOException {
+  private boolean importFile(final File file) {
     FileInputStream fileInputStream = null;
     try {
       TrackImporter trackImporter;
@@ -177,29 +183,29 @@ public class ImportAsyncTask extends AsyncTask<Void, Integer, Boolean> {
               FileUtils.SDCARD_TOP_DIR);
           FileUtils.ensureDirectoryExists(dir);
           dir = new File(dir, name.substring(0, name.lastIndexOf('.')));
-          FileUtils.ensureDirectoryExists(dir);          
+          FileUtils.ensureDirectoryExists(dir);
           trackImporter = new KmzTrackImporter(context, dir.getPath());
         }
       } else {
         trackImporter = new GpxFileTrackImporter(context);
       }
       fileInputStream = new FileInputStream(file);
-      long trackIds[] = trackImporter.importFile(fileInputStream);
-      int length = trackIds.length;
-      if (length > 0) {
-        trackId = trackIds[length - 1];
-      }
-      return true;
-    } catch (Exception e) {
-      Log.d(TAG, "file: " + file.getAbsolutePath(), e);
+      trackId = trackImporter.importFile(fileInputStream);
+      return trackId != -1L;
+    } catch (FileNotFoundException e) {
+      Log.e(TAG, "Unable to import file", e);
       return false;
     } finally {
       if (fileInputStream != null) {
-        fileInputStream.close();        
+        try {
+          fileInputStream.close();
+        } catch (IOException e) {
+          Log.e(TAG, "Unable to close file input stream", e);
+        }
       }
     }
   }
-
+  
   /**
    * Gets a list of files. If importAll is true, returns a list of the files
    * under the path directory. If importAll is false, returns a list containing

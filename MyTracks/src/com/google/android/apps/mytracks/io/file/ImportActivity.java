@@ -142,7 +142,6 @@ public class ImportActivity extends Activity {
               public void onCancel(DialogInterface dialog) {
                 importAsyncTask.cancel(true);
                 dialog.dismiss();
-                finish();
               }
             }, directoryDisplayName);
         return progressDialog;

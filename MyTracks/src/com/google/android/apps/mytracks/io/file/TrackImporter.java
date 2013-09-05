@@ -15,12 +15,7 @@
  */
 package com.google.android.apps.mytracks.io.file;
 
-import java.io.IOException;
 import java.io.InputStream;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.xml.sax.SAXException;
 
 /**
  * Interface for a track importer.
@@ -29,6 +24,11 @@ import org.xml.sax.SAXException;
  */
 public interface TrackImporter {
 
-  public long[] importFile(InputStream inputStream)
-      throws IOException, ParserConfigurationException, SAXException;
+  /**
+   * Import a file.
+   * 
+   * @param inputStream the file's input stream
+   * @return the imported track id or -1L.
+   */
+  public long importFile(InputStream inputStream);
 }

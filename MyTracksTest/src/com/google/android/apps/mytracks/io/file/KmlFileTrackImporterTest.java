@@ -87,9 +87,8 @@ public class KmlFileTrackImporterTest extends AbstractTestFileTrackImporter {
     InputStream inputStream = new ByteArrayInputStream(VALID_ONE_TRACK_ONE_SEGMENT_GPX.getBytes());
     KmlFileTrackImporter kmlFileTrackImporter = new KmlFileTrackImporter(
         getContext(), -1L, null, myTracksProviderUtils);
-    long[] trackIds = kmlFileTrackImporter.importFile(inputStream);
-    assertEquals(1, trackIds.length);
-    assertEquals(TRACK_ID_0, trackIds[0]);
+    long trackId = kmlFileTrackImporter.importFile(inputStream);
+    assertEquals(TRACK_ID_0, trackId);
 
     long time0 = DATE_FORMAT_0.parse(TRACK_TIME_0).getTime();
     long time1 = DATE_FORMAT_1.parse(TRACK_TIME_1).getTime();
@@ -121,9 +120,8 @@ public class KmlFileTrackImporterTest extends AbstractTestFileTrackImporter {
     InputStream inputStream = new ByteArrayInputStream(VALID_ONE_TRACK_TWO_SEGMENTS_GPX.getBytes());
     KmlFileTrackImporter kmlFileTrackImporter = new KmlFileTrackImporter(
         getContext(), -1L, null, myTracksProviderUtils);
-    long[] trackIds = kmlFileTrackImporter.importFile(inputStream);
-    assertEquals(1, trackIds.length);
-    assertEquals(TRACK_ID_0, trackIds[0]);
+    long trackId = kmlFileTrackImporter.importFile(inputStream);
+    assertEquals(TRACK_ID_0, trackId);
 
     long time0 = DATE_FORMAT_0.parse(TRACK_TIME_0).getTime();
     long time1 = DATE_FORMAT_1.parse(TRACK_TIME_1).getTime();

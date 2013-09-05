@@ -56,10 +56,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.xml.sax.SAXException;
-
 /**
  * SyncAdapter to sync tracks with Google Drive.
  * 
@@ -355,26 +351,17 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
           continue;
         }
         KmlFileTrackImporter kmlFileTrackImporter = new KmlFileTrackImporter(context, -1L, null);
-        long[] trackIds = kmlFileTrackImporter.importFile(inputStream);
-        if (trackIds.length == 1) {
-          Track track = myTracksProviderUtils.getTrack(trackIds[0]);
+        long trackId = kmlFileTrackImporter.importFile(inputStream);
+        if (trackId != -1L) {
+          Track track = myTracksProviderUtils.getTrack(trackId);
           if (track == null) {
             Log.e(TAG, "Unable to insert new drive file for " + driveFile.getId());
             continue;
           }
           SyncUtils.updateTrackWithDriveFileInfo(myTracksProviderUtils, track, driveFile);
           Log.d(TAG, "Add from Google Drive " + track.getName());
-        } else {
-          // Clean up if imported more than one track
-          for (int i = 0; i < trackIds.length; i++) {
-            myTracksProviderUtils.deleteTrack(trackIds[i]);
-          }
         }
-      } catch (SAXException e) {
-        Log.e(TAG, "Unable to insert new drive file for " + driveFile.getId(), e);
       } catch (IOException e) {
-        Log.e(TAG, "Unable to insert new drive file for " + driveFile.getId(), e);
-      } catch (ParserConfigurationException e) {
         Log.e(TAG, "Unable to insert new drive file for " + driveFile.getId(), e);
       } finally {
         if (inputStream != null) {
@@ -505,9 +492,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
       }
       KmlFileTrackImporter kmlFileTrackImporter = new KmlFileTrackImporter(
           context, track.getId(), null);
-      long[] trackIds = kmlFileTrackImporter.importFile(inputStream);
-      if (trackIds.length == 1) {
-        Track newTrack = myTracksProviderUtils.getTrack(trackIds[0]);
+      long trackId = kmlFileTrackImporter.importFile(inputStream);
+      if (trackId != -1L) {
+        Track newTrack = myTracksProviderUtils.getTrack(trackId);
         if (newTrack == null) {
           Log.e(TAG, "Unable to merge, imported track is null");
         } else {
@@ -515,12 +502,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
           return true;
         }
       } else {
-        Log.e(TAG, "Unable to merge, imported size is not 1");
+        Log.e(TAG, "Unable to merge, track id is -1L");
       }
-    } catch (SAXException e) {
-      Log.e(TAG, "Unable to merge", e);
-    } catch (ParserConfigurationException e) {
-      Log.e(TAG, "Unable to merge", e);
     } catch (IOException e) {
       Log.e(TAG, "Unable to merge", e);
     } finally {
