@@ -350,17 +350,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
       if (driveFile == null) {
         return;
       }
-      boolean success = false;
-      long trackId = -1L;
-      try {
-        Uri uri = myTracksProviderUtils.insertTrack(new Track());
-        trackId = Long.parseLong(uri.getLastPathSegment());
-        success = updateTrack(trackId, driveFile);
-      } finally {
-        if (!success && trackId != -1L) {
-          myTracksProviderUtils.deleteTrack(trackId);
-        }
-      }
+      updateTrack(-1L, driveFile);
     }
   }
 
@@ -449,8 +439,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
           + driveFile.getTitle());
       if (!updateTrack(track.getId(), driveFile)) {
         Log.e(TAG, "Unable to update drive change");
-        track.setModifiedTime(driveModifiedTime);
-        myTracksProviderUtils.updateTrack(track);
+        // The track could have been deleted in the unsuccessful update attempt
+        track = myTracksProviderUtils.getTrack(track.getId());
+        if (track != null) {
+          track.setModifiedTime(driveModifiedTime);
+          myTracksProviderUtils.updateTrack(track);
+        }
       }
     }
   }
@@ -458,7 +452,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
   /**
    * Updates a track based on a drive file. Returns true if successful.
    * 
-   * @param trackId the track id
+   * @param trackId the track id. -1L to insert a new track
    * @param driveFile the drive file
    */
   private boolean updateTrack(long trackId, File driveFile) throws IOException {
@@ -501,7 +495,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
   /**
    * Imports drive file to track.
    * 
-   * @param trackId the track id
+   * @param trackId the track id. -1L to insert a new track
    * @param driveFile the drive file
    */
   private Track importDriveFile(long trackId, File driveFile) throws IOException {
@@ -509,14 +503,17 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     try {
       inputStream = downloadDriveFile(driveFile, true);
       if (inputStream == null) {
-        Log.e(TAG,
-            "Unable to import file. Input stream is null for drive file " + driveFile.getTitle());
+        Log.e(TAG, "Unable to import drive file. Input stream is null.");
         return null;
       }
 
       TrackImporter trackImporter;
       boolean useKmz = KmzTrackExporter.KMZ_EXTENSION.equals(driveFile.getFileExtension());
       if (useKmz) {
+        if (trackId == -1L) {
+          Uri uri = myTracksProviderUtils.insertTrack(new Track());
+          trackId = Long.parseLong(uri.getLastPathSegment());          
+        }
         trackImporter = new KmzTrackImporter(context, trackId);
       } else {
         trackImporter = new KmlFileTrackImporter(context, trackId);
@@ -524,18 +521,18 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
       long importedId = trackImporter.importFile(inputStream);
       if (importedId == -1L) {
-        Log.e(TAG, "Unable to merge, imported id is -1L");
+        Log.e(TAG, "Unable to import drive file. Imported id is -1L.");
         return null;
       }
       Track track = myTracksProviderUtils.getTrack(importedId);
       if (track == null) {
-        Log.e(TAG, "Unable to merge, imported track is null");
+        Log.e(TAG, "Unable to import drive file. Imported track is null.");
         return null;
       } else {
         return track;
       }
     } catch (IOException e) {
-      Log.e(TAG, "Unable to merge", e);
+      Log.e(TAG, "Unable to import drive file.", e);
       return null;
     } finally {
       if (inputStream != null) {
