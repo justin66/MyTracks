@@ -58,8 +58,7 @@ public class TripStatisticsUpdater {
   /**
    * The number of grade readings to smooth to get a somewhat accurate signal.
    */
-  @VisibleForTesting
-  static final int GRADE_SMOOTHING_FACTOR = 5;
+  public static final int GRADE_SMOOTHING_FACTOR = 5;
 
   /**
    * The number of speed reading to smooth to get a somewhat accurate signal.

@@ -18,6 +18,8 @@ package com.google.android.apps.mytracks.util;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils;
 import com.google.android.apps.mytracks.content.MyTracksProviderUtils.LocationIterator;
 import com.google.android.apps.mytracks.content.Track;
+import com.google.android.apps.mytracks.stats.DoubleBuffer;
+import com.google.android.apps.mytracks.stats.TripStatisticsUpdater;
 import com.google.android.maps.mytracks.R;
 import com.google.common.annotations.VisibleForTesting;
 
@@ -289,12 +291,16 @@ public class CalorieUtils {
     long trackId = track.getId();
     LocationIterator points = providerUtils.getTrackPointLocationIterator(trackId, -1, false,
         MyTracksProviderUtils.DEFAULT_LOCATION_FACTORY);
-    // TODO How get grade
-    double grade = 0;
+
+    DoubleBuffer gradeBuffer = new DoubleBuffer(TripStatisticsUpdater.GRADE_SMOOTHING_FACTOR);
+
     if (points.hasNext()) {
       Location start = points.next();
+
       while (points.hasNext()) {
         Location stop = points.next();
+        double grade = updateGrade(gradeBuffer, stop.distanceTo(start),
+            stop.getAltitude() - start.getAltitude());
         calorie += getCalorie(start, stop, grade, PreferencesUtils.getInt(context,
             R.string.stats_weight_key, PreferencesUtils.STATS_WEIGHT_DEFAULT), activityType);
         start = stop;
@@ -302,5 +308,24 @@ public class CalorieUtils {
     }
     return calorie;
   }
-  
+
+  /**
+   * Updates a grade reading.
+   * 
+   * @param gradeBuffer
+   * @param distance
+   * @param rise
+   * @return
+   */
+  private static double updateGrade(DoubleBuffer gradeBuffer, float distance, Double rise) {
+    double grade = 0;
+    if (rise > 0 && distance > 0) {
+      gradeBuffer.setNext(rise / distance);
+      grade = gradeBuffer.getAverage();
+    } else {
+      gradeBuffer.setNext(0);
+    }
+    return grade;
+  }
+
 }
