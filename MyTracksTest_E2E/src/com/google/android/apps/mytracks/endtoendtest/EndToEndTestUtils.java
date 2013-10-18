@@ -79,6 +79,7 @@ public class EndToEndTestUtils {
   public static final String TRACK_DESC_PREFIX = "testTrackDesc";
   public static final String GPX = "gpx";
   public static final String KML = "kml";
+  public static final String KMZ = "kmz";
   public static final String CSV = "csv";
   public static final String TCX = "tcx";
   public static final String BACKUPS = "backups";
@@ -532,7 +533,9 @@ public class EndToEndTestUtils {
     FileFilter filter = new FileFilter() {
       @Override
       public boolean accept(File pathname) {
-        return pathname.getName().indexOf("." + trackKind) > 0;
+        String postFix = trackKind.equalsIgnoreCase(EndToEndTestUtils.KML) ? EndToEndTestUtils.KMZ
+            : trackKind;
+        return pathname.getName().indexOf("." + postFix) > 0;
       }
     };
     return (new File(directoryPath)).listFiles(filter);

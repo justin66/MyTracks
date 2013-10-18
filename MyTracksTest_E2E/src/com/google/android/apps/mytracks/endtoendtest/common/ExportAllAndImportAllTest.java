@@ -59,8 +59,8 @@ public class ExportAllAndImportAllTest extends ActivityInstrumentationTestCase2<
     instrumentation = getInstrumentation();
     activityMyTracks = getActivity();
     EndToEndTestUtils.setupForAllTest(instrumentation, activityMyTracks);
-    trackNumber = EndToEndTestUtils.SOLO.getCurrentViews(ListView.class).get(0).getCount();
     EndToEndTestUtils.createTrackIfEmpty(1, true);
+    trackNumber = EndToEndTestUtils.SOLO.getCurrentViews(ListView.class).get(0).getCount();
   }
 
   /**
@@ -481,8 +481,8 @@ public class ExportAllAndImportAllTest extends ActivityInstrumentationTestCase2<
         + "</trkseg> " + "</trk> " + "</gpx>";
 
     try {
-      File file = new File(FileUtils.getPath(EndToEndTestUtils.GPX.toLowerCase())
-          + File.separator + fileName);
+      File file = new File(FileUtils.getPath(EndToEndTestUtils.GPX.toLowerCase()) + File.separator
+          + fileName);
       FileOutputStream fop = new FileOutputStream(file);
       // if file doesnt exists, then create it
       if (!file.exists()) {
