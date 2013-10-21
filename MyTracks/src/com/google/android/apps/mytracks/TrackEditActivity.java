@@ -188,12 +188,12 @@ public class TrackEditActivity extends AbstractMyTracksActivity
         String category = activityType.getText().toString();
         if (!category.equals(track.getCategory())) {
           // TODO Is there no race condition when setCalorie is called.
-          double calorie = CalorieUtils.calculateTrackCalorie(getApplicationContext(), track,
+          double[] calories = CalorieUtils.calculateTrackCalorie(getApplicationContext(), track,
               category);
 
-          track.getTripStatistics().setCalorie(calorie);
+          track.getTripStatistics().setCalorie(calories[0]);
           TrackRecordingServiceConnectionUtils.updateCalorie(trackRecordingServiceConnection,
-              calorie);
+              calories);
         }
         track.setCategory(category);
         track.setIcon(TrackIconUtils.getIconValue(TrackEditActivity.this, category));

@@ -226,10 +226,12 @@ public class TripStatisticsUpdater {
   /**
    * Updates the calorie value.
    * 
-   * @param calorie new calorie value.
+   * @param calorieTotal the calorie value of entire track
+   * @param calorieCurrentSegment the calorie value of current segment
    */
-  public void updateCalorie(double calorie) {
-    currentSegment.setCalorie(calorie);
+  public void updateCalorie(double calorieTotal, double calorieCurrentSegment) {
+    tripStatistics.setCalorie(calorieTotal);
+    currentSegment.setCalorie(calorieCurrentSegment);
   }
 
   /**

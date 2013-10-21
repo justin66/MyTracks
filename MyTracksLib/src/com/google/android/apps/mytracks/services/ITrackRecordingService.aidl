@@ -110,7 +110,8 @@ interface ITrackRecordingService {
   /**
    * Updates the calorie value.
    * 
-   * @param calorie new calorie value.
+   * @param calorieTotal the calorie value of entire track
+   * @param calorieCurrentSegment the calorie value of current segment
    */
-  void updateCalorie(double calorie);
+  void updateCalorie(double calorieTotal, double calorieCurrentSegment);
 }

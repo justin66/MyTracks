@@ -196,16 +196,22 @@ public class TrackRecordingServiceConnectionUtils {
   
   /**
    * Updates the calorie of current recording track.
+   * 
+   * @param trackRecordingServiceConnection the TrackRecordingServiceConnection
+   *          instance
+   * @param calories a double array of calorie value and the size of this array
+   *          is 2. The first value is the calorie of entire track and the
+   *          second value is the calorie of current segment
    */
   public static void updateCalorie(TrackRecordingServiceConnection trackRecordingServiceConnection,
-      double calorie) {
+      double[] calories) {
     ITrackRecordingService trackRecordingService = trackRecordingServiceConnection
         .getServiceIfBound();
     if (trackRecordingService == null) {
       Log.d(TAG, "Unable to update calorie, no track recording service");
     } else {
       try {
-        trackRecordingService.updateCalorie(calorie);
+        trackRecordingService.updateCalorie(calories[0], calories[1]);
       } catch (RemoteException e) {
         Log.e(TAG, "Unable to update calorie", e);
       } catch (IllegalStateException e) {

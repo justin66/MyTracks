@@ -1335,32 +1335,31 @@ public class TrackRecordingService extends Service {
     }
 
     @Override
-    public void updateCalorie(double calorie) {
+    public void updateCalorie(double calorieTotal, double calorieCurrentSegment) {
       if (!canAccess()) {
         return;
       }
-      trackRecordingService.updateCalorie(calorie);
+      trackRecordingService.updateCalorie(calorieTotal, calorieCurrentSegment);
     }
   }
   
   /**
    * Updates the calorie value.
    * 
-   * @param calorie new calorie value.
+   * @param calorieTotal the calorie value of entire track
+   * @param calorieCurrentSegment the calorie value of current segment
    */
-  public void updateCalorie(final double calorie) {
+  public void updateCalorie(final double calorieTotal, final double calorieCurrentSegment) {
     if (myTracksLocationManager == null || executorService == null
         || !myTracksLocationManager.isAllowed() || executorService.isShutdown()
         || executorService.isTerminated()) {
       return;
     }
     executorService.submit(new Runnable() {
-        @Override
+      @Override
       public void run() {
-          trackTripStatisticsUpdater.updateCalorie(calorie);
+        trackTripStatisticsUpdater.updateCalorie(calorieTotal, calorieCurrentSegment);
       }
     });
-    
-    
   }
 }
