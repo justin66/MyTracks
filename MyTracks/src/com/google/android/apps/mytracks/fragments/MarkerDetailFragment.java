@@ -26,22 +26,27 @@ import com.google.android.apps.mytracks.util.IntentUtils;
 import com.google.android.apps.mytracks.util.PhotoUtils;
 import com.google.android.apps.mytracks.util.PreferencesUtils;
 import com.google.android.apps.mytracks.util.StatsUtils;
+import com.google.android.apps.mytracks.util.StringUtils;
 import com.google.android.maps.mytracks.R;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 /**
@@ -51,21 +56,33 @@ import android.widget.TextView;
  */
 public class MarkerDetailFragment extends Fragment {
 
-  private static final String TAG = MarkerDetailFragment.class.getSimpleName();
-  private static final String KEY_MARKER_ID = "markerId";
-
   public static MarkerDetailFragment newInstance(long markerId) {
-    MarkerDetailFragment fragment = new MarkerDetailFragment();
-
     Bundle bundle = new Bundle();
     bundle.putLong(KEY_MARKER_ID, markerId);
-    fragment.setArguments(bundle);
 
+    MarkerDetailFragment fragment = new MarkerDetailFragment();
+    fragment.setArguments(bundle);
     return fragment;
   }
 
+  private static final String TAG = MarkerDetailFragment.class.getSimpleName();
+  private static final String KEY_MARKER_ID = "markerId";
+  private static final long HIDE_TEXT_DELAY = 4000L; // 4 seconds
+
   private MyTracksProviderUtils myTracksProviderUtils;
+  private Handler handler;
+  private ImageView photo;
+  private ImageView photoGradient;
+  private LinearLayout waypointInfo;
   private Waypoint waypoint;
+
+  private Runnable hideText = new Runnable() {
+      @Override
+    public void run() {
+      photoGradient.setVisibility(View.GONE);
+      waypointInfo.setVisibility(View.GONE);
+    }
+  };
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -78,13 +95,29 @@ public class MarkerDetailFragment extends Fragment {
       return;
     }
     myTracksProviderUtils = MyTracksProviderUtils.Factory.get(getActivity());
+    handler = new Handler();
   }
 
   @Override
   public View onCreateView(
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     setHasOptionsMenu(true);
-    return inflater.inflate(R.layout.marker_detail_fragment, container, false);
+    View view = inflater.inflate(R.layout.marker_detail_fragment, container, false);
+
+    photo = (ImageView) view.findViewById(R.id.marker_detail_waypoint_photo);
+    photo.setOnClickListener(new View.OnClickListener() {
+        @Override
+      public void onClick(View v) {
+        handler.removeCallbacks(hideText);
+        int visibility = waypointInfo.getVisibility() == View.GONE ? View.VISIBLE : View.GONE;
+        photoGradient.setVisibility(visibility);
+        waypointInfo.setVisibility(visibility);
+      }
+    });
+    photoGradient = (ImageView) view.findViewById(R.id.marker_detail_waypoint_photo_gradient);
+    waypointInfo = (LinearLayout) view.findViewById(R.id.marker_detail_waypoint_info);
+
+    return view;
   };
 
   @Override
@@ -93,7 +126,30 @@ public class MarkerDetailFragment extends Fragment {
 
     // Need to update the waypoint in case returning after an edit
     updateWaypoint(true);
-    update();
+    updateUi();
+  }
+
+  @Override
+  public void onPause() {
+    super.onPause();
+    handler.removeCallbacks(hideText);
+  }
+
+  @Override
+  public void setMenuVisibility(boolean menuVisible) {
+    super.setMenuVisibility(menuVisible);
+    /*
+     * View pager caches the neighboring fragments in the resumed state. If
+     * becoming visible from the resumed state, update the UI to display the
+     * text above the image.
+     */
+    if (isResumed()) {
+      if (menuVisible) {
+        updateUi();
+      } else {
+        handler.removeCallbacks(hideText);
+      }
+    }
   }
 
   @Override
@@ -154,46 +210,79 @@ public class MarkerDetailFragment extends Fragment {
    * Updates the UI.
    */
   @SuppressWarnings("deprecation")
-  private void update() {
-    View waypointSection = getView().findViewById(R.id.marker_detail_waypoint_section);
-    View statisticsSection = getView().findViewById(R.id.marker_detail_statistics_section);
+  private void updateUi() {
+    View waypointView = getView().findViewById(R.id.marker_detail_waypoint);
+    View statisticsView = getView().findViewById(R.id.marker_detail_statistics);
 
     if (waypoint.getType() == WaypointType.WAYPOINT) {
-      waypointSection.setVisibility(View.VISIBLE);
-      statisticsSection.setVisibility(View.GONE);
+      waypointView.setVisibility(View.VISIBLE);
+      statisticsView.setVisibility(View.GONE);
 
-      ImageView imageView = (ImageView) getView().findViewById(R.id.marker_detail_waypoint_photo);
       String photoUrl = waypoint.getPhotoUrl();
       if (photoUrl == null || photoUrl.equals("")) {
-        imageView.setVisibility(View.GONE);
+        photo.setVisibility(View.GONE);
+        photoGradient.setVisibility(View.GONE);
+        waypointInfo.setVisibility(View.VISIBLE);
+        setLayoutGravity(waypointInfo, Gravity.TOP);
       } else {
-        imageView.setVisibility(View.VISIBLE);
+        photo.setVisibility(View.VISIBLE);
+        photoGradient.setVisibility(View.VISIBLE);
+        waypointInfo.setVisibility(View.VISIBLE);
+        setLayoutGravity(waypointInfo, Gravity.BOTTOM);
+
         Display defaultDisplay = getActivity().getWindowManager().getDefaultDisplay();
-        PhotoUtils.setImageVew(imageView, Uri.parse(photoUrl), defaultDisplay.getWidth(),
+        PhotoUtils.setImageVew(photo, Uri.parse(photoUrl), defaultDisplay.getWidth(),
             defaultDisplay.getHeight(), true);
+        handler.postDelayed(hideText, HIDE_TEXT_DELAY);
       }
 
       TextView name = (TextView) getView().findViewById(R.id.marker_detail_waypoint_name);
-      name.setText(getString(R.string.generic_name_line, waypoint.getName()));
+      setTextView(name, waypoint.getName());
 
-      TextView markerType = (TextView) getView()
-          .findViewById(R.id.marker_detail_waypoint_marker_type);
-      markerType.setText(
-          getString(R.string.marker_detail_waypoint_marker_type, waypoint.getCategory()));
+      TextView category = (TextView) getView().findViewById(R.id.marker_detail_waypoint_category);
+      setTextView(category, StringUtils.getCategory(waypoint.getCategory()));
 
       TextView description = (TextView) getView()
           .findViewById(R.id.marker_detail_waypoint_description);
-      description.setText(getString(R.string.generic_description_line, waypoint.getDescription()));
+      setTextView(description, waypoint.getDescription());
     } else {
-      waypointSection.setVisibility(View.GONE);
-      statisticsSection.setVisibility(View.VISIBLE);
+      waypointView.setVisibility(View.GONE);
+      statisticsView.setVisibility(View.VISIBLE);
 
       TextView name = (TextView) getView().findViewById(R.id.marker_detail_statistics_name);
-      name.setText(getString(R.string.generic_name_line, waypoint.getName()));
+      setTextView(name, waypoint.getName());
 
       StatsUtils.setTripStatisticsValues(
           getActivity(), waypoint.getTripStatistics(), PreferencesUtils.RECORDING_TRACK_ID_DEFAULT);
       StatsUtils.setLocationValues(getActivity(), waypoint.getLocation(), false);
+    }
+  }
+
+  /**
+   * Sets the layout gravity. Assuming the parent is a framelayout.
+   * 
+   * @param linearLayout the linear layout
+   * @param gravity the gravity
+   */
+  private void setLayoutGravity(LinearLayout linearLayout, int gravity) {
+    FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) linearLayout
+        .getLayoutParams();
+    layoutParams.gravity = gravity;
+    linearLayout.setLayoutParams(layoutParams);
+  }
+
+  /**
+   * Sets a text view.
+   * 
+   * @param textView the text view
+   * @param value the value for the text view
+   */
+  private void setTextView(TextView textView, String value) {
+    if (value == null || value.length() == 0) {
+      textView.setVisibility(View.GONE);
+    } else {
+      textView.setVisibility(View.VISIBLE);
+      textView.setText(value);
     }
   }
 }

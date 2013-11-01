@@ -229,6 +229,18 @@ public class StringUtils {
   }
 
   /**
+   * Gets a string for category.
+   * 
+   * @param category the category
+   */
+  public static String getCategory(String category) {
+    if (category == null || category.length() == 0) {
+      return null;
+    }
+    return "[" + category + "]";
+  }
+
+  /**
    * Gets a string for category and description.
    * 
    * @param category the category

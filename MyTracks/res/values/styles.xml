@@ -219,10 +219,6 @@ limitations under the License.
   <style name="TextLarge" parent="@style/Text">
     <item name="android:textSize">22sp</item>
   </style>
-  <!-- text large with top margin -->
-  <style name="TextLarge.WithTopMargin">
-    <item name="android:layout_marginTop">8dp</item>
-  </style>
   <!-- text medium -->
   <style name="TextMedium" parent="@style/Text">
     <item name="android:textSize">18sp</item>

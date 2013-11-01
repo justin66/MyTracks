@@ -14,46 +14,59 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-  style="@style/StatsScrollView" >
-  <LinearLayout
-    android:layout_height="wrap_content"
-    android:layout_width="match_parent"
-    android:orientation="vertical"
-    android:padding="8dp" >
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_height="match_parent"
+  android:layout_width="match_parent" >
+  <FrameLayout
+    android:id="@+id/marker_detail_waypoint"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent" >
+    <ImageView
+      android:contentDescription="@string/icon_marker"
+      android:id="@+id/marker_detail_waypoint_photo"
+      android:layout_height="match_parent"
+      android:layout_width="match_parent"
+      android:scaleType="fitCenter" />
+    <!-- A gradient on top of the photo -->
+    <ImageView
+      android:alpha=".6"
+      android:contentDescription="@string/icon_marker"
+      android:id="@+id/marker_detail_waypoint_photo_gradient"
+      android:layout_height="match_parent"
+      android:layout_width="match_parent"
+      android:src="@drawable/photo_gradient" />
     <LinearLayout
-      android:id="@+id/marker_detail_waypoint_section"
+      android:id="@+id/marker_detail_waypoint_info"
+      android:layout_gravity="bottom"
       android:layout_height="wrap_content"
       android:layout_width="match_parent"
-      android:orientation="vertical" >
-      <ImageView
-        android:adjustViewBounds="true"
-        android:id="@+id/marker_detail_waypoint_photo"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:scaleType="fitCenter" />
+      android:orientation="vertical"
+      android:padding="8dp" >
       <TextView
         android:id="@+id/marker_detail_waypoint_name"
-        style="@style/TextLarge.WithTopMargin" />
+        style="@style/TextMedium" />
       <TextView
-        android:id="@+id/marker_detail_waypoint_marker_type"
-        style="@style/TextLarge.WithTopMargin" />
+        android:id="@+id/marker_detail_waypoint_category"
+        style="@style/TextSmall" />
       <TextView
         android:id="@+id/marker_detail_waypoint_description"
-        style="@style/TextLarge.WithTopMargin" />
+        style="@style/TextSmall" />
     </LinearLayout>
+  </FrameLayout>
+  <ScrollView
+    android:id="@+id/marker_detail_statistics"
+    style="@style/StatsScrollView" >
     <LinearLayout
-      android:id="@+id/marker_detail_statistics_section"
       android:layout_height="wrap_content"
       android:layout_width="match_parent"
       android:orientation="vertical" >
       <TextView
         android:id="@+id/marker_detail_statistics_name"
-        style="@style/TextLarge" />
+        style="@style/TextMedium" />
       <TextView
         android:text="@string/marker_detail_statistics_title"
-        style="@style/TextLarge.WithTopMargin" />
+        style="@style/TextMedium" />
       <include layout="@layout/stats_content" />
     </LinearLayout>
-  </LinearLayout>
-</ScrollView>
+  </ScrollView>
+</FrameLayout>
