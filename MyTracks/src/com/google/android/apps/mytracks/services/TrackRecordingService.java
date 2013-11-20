@@ -766,30 +766,35 @@ public class TrackRecordingService extends Service {
     if (track != null && !paused) {
       insertLocation(track, lastLocation, getLastValidTrackPointInCurrentSegment(trackId));
 
-      int activityRecognitionType = PreferencesUtils.getInt(this,
-          R.string.activity_recognition_type_key,
-          PreferencesUtils.ACTIVITY_RECOGNITION_TYPE_DEFAULT);
-      if (activityRecognitionType != PreferencesUtils.ACTIVITY_RECOGNITION_TYPE_DEFAULT) {
-        String iconValue = null;
-        switch (activityRecognitionType) {
-          case DetectedActivity.IN_VEHICLE:
-            iconValue = TrackIconUtils.DRIVE;
-            break;
-          case DetectedActivity.ON_BICYCLE:
-            iconValue = TrackIconUtils.BIKE;
-            break;
-          case DetectedActivity.ON_FOOT:
-            iconValue = TrackIconUtils.WALK;
-            break;
-          default:
-            break;
+      if (PreferencesUtils.DEFAULT_ACTIVITY_DEFAULT.equals(track.getCategory())) {
+        // Category not set, use activity_recognition_type_key value
+        int activityRecognitionType = PreferencesUtils.getInt(this,
+            R.string.activity_recognition_type_key,
+            PreferencesUtils.ACTIVITY_RECOGNITION_TYPE_DEFAULT);
+        if (activityRecognitionType != PreferencesUtils.ACTIVITY_RECOGNITION_TYPE_DEFAULT) {
+          String iconValue = null;
+          switch (activityRecognitionType) {
+            case DetectedActivity.IN_VEHICLE:
+              iconValue = TrackIconUtils.DRIVE;
+              break;
+            case DetectedActivity.ON_BICYCLE:
+              iconValue = TrackIconUtils.BIKE;
+              break;
+            case DetectedActivity.ON_FOOT:
+              iconValue = TrackIconUtils.WALK;
+              break;
+            default:
+              break;
+          }
+          if (iconValue != null) {
+            track.setIcon(iconValue);
+            track.setCategory(getString(TrackIconUtils.getIconActivityType(iconValue)));
+            double calorie = CalorieUtils.getTrackCalorie(this, track, -1L);
+            track.getTripStatistics().setCalorie(calorie);
+          }
         }
-        if (iconValue != null) {
-          track.setIcon(iconValue);
-          track.setCategory(getString(TrackIconUtils.getIconActivityType(iconValue)));
-        }
-      }  
-      updateRecordingTrack(track, myTracksProviderUtils.getLastTrackPointId(trackId), false);      
+      }
+      updateRecordingTrack(track, myTracksProviderUtils.getLastTrackPointId(trackId), false);
     }
 
     endRecording(true, trackId);
